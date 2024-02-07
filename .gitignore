@@ -7,3 +7,8 @@
 *.blg
 *.bbl
 main.pdf
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.fdb_latexmk
+*.fls
