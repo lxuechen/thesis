@@ -29,3 +29,28 @@ Li, Xuechen*, Daogao Liu*, Tatsunori B. Hashimoto, Huseyin A. Inan, Janardhan Ku
 
 \newpage
 \section*{Notation}
+We use the following notation throughout.
+
+\paragraph{Sets.} 
+We reserve standard symbols for common sets.
+Let $\mathbb{N}$ be the set of naturals (this includes 0), and $\mathbb{N}_+$ be the set of positive naturals (this excludes 0).
+Let $\R$ be the set of reals.
+For $n \in \mathbb{N}_+$, we define the shorthand $[n] = \{1, . . . , n\}$.
+For a set $\mathcal{T}$, its size is represented by $|\mathcal{T}|$.
+
+\paragraph{Linear Algebra.}
+Given $d \in \mathbb{N}_+$, 
+let $\mathbf{S}^d$ denote the set of $d \times d$ symmetric matrices, and $\mathbf{S}^d_+ \subset \mathbf{S}^d$ the positive semidefinite subset. 
+Given $M \in \mathbf{S}^d$, let $\lambda_1(M) \ge \lambda_2(M) \ge \cdots \ge \lambda_d(M)$ denote its eigenvalues in descending order.
+
+We use standard notation for various vector norms.
+Let $v\in \R^d$ be a real vector with $d$ elements. 
+We denote the Euclidean norm ($\ell^2$-norm) by $\|v\|_2$, 
+the $\ell^\infty$-norm by $\|v\|_\infty$, and the $\ell^1$-norm by $\|v\|_1$.
+Given $A \in \mathbf{S}^d_+$, let $\| x \|_A = (x^\top A x)^{1/2}$ denote the induced Mahalanobis norm.
+
+\paragraph{Probability \& Statistics.}
+We denote distributions using calligraphic letters, e.g., $\mathcal{D}, \mathcal{P}, \mathcal{Q}$. We use $x \sim \mathcal{D}$ to denote sampling an element $x$ from the distribution $\mathcal{D}$. For a random variable $X$ and event $O$, we denote the probability of the event as $\operatorname{Pr}[X\in O]$, the expectation of $X$ as $\mathbb{E}[X]$ and the variance as $\V[X]$. We denote the normal distribution with mean $\mu$ and standard deviation $\sigma$ as $\mathcal{N}\left(\mu, \sigma^2\right)$.
+
+\paragraph{Miscellaneous.}
+For scalar functions $f, g$, we say $f \lesssim g$ if $f \leq C g$ for some numerical constant $C>0$. 
