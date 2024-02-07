@@ -1,3 +1,9 @@
 \prefacesection{Abstract}
 
-My abstract.
+Deep learning models can memorize training data. This poses privacy risks when the data is sensitive. Differential privacy, when applied to a machine learning context, provably limits data memorization of models. 
+However, previous approaches for guaranteeing differential privacy were computationally inefficient and produced models with inferior performance. In this thesis, we present works that dramatically improve the efficiency, performance, and practicality of differentially private deep learning. 
+The results in this thesis led to the first deployment of differentially machine learning at Microsoft (including in products such as Microsoft Outlook), protecting users' privacy and providing substantial monetary savings.
+
+We demonstrate the feasibility of efficiently training performant models with differential privacy. We show that Differentially Private Stochastic Gradient Descent (DP-SGD), when applied with appropriate hyperparameters to fine-tune pretrained models of increasing size, consistently produces better privacy-utility tradeoffs. A naive implementation of DP-SGD consumes substantial memory and introduces computational overhead. We present algorithms and implementations that make differentially private training as efficient as standard training for Transformers.
+
+A prevailing belief in the community is that DP-SGD performs poorly in high-dimensional spaces. This intuition, grounded in prior dimension-dependent bounds for private convex optimization, appears to be at odds with our empirical observations. To address this disparity, we study when the dimension of the optimization problem adversely affects the performance of DP-SGD. Theoretically, we show that DP-SGD has dimension-independent bounds for a class of unconstrained convex optimization problems. Empirically, we show that gradients of large language models obtained during fine-tuning are mostly controlled by a few principal components—a characteristic similar to conditions under which we obtain dimension-independent bounds.
