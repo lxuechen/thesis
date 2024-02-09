@@ -7,7 +7,9 @@ For instance, a South Korean company developed a chatbot based on (private) user
 In addition, privacy concerns impede the development of data-driven systems in specialized domains such as health care and law where the vast amount of quality data is considered sensitive or proprietary.
 These concerns present a serious challenge in fully realizing the societal benefits of AI and machine learning as they gain rising attention with tightening legislation and growing discussions on policy and ethics. 
 
-
+Differential Privacy~\cite[DP]{dwork2014algorithmic} is a formal privacy guarantee that has become the gold standard for private statistical analysis.
+Intuitively, a randomized algorithm satisfies DP if it is difficult (in a probabilistic sense) to distinguish the two outputs of the algorithm obtained on any two input datasets that are similar.
+DP provably implies the hardness of membership inference~\cite{yeom2018privacy,wasserman2010statistical} and data reconstruction~\cite{pmlr-v162-guo22c,hayes2023bounding}.
 
 \section{Overview of Results}
 
@@ -18,7 +20,7 @@ The dissertation is based on the following peer-reviewed works.
 * indicates equal contribution.
 
 \paragraph{Chapter 3:} 
-Li, Xuechen, Florian Tramer, Percy Liang, and Tatsunori Hashimoto. "Large Language Models Can Be Strong Differentially Private Learners." International Conference on Learning Representations (ICLR), 2022~\cite{li2021large}.
+Li, Xuechen, Florian Tramer, Percy Liang, and Tatsunori Hashimoto. "Large Language Models Can Be Strong Differentially Private Learners." International Conference on Learning Representations (ICLR), 2022~\cite{li2022large}.
 
 \paragraph{Chapter 4:}
 He, Jiyan*, Xuechen Li*, Da Yu*, Huishuai Zhang, Janardhan Kulkarni, Yin Tat Lee, Arturs Backurs, Nenghai Yu, and Jiang Bian. "Exploring the Limits of Differentially Private Deep Learning With Group-Wise Clipping." International Conference on Learning Representations (ICLR), 2023~\cite{he2022exploring}.
@@ -52,4 +54,4 @@ Given $A \in \mathbf{S}^d_+$, let $\| x \|_A = (x^\top A x)^{1/2}$ denote the in
 We denote distributions using calligraphic letters, e.g., $\mathcal{D}, \mathcal{P}, \mathcal{Q}$. We use $x \sim \mathcal{D}$ to denote sampling an element $x$ from the distribution $\mathcal{D}$. For a random variable $X$ and event $O$, we denote the probability of the event as $\operatorname{Pr}[X\in O]$, the expectation of $X$ as $\mathbb{E}[X]$ and the variance as $\V[X]$. We denote the normal distribution with mean $\mu$ and standard deviation $\sigma$ as $\mathcal{N}\left(\mu, \sigma^2\right)$.
 
 \paragraph{Miscellaneous.}
-For scalar functions $f, g$, we say $f \lesssim g$ if $f \leq C g$ for some numerical constant $C>0$. 
+For scalar functions $f,g: \mathcal{X} \to \R$, we say $f \lesssim g$ if $f(x) \leq C g(x)$ for some numerical constant $C>0$ and all $x\in\mathcal{X}$. 
