@@ -12,3 +12,4 @@ main.pdf
 *.synctex.gz
 *.fdb_latexmk
 *.fls
+*.sublime-workspace
