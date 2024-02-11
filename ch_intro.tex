@@ -50,11 +50,14 @@ For the purpose of this chapter, we summarize the challenges to making DP-SGD ef
 Instantiating per-example gradients and (potentially) normalizing them can incur both high memory and time costs in standard machine learning frameworks~\citep{paszke2019pytorch,frostig2018compiling}, and thus private machine learning with DP-SGD is reportedly much more memory demanding and/or slower than its non-private counterpart~\citep{carlini2019secret,hoory2021learning}. 
 
 \paragraph{DP-SGD incurs performance loss.}
-DP-SGD is known to (possibly) incur substantial performance losses in the resulting model compared to SGD due to the isotropic privacy noise added to parameter updates in each iteration.
+DP-SGD is known to (possibly) incur substantial performance losses in the resulting model compared to SGD due to the isotropic privacy noise added to parameter updates in each iteration.\\
 
+Chapter~\ref{ch_3} addresses the memory and performance challenges of DP-SGD.
+In particular, the chapter first presents \emph{ghost clipping}, a memory-saving technique that makes training with DP as memory efficient as standard training for Transformer models---at a modest runtime overhead.
+To tackle the performance issue, the chapter provides prescriptions for hyperparameter tuning and shows that fine-tuning pretrained language models with DP-SGD yields strong performance for a suite of NLP tasks at common privacy levels.
+In the end, the chapter presents empirical observations that the dimensionality of gradient updates does not explain private fine-tuning performance, contrary to conventional wisdom.
+For example, larger pretrained models lead to better private fine-tuning results, and parameter-efficient adaptation methods that reduce the dimensionality of updates do not necessarily outperform a baseline method that fine-tunes all model parameters.
 
-% DP-SGD is a common algo for training deep learning models with DP. give a brief intro (clipping, noising). why it's commonly used? what are the prior drawbacks?
-% chpt3 presents ghost clipping. approaches to improve performance (prescriptive tuning). performance improves with larger and thus better pretrained models. low-rank tuning doesn't necessarily help.
 % methods in chpt3 was good, but the memory-time tradeoff. 
 
 \newpage
