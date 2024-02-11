@@ -23,9 +23,10 @@ While most of the thesis works in a setting where a publicly pretrained model is
 For example, batch size tuning with effective noise described in Chapter~\ref{ch_3} can be applied to improve the performance of private pretraining. 
 Chapter~\ref{ch_background} discusses how performant DP approaches can be potentially adopted to protect copyright when models are trained on copyrighted material.
 
-% revise the ethics part.
-% Finally, we note that privacy is a complex issue and the DP machinery is not a panacea to all privacy problems.
-% Privacy harms can occur at the data collection and data processing stages~\cite{solove2005taxonomy}.
+Finally, we note that the general issue of privacy in machine learning is broad and complex.
+DP is a specific (strong) guarantee, but it is not the panacea to all privacy problems.
+For example, DP does not address various privacy harms that occur during data collection~\cite{solove2005taxonomy}.
+In addition, in order for DP algorithms to be effective at limiting the inference of participation, one needs to understand the context of the application as well as the data generation process~\cite{kifer2011no}.
 
 \section{Overview of Technical Results}\label{sec:overview_of_results}
 
