@@ -40,7 +40,22 @@ Chapter~\ref{ch_6} discusses the limitations and the broader societal impact in 
 
 \section{Summary of Contributions}\label{sec:overview_of_results}
 
+In order to develop improved approaches for deep learning with DP, we reexamine the \emph{Differentially Private Stochastic Gradient Descent} (DP-SGD) algorithm.
+DP-SGD is a popular algorithm for training deep learning models with DP owing to its algorithmic simplicity and its ease of privacy accounting through standard composition theorems~\cite{dwork2014algorithmic}.
+Similar to plain SGD, DP-SGD updates model weights incrementally with the gradient computed at each iteration.
+On the other hand, DP-SGD differs from SGD in that it clips \emph{per-example gradients} and noises their average before updating the weights for each iteration. 
+For the purpose of this chapter, we summarize the challenges to making DP-SGD effective in practice below and defer to Chapter~\ref{ch_2} for a detailed treatment of the algorithm. 
 
+\paragraph{DP-SGD is computationally intensive.} DP-SGD is known to be computationally costly due to clipping per-example gradients.
+Instantiating per-example gradients and (potentially) normalizing them can incur both high memory and time costs in standard machine learning frameworks~\citep{paszke2019pytorch,frostig2018compiling}, and thus private machine learning with DP-SGD is reportedly much more memory demanding and/or slower than its non-private counterpart~\citep{carlini2019secret,hoory2021learning}. 
+
+\paragraph{DP-SGD incurs performance loss.}
+DP-SGD is known to (possibly) incur substantial performance losses in the resulting model compared to SGD due to the isotropic privacy noise added to parameter updates in each iteration.
+
+
+% DP-SGD is a common algo for training deep learning models with DP. give a brief intro (clipping, noising). why it's commonly used? what are the prior drawbacks?
+% chpt3 presents ghost clipping. approaches to improve performance (prescriptive tuning). performance improves with larger and thus better pretrained models. low-rank tuning doesn't necessarily help.
+% methods in chpt3 was good, but the memory-time tradeoff. 
 
 \newpage
 \section{Summary of Publications}
