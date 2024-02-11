@@ -20,9 +20,13 @@ These improvements have made deep learning with DP a lot more compelling from an
 For example, some of the presented ideas made possible the first set of deployments of differentially private machine learning at Microsoft.
 % Chapter~\ref{ch_2} covers relevant background on privacy risks in machine learning, common DP algorithms for training models, and drawbacks of previous approaches.
 % , building on ideas from past work~\cite{abadi2016deep,tramer2020differentially}.
-To make matters concrete, we summarize our main contributions in Section~\ref{sec:overview_of_results} below.
-% Our contributions are presented in Chapters~\ref{ch_3},\ref{ch_4}, and \ref{ch_5}; we summarize 
 
+To begin, Chapter~\ref{ch_2} presents background on privacy risks in machine learning and common algorithms for model training with DP.
+Chapter~\ref{ch_3} presents a gradient clipping technique that eliminates the memory overhead of training with DP and approaches for improving the privacy-utility tradeoff.
+Chapter~\ref{ch_4} presents techniques that eliminate the memory-compute tradeoff of training with DP by extending ideas in the previous chapter.
+Chapter~\ref{ch_5} provides theoretical interpretations of our empirical observations.
+To make matters concrete, we summarize the contributions in Chapters~\ref{ch_3},~\ref{ch_4}, and~\ref{ch_5} in Section~\ref{sec:overview_of_results} below.\\
+% Our contributions are presented in Chapters~\ref{ch_3},\ref{ch_4}, and \ref{ch_5}; we summarize 
 
 While most of the thesis works in a setting where private learning is aided with public data, it is worthwhile to note that certain ideas presented herein can be applied more broadly. 
 For example, Chapter~\ref{ch_2} discusses how performant DP approaches can be potentially adopted to protect copyright when models are trained on copyrighted material.
