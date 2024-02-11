@@ -7,7 +7,6 @@
 % See the suthesis-2e.sty file for documentation
 %
 \documentclass[12pt]{report}
-\usepackage{suthesis-2e}  % (modified) Stanford thesis style file
 
 % useful packages
 \usepackage{graphicx}  % figures
@@ -15,15 +14,32 @@
 \usepackage{siunitx}  % SI units
 \usepackage{tabularx}  % nice single page tables
 \usepackage{longtable}  % tables spanning multiple pages
-\usepackage{hyperref}  % URLs
-\usepackage[autostyle, english = american]{csquotes}  % quote orientation
-\MakeOuterQuote{"}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{mdframed}
 
-% use png first, otherwise pdf
-% (useful for faster compile times, for final submission switch order)
+\usepackage{todonotes}
+\usepackage{color}
+\definecolor{myfavblue}{rgb}{0.05, 0.2, 0.8}
+\definecolor{blue}{rgb}{0.05, 0.2, 0.8} % myfavblue
+\definecolor{keywords}{RGB}{255,0,90}
+\definecolor{comments}{RGB}{0,0,113}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{green}{RGB}{0,150,0}
+\definecolor{C0}{rgb}{0.12156862745098039, 0.4666666666666667, 0.7058823529411765}  % matplotlib C0
+\definecolor{mydarkblue}{rgb}{0,0.08,0.45}
+\hypersetup{
+    colorlinks=true,
+    allcolors=myfavblue,
+    linkcolor=myfavblue,
+    citecolor=myfavblue,
+    filecolor=myfavblue,
+    urlcolor=myfavblue
+}
+\input{lxuechen}
+
 \DeclareGraphicsExtensions{.png,.pdf}
 
-\input{lxuechen}
+\usepackage{suthesis-2e}  % (modified) Stanford thesis style file
 
 \begin{document}
 \title{Effective Differentially Private Deep Learning}
@@ -32,16 +48,11 @@
 \principaladviser{Tatsunori Hashimoto}
 \coprincipaladviser{Carlos Guestrin}
 \firstreader{Percy Liang}
-% \thirdreader{Jane Supernumerary}  % uncomment if needed
-% \fourthreader{Severus Snape}  % uncomment if needed
- 
-% no signature or copyright pages in online submission
-% (they are added by the library)
 
-% including chapters, no .tex extension necessary
 \beforepreface
 \include{preface_abstract}
 \include{preface_acknowledgements}
+
 \afterpreface
 \include{ch_intro}
 \include{ch_background}
@@ -50,15 +61,11 @@
 \include{ch_5}
 \include{ch_conclusion}
 
-% uncomment below if you have an appendix
-% \appendix
-% \chapter{A Long Proof}
+\appendix
 
 \bibliographystyle{unsrt}  % can change to fit your field e.g. pnas2009
 \bibliography{mybib}  % no .bib extension necessary
 
-% adds a non-numbered signature page at end (for printing on ACID-FREE paper)
-% (remember to comment out when submitting final version)
 \onlinesignature
 
 \end{document}
