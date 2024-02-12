@@ -11,17 +11,26 @@ As a result of these concerns, there has been a large interest in developing
 methods that provide data privacy guarantees for large language models.
 The standard paradigm for providing such a guarantee in machine learning is \textit{Differential Privacy} (DP)~\citep{dwork2006calibrating,dwork2014algorithmic}.
 Unfortunately, DP learning has typically struggled to produce useful models when applied to large language models, resulting in models with either vacuous privacy guarantees \citep{dupuy2021efficient} or performance far below non-private baselines.
-This is widely attributed to the fact that the core primitive of \textit{Differentially Private Stochastic Gradient Descent} (DP-SGD)~\citep{song2013stochastic,bassily2014differentially,abadi2016deep} injects noise that must scale with the number of parameters, resulting in large noise levels for large language models \citep{yu2021not}.
+% This is widely attributed to the fact that the core primitive of \textit{Differentially Private Stochastic Gradient Descent} (DP-SGD)~\citep{song2013stochastic,bassily2014differentially,abadi2016deep} injects noise that must scale with the number of parameters, resulting in large noise levels for large language models \citep{yu2021not}.
 
 \section{Differential Privacy}
 
 \begin{defi}[Approximate-DP]
-A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-differentially private if for all adjacent datasets $X, X'\in\mathcal{X}$ and all $Y \subset \Y$, 
+A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-differentially private if for all neighboring datasets $X, X'\in\mathcal{X}$ and all $Y \subset \Y$, 
 $$
 \Prob{\M(X) \in Y} \le \exp( \epsilon ) \Prob{ \M(X') \in Y } + \delta.
 \label{eq:epsilon_delta_dp}
 $$
 \end{defi}
+When $\delta=0$, the randomized algorithm $\M$ is said to satisfy \emph{pure differential privacy}.
+The definition of ``neighboring'' could vary based on context. 
+For this thesis, we say that two datasets $X$ and $X'$ are neighboring if one could be obtained from
+another by including an additional record. 
+In other words, $X$ and $X'$ always differ by 1 in terms of size.\footnote{
+In other text, this is referred to as \emph{unbounded DP}~\cite{kifer2011no}. When ``neighboring'' is defined as two datasets of the same size differ by 1 element, it is referred to as \emph{bounded DP}.
+Unbounded DP implies bounded DP with a different privacy leakage parameter.
+The reverse direction generally is not true.
+}
 
 
 \section[Differentially Private Stochastic Gradient Descent]{\large Differentially Private Stochastic Gradient Descent}
@@ -36,9 +45,6 @@ This is widely believed to be the cause for DP optimization to perform poorly at
 
 We use DP-Adam throughout. DP-Adam works just like regular Adam~\citep{kingma2014adam} but performs updates and moment accumulation with privatized gradients. 
 The gradient privatization part is the same as that performed in DP-SGD~\citep{song2013stochastic,abadi2016deep}.
-Seemingly uncommon, DP-Adam is used in many private ML libraries.\footnote{
-  \url{https://github.com/tensorflow/privacy/blob/7c4f5bab0964bd32b7ceafa009d9488920856440/tensorflow_privacy/privacy/optimizers/dp_optimizer.py\#L385}
-}
 To determine the noise multiplier, we account privacy through R\'enyi differential privacy (RDP)~\citep{mironov2017renyi,mironov2019r}.
 For completeness, we include the pseudocode for DP-Adam below. 
 
@@ -104,4 +110,4 @@ For completeness, we include the pseudocode for DP-Adam below.
 
 \section{Why Differential Privacy?}
 
-\section{Past Findings}
+\section{Past Work on Deep Learning with DP}
