@@ -13,6 +13,8 @@ The standard paradigm for providing such a guarantee in machine learning is \tex
 Unfortunately, DP learning has typically struggled to produce useful models when applied to large language models, resulting in models with either vacuous privacy guarantees \citep{dupuy2021efficient} or performance far below non-private baselines.
 % This is widely attributed to the fact that the core primitive of \textit{Differentially Private Stochastic Gradient Descent} (DP-SGD)~\citep{song2013stochastic,bassily2014differentially,abadi2016deep} injects noise that must scale with the number of parameters, resulting in large noise levels for large language models \citep{yu2021not}.
 
+\Chen{this is too light on attacks.}
+
 \section{Differential Privacy}
 
 \begin{defi}[Approximate-DP]
@@ -31,6 +33,8 @@ In other text, this is referred to as \emph{unbounded DP}~\cite{kifer2011no}. Wh
 Unbounded DP implies bounded DP with a different privacy leakage parameter.
 The reverse direction generally is not true.
 }
+
+\Chen{mention post-processing property, and composition theorem. the first is needed to understand why DP-SGD prevents leakage. the second is need to help understand how this fits the iterative optimization paradigm.}
 
 
 \section[Differentially Private Stochastic Gradient Descent]{\large Differentially Private Stochastic Gradient Descent}
@@ -106,8 +110,8 @@ For completeness, we include the pseudocode for DP-Adam below.
 \end{algorithm}
 
 
-\Chen{post-processing property}
-
 \section{Why Differential Privacy?}
+\Chen{past work heuristic privacy without def'n all broken. neuracrypt, instahide, texthide, etc. go back to dwork's works on why you need to start with def'n. maybe mention some crypto stuff as well.}
 
 \section{Past Work on Deep Learning with DP}
+\Chen{give some historical context on the performance and runtime overhead.}
