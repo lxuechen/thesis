@@ -3,69 +3,69 @@
 The issue of privacy in machine learning has gained considerable attention as an increasing amount of user data becomes a potential source for training predictive models.
 Privacy attacks against machine learning pipelines have demonstrated that models trained without formal guarantees can reveal membership information and reproduce training data~\cite{shokri2017membership,carlini2021extracting}.
 These vulnerabilities are not merely of academic interest---they have already led to societal harms and an increasing public distrust towards machine learning applications.
-For instance, a South Korean company developed a chatbot based on (private) user data that regurgitated in its responses sensitive information such as nicknames and home addresses. This led to a public relations incident~\cite{sk-chatbot}.
+For instance, a South Korean company developed a chatbot with (private) user data that regurgitated sensitive information such as nicknames and home addresses. This led to a public relations incident~\cite{sk-chatbot}.
 In addition, privacy concerns impede the development of data-driven systems in specialized domains such as health care where a vast amount of quality data is sensitive.
-These concerns present a challenge to fully realizing the societal benefits of AI and machine learning as they gain rising attention with tightening legislation and policy.
+These concerns present a challenge to fully realizing the societal benefits of machine learning and AI as they gain rising attention with tightening legislation and policy.
 
 Differential Privacy~\cite[DP]{dwork2014algorithmic} is a formal privacy definition that has become the gold standard for statistical analysis with private data.
 % Intuitively, a randomized algorithm satisfies DP if it is difficult (in a probabilistic sense) to distinguish the two outputs of the algorithm obtained on any two similar input datasets.
 Differentially private algorithms are provably resistant to membership inference~\cite{yeom2018privacy,wasserman2010statistical} and data reconstruction attacks~\cite{pmlr-v162-guo22c,hayes2023bounding}.
-Due to possessing a suite of attractive properties, DP algorithms have been deployed in high-stakes scenarios such as the 2020 US census~\cite{us-census} to protect users' privacy.
+As such, these algorithms have been deployed in high-stakes scenarios such as the 2020 US census~\cite{us-census} to protect users' privacy.
 
 In contrast to the growing adoption of DP for private statistical data analysis, the privacy framework has seen limited industry adoption for deep learning applications.
-This is because previous approaches for training deep learning models with the DP guarantee typically were computationally intensive or incurred substantial performance penalties on the resulting model.
+This is because previous approaches for training deep learning models with DP guarantees typically were computationally intensive or incurred substantial performance penalties on the resulting model.
 
 This thesis contributes improved techniques for training deep learning models with DP that are much more efficient and performant than prior art.
-These improvements have gained industry adoption and have made deep learning with DP a lot more compelling.
+These improvements have gained industry adoption and have made deep learning with DP compelling.
 For example, some of the presented ideas led to the first set of deployments of differentially private machine learning at Microsoft.
 % Chapter~\ref{ch_2} covers relevant background on privacy risks in machine learning, common DP algorithms for training models, and drawbacks of previous approaches.
 % , building on ideas from past work~\cite{abadi2016deep,tramer2020differentially}.
 
-The remaining thesis starts with Chapter~\ref{ch_2} which presents background on privacy risks in machine learning and common algorithms for model training with DP.
-Chapter~\ref{ch_3} presents a gradient clipping technique that eliminates the memory overhead and approaches for improving the privacy-utility tradeoff.
-Chapter~\ref{ch_4} presents techniques that eliminate the memory-compute tradeoff by extending ideas in the previous chapter.
+The remaining thesis starts with Chapter~\ref{ch_2} which presents background on privacy risks in machine learning and common algorithms for training models with DP.
+Chapter~\ref{ch_3} presents a technique that eliminates the memory overhead of training with DP and approaches for improving the privacy-utility tradeoff.
+Chapter~\ref{ch_4} presents techniques that further eliminate the memory-compute tradeoff by extending ideas in the previous chapter.
 Chapter~\ref{ch_5} provides theoretical interpretations of our empirical observations.
-To make matters concrete, we summarize our contributions in Section~\ref{sec:overview_of_results} below.\\
+We summarize these contributions in Section~\ref{sec:overview_of_results} below.\\
 % Our contributions are presented in Chapters~\ref{ch_3},\ref{ch_4}, and \ref{ch_5}; we summarize 
 
 While most of the thesis works in a setting where private learning is aided with public data, it is worthwhile to note that certain ideas presented herein can be applied more broadly. 
-For example, Chapter~\ref{ch_2} discusses how performant DP approaches can be potentially adopted to protect copyright when models are trained on copyrighted material.
+For example, Chapter~\ref{ch_2} discusses how performant DP approaches can be useful to protect copyright when models are trained on copyrighted material.
 Chapter~\ref{ch_3} discusses batch size tuning with effective noise, which can be applied to improve the performance of private pretraining.
 
 Finally, we note that the general issue of privacy in machine learning is broad and complex.
 While DP offers a robust and specific form of protection, it should not be seen as a universal solution to all issues related to privacy.
 For example, DP does not address various privacy harms that occur during data collection~\cite{solove2005taxonomy}.
-In addition, in order for DP algorithms to be effective at limiting the inference of participation, one needs to understand the context of the application as well as the underlying generation process of the private data~\cite{kifer2011no}. 
+In addition, in order for DP algorithms to be effective at limiting the \emph{inference of participation}, one needs to understand the context of the application as well as the underlying generation process of the private data~\cite{kifer2011no}. 
 Chapter~\ref{ch_6} discusses the limitations and the broader societal impact in detail.
 
 \section{Summary of Contributions}\label{sec:overview_of_results}
 
-In order to develop improved approaches for deep learning with DP, we reexamine the \emph{Differentially Private Stochastic Gradient Descent} (DP-SGD) algorithm.
+Before summarizing our contributions, we recap the \emph{Differentially Private Stochastic Gradient Descent} (DP-SGD) algorithm.
 DP-SGD is a popular algorithm for training deep learning models with DP owing to its algorithmic simplicity and its ease of privacy accounting through standard composition theorems~\cite{dwork2014algorithmic}.
 Similar to plain SGD, DP-SGD updates model weights incrementally with the gradient computed at each iteration.
 On the other hand, DP-SGD differs from SGD in that it clips \emph{per-example gradients} and noises their average before updating the weights for each iteration. 
 For the purpose of this chapter, we summarize the challenges to making DP-SGD effective in practice below and defer to Chapter~\ref{ch_2} for a detailed treatment of the algorithm. 
 
 \paragraph{DP-SGD is computationally intensive.} DP-SGD is known to be computationally costly due to clipping per-example gradients.
-Instantiating per-example gradients and (potentially) normalizing them can incur both high memory and time costs in standard machine learning frameworks~\citep{paszke2019pytorch,frostig2018compiling}, and thus private machine learning with DP-SGD is reportedly much more memory demanding and/or slower than its non-private counterpart~\citep{carlini2019secret,hoory2021learning}. 
+Instantiating per-example gradients and normalizing them can incur both high memory and time costs in standard machine learning frameworks~\citep{paszke2019pytorch,frostig2018compiling}, and thus private machine learning with DP-SGD is reportedly much more memory demanding and/or slower than its non-private counterpart~\citep{carlini2019secret,hoory2021learning}. 
 
 \paragraph{DP-SGD incurs performance loss.}
-DP-SGD is known to (possibly) incur substantial performance losses in the resulting model compared to SGD due to the isotropic privacy noise added to parameter updates in each iteration.\\
+DP-SGD is known to (potentially) incur substantial performance losses in the resulting model compared to SGD due to the isotropic privacy noise added to parameter updates in each iteration.\\
 
 \subsection{Contributions}
 
 Chapter~\ref{ch_3} addresses the memory and performance challenges of DP-SGD.
-In particular, the chapter first presents \emph{ghost clipping}, a memory-saving technique that makes training with DP as memory efficient as standard training for Transformer models---at a modest runtime overhead.
+In particular, the chapter first presents \emph{ghost clipping}, a memory-saving technique that makes training with DP as memory efficient as standard training for Transformer models---with a modest wall time overhead.
 To tackle the performance issue, the chapter provides prescriptions for hyperparameter tuning and shows that fine-tuning pretrained language models with DP-SGD yields strong performance for a suite of NLP tasks at common privacy levels.
 In the end, the chapter presents empirical observations that the dimensionality of gradient updates does not explain private fine-tuning performance---contrary to conventional wisdom.
-For example, larger pretrained models lead to better private fine-tuning results, and parameter-efficient adaptation methods that reduce the dimensionality of updates do not necessarily outperform a baseline method that fine-tunes all model parameters.
+For example, larger pretrained models lead to better private fine-tuning results, and parameter-efficient adaptation methods with a reduced dimensionality of updates do not necessarily outperform a baseline method that fine-tunes all model parameters.
 
-Chapter~\ref{ch_4} addresses the runtime overhead of techniques introduced in Chapter~\ref{ch_3}, leveraging
-two instantiations of \emph{group-wise clipping} for DP-SGD.
-In this chapter, we first present \emph{per-layer clipping}, which enables clipping to be performed in conjunction with backpropagation in
-DP-SGD. 
-This results in private learning that is as memory-efficient and almost as fast per training update as non-private learning for many small- to moderate-scale workflows of interest.
-In the remainder of the chapter, we bypass scaling challenges associated with communicating per-example gradient norms with \emph{per-device clipping}, with which we scale DP fine-tuning to work with the 175 billion-parameter GPT-3 and obtain improved task performance for a challenging summarization task at $\epsilon=1$.
+Chapter~\ref{ch_4} addresses the run time overhead DP-SGD, leveraging
+two instantiations of \emph{group-wise clipping}.
+The chapter first presents a particular implementation of \emph{per-layer clipping}, which clips layer-wise per-example gradients \emph{in conjunction} with backpropagation in DP-SGD. 
+This results in DP training that is as memory-efficient and (almost) as fast per update as standard training for many small- to moderate-scale workflows of interest.
+The remainder of the chapter presents \emph{per-device clipping}, which eliminates communication overheads for large-scale DP training workflows where model sharding is necessary.
+With this approach, we scale DP fine-tuning to work with the 175 billion-parameter GPT-3 and obtain a state-of-the-art task performance for a challenging summarization task.
 
 
 Chapter~\ref{ch_5} studies when DP-SGD performs well for optimizing high dimensional objectives. 
