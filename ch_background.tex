@@ -25,9 +25,9 @@ $$
 When $\delta=0$, the randomized algorithm $\M$ is said to satisfy \emph{pure differential privacy}.
 The definition of ``neighboring'' could vary based on context. 
 For this thesis, we say that two datasets $X$ and $X'$ are neighboring if one could be obtained from
-another by including an additional record. 
-In other words, $X$ and $X'$ always differ by 1 in terms of size.\footnote{
-In other text, this is referred to as \emph{unbounded DP}~\cite{kifer2011no}. When ``neighboring'' is defined as two datasets of the same size differ by 1 element, it is referred to as \emph{bounded DP}.
+another by including an additional example/record. 
+In other words, $X$ and $X'$ always differ by one in terms of size.\footnote{
+In other text, this is referred to as \emph{unbounded DP}~\cite{kifer2011no}. When ``neighboring'' is defined as two datasets of the same size differ by one element, it is referred to as \emph{bounded DP}.
 Unbounded DP implies bounded DP with a different privacy leakage parameter.
 The reverse direction generally is not true.
 }
