@@ -2,12 +2,14 @@
     "folders":
     [
         {
-            "path": "."
-        }
+            "path": ".",
+        },
+        {
+			"path": "/Users/xuechenli/Desktop/papers/private-lm-paper"
+		},
     ],
     "settings":
     {
-        "TEXroot": "main.tex"
-    }
+        "TEXroot": "main.tex",
+    },
 }
-

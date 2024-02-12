@@ -52,6 +52,8 @@ Instantiating per-example gradients and (potentially) normalizing them can incur
 \paragraph{DP-SGD incurs performance loss.}
 DP-SGD is known to (possibly) incur substantial performance losses in the resulting model compared to SGD due to the isotropic privacy noise added to parameter updates in each iteration.\\
 
+\subsection{Contributions}
+
 Chapter~\ref{ch_3} addresses the memory and performance challenges of DP-SGD.
 In particular, the chapter first presents \emph{ghost clipping}, a memory-saving technique that makes training with DP as memory efficient as standard training for Transformer models---at a modest runtime overhead.
 To tackle the performance issue, the chapter provides prescriptions for hyperparameter tuning and shows that fine-tuning pretrained language models with DP-SGD yields strong performance for a suite of NLP tasks at common privacy levels.
@@ -71,7 +73,7 @@ We aim to provide a better understanding of the relation between problem dimensi
 On the theoretical front, we show that DP-SGD can result in dimension-independent error bounds even when gradients span the entire ambient space for unconstrained optimization problems.
 We formalize this in a condition that we call \emph{Restricted Lipschitz Continuity} and derive refined bounds for the excess empirical and population risks for DP-SGD when loss functions obey this condition.
 We empirically show that gradients of language models during fine-tuning are mostly
-controlled by a few principal components — a behavior that is similar to conditions under which we
+controlled by a few principal components---a behavior that is similar to conditions under which we
 obtain dimension-independent bounds for private convex ERM. This provides a possible explanation
 for the observation that densely fine-tuning with DP-SGD need not necessarily experience much
 worse performance than sparsely fine-tuning.

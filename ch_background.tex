@@ -1,4 +1,107 @@
-% Full title as you would like it to appear on the page
 \chapter{Background}\label{ch_2}
-% Short title that appears in the header of pages within the chapter
 \chaptermark{Background}
+
+% Privacy attacks. Why DP? Ends the cat and mouse game.
+
+Machine learning systems trained on sensitive user data can be vulnerable to privacy attacks~\citep{shokri2017membership,hayes2019logan}.
+This issue is especially pressing for recent applications of large language models, as these models are capable of memorizing and reconstructing sensitive examples contained in 
+the training data~\citep{DBLP:journals/corr/ZhangBHRV16, carlini2020extracting}.
+
+As a result of these concerns, there has been a large interest in developing
+methods that provide data privacy guarantees for large language models.
+The standard paradigm for providing such a guarantee in machine learning is \textit{Differential Privacy} (DP)~\citep{dwork2006calibrating,dwork2014algorithmic}.
+Unfortunately, DP learning has typically struggled to produce useful models when applied to large language models, resulting in models with either vacuous privacy guarantees \citep{dupuy2021efficient} or performance far below non-private baselines.
+This is widely attributed to the fact that the core primitive of \textit{Differentially Private Stochastic Gradient Descent} (DP-SGD)~\citep{song2013stochastic,bassily2014differentially,abadi2016deep} injects noise that must scale with the number of parameters, resulting in large noise levels for large language models \citep{yu2021not}.
+
+\section{Differential Privacy}
+
+\begin{defi}[Approximate-DP]
+A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-differentially private if for all adjacent datasets $X, X'\in\mathcal{X}$ and all $Y \subset \Y$, 
+$$
+\Prob{\M(X) \in Y} \le \exp( \epsilon ) \Prob{ \M(X') \in Y } + \delta.
+\label{eq:epsilon_delta_dp}
+$$
+\end{defi}
+
+
+\section{\large Differentially Private Stochastic Gradient Descent}
+
+DP learning typically relies on DP optimizers which privatize gradients before performing updates. 
+The privatization step ensures that parameter updates leak limited information about training examples through their gradients.
+Specifically, this step clips per-example gradients with a norm constraint $C$, and adds Gaussian noise $z\sim\mathcal{N}(0, C^2\sigma^2 I_p)$ to the sum of clipped gradients.
+Here, $\sigma$ is the \textit{noise multiplier} determined from the privacy budget $(\epsilon, \delta)$, number of gradient updates $S$, and sampling rate $q=\tfrac{B}{N}$ for a batch size of $B$ and a dataset size of $N$.\footnote{Since we adopted the definition of ``neighboring'' based on addition/removal, the batch size here should be interpreted as the lot size~\citep{abadi2016deep} or, equivalently stated, the expected size of a batch drawn with Poisson sampling.}
+Intuitively, clipping individual gradients ensures that each example has bounded influence on the parameter update, whereas noising the gradient prevents exact tracing of particular examples.
+The noise being isotropic implies that larger models would experience heavier noise per update, as the norm of the $p$-dimensional Gaussian $\normtwo{z}$ scales as $C \sigma \sqrt{p}$.
+This is widely believed to be the cause for DP optimization to perform poorly at training high-dimensional deep learning models~\citep{gautum14,yu2021not}.
+
+We use DP-Adam throughout. DP-Adam works just like regular Adam~\citep{kingma2014adam} but performs updates and moment accumulation with privatized gradients. 
+The gradient privatization part is the same as that performed in DP-SGD~\citep{song2013stochastic,abadi2016deep}.
+Seemingly uncommon, DP-Adam is used in many private ML libraries.\footnote{
+  \url{https://github.com/tensorflow/privacy/blob/7c4f5bab0964bd32b7ceafa009d9488920856440/tensorflow_privacy/privacy/optimizers/dp_optimizer.py\#L385}
+}
+To determine the noise multiplier, we account privacy through R\'enyi differential privacy (RDP)~\citep{mironov2017renyi,mironov2019r}.
+For completeness, we include the pseudocode for DP-Adam below. 
+
+\vspace{-2mm}
+\begin{algorithm}[H]\label{algo:dp_adam}
+\centering
+\caption{DP-Adam}
+\begin{algorithmic}[1]
+  \State {\bfseries Input:}
+  Data $\D=\{x_i\}_{i=1}^N$, learning rate $\eta$, noise multiplier $\sigma$, batch size $B$, Euclidean norm threshold for gradients $C$, epochs $E$, initial parameter vector $\theta_0\in\R^p$, initial moment estimates $m_0, v_0 \in \R^p$,
+  exponential decay rates $\beta_1, \beta_2 \in \R$,
+  avoid division-by-zero constant $\gamma\in \R$.
+
+  \For{ $t \in [E \cdot \nicefrac{N}{B}]$ }
+
+    \State Draw a batch $B_t$ via Poisson sampling; each element has probability $\nicefrac{B}{N}$ of being selected
+    \For{ $x_i \in B_t$ }
+        \State
+        $
+        g_t(x_i) \gets \nabla_{\theta_t} \mathcal{L}(x_i), \quad
+        \tilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })
+        $
+    \EndFor
+    \State $z_t \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
+    \State $\bar{g_t} = \frac{1}{B} \bracks{ 
+        \sum_{i=1}^N \tilde{g_t}(x_i) + z_t
+    }$
+    \State $\theta_{t + 1}, m_{t+1}, v_{t+1} \gets \text{AdamUpdate}(\theta_t, m_{t}, v_{t}, \bar{g_t}, \beta_1, \beta_2, \gamma)$
+    \EndFor
+\State \Return $\theta_{\nicefrac{TN}{B}}$
+\end{algorithmic}
+\end{algorithm}
+
+\vspace{-6mm}
+\begin{algorithm}[H]\label{algo:adam_update}
+\centering
+\caption{AdamUpdate}
+\begin{algorithmic}[1]
+  \State {\bfseries Input:}
+  $\theta_t, m_t, v_t, \bar{g_t}, \beta_1, \beta_2, \gamma$ 
+  \State
+  $
+  m_{t+1} \leftarrow
+    \beta_{1} \cdot m_{t} + \left(1-\beta_{1}\right) \cdot \bar{g_t}, \quad 
+  v_{t+1} \leftarrow
+    \beta_{2} \cdot v_{t}+\left(1-\beta_{2}\right) \cdot \bar{g_t}^{2}
+  $
+  \State
+  $
+  \widehat{m}_{t+1} \leftarrow m_{t+1} /\left(1-\beta_{1}^{t}\right), \quad
+  \widehat{v}_{t+1} \leftarrow v_{t+1} /\left(1-\beta_{2}^{t}\right)
+  $
+  \State
+  $
+  \theta_{t+1} \leftarrow \theta_{t}-\alpha \cdot \widehat{m}_{t+1} /\left(\sqrt{\widehat{v}_{t+1}}+\gamma\right)
+  $
+  \State  \Return $\theta_{t+1}, m_{t +1}, v_{t + 1}$
+\end{algorithmic}
+\end{algorithm}
+
+
+\Chen{post-processing property}
+
+\section{\large Why Differential Privacy? Why Not Heuristic Privacy?}
+
+\section{Past Findings}
