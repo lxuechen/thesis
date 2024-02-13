@@ -1,11 +1,17 @@
 \chapter{Background}\label{ch_2}
 \chaptermark{Background}
 
-% Privacy attacks. Why DP? Ends the cat and mouse game.
+Privacy in machine learning has a multitude of meanings.
+For example, a hospital may be interested in using an external machine learning service but is afraid that sending input queries with its patient data can breach privacy.
+This is an example that necessitates \emph{private inference}.
+On the other hand, a tech corporation may be interested in training better predictive models with user data to offer improved services but is afraid that deploying such models can leak sensitive information in the training data.
+This scenario calls for \emph{private training} which is the focus of the present thesis. 
+% The literature has studied privacy protection from a multitude of angles. For example secure inference
+% classic works
 
-Machine learning systems trained on sensitive user data can be vulnerable to privacy attacks~\citep{shokri2017membership,hayes2019logan}.
-This issue is especially pressing for recent applications of large language models, as these models are capable of memorizing and reconstructing sensitive examples contained in 
-the training data~\citep{DBLP:journals/corr/ZhangBHRV16, carlini2020extracting}.
+% Machine learning systems trained on sensitive user data can be vulnerable to privacy attacks~\citep{shokri2017membership,hayes2019logan}.
+% This issue is especially pressing for recent applications of large language models, as these models are capable of memorizing and reconstructing sensitive examples contained in 
+% the training data~\citep{DBLP:journals/corr/ZhangBHRV16, carlini2020extracting}.
 
 As a result of these concerns, there has been a large interest in developing
 methods that provide data privacy guarantees for large language models.
