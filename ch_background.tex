@@ -4,22 +4,25 @@
 Privacy in machine learning has a multitude of meanings.
 For example, a hospital may be interested in using an external machine learning service but is afraid that sending input queries with its patient data can breach privacy.
 This is an example that necessitates \emph{private inference}.
-On the other hand, a tech corporation may be interested in training better predictive models with user data to offer improved services but is afraid that deploying such models can leak sensitive information in the training data.
+On the other hand, a tech corporation may be interested in training better predictive models with user data to offer improved services but is afraid that deploying such models can leak sensitive information of individual users.
 This scenario calls for \emph{private training} which is the focus of the present thesis. 
-% The literature has studied privacy protection from a multitude of angles. For example secure inference
-% classic works
+
+Early works on private training studied simple models such as logistic regression models~\cite{chaudhuri2008privacy,chaudhuri2011differentially} and support vector machines~\cite{rubinstein2009learning}.
+Subsequent works studied private training for deep learning models~\cite{shokri2015privacy,abadi2016deep,papernot2016semi,papernot2018scalable}.
+
+% mention membership inference attacks shroki stuff, data reconstruction attacks carlini extracting text 2 papers, papernot privacy papers.
 
 % Machine learning systems trained on sensitive user data can be vulnerable to privacy attacks~\citep{shokri2017membership,hayes2019logan}.
 % This issue is especially pressing for recent applications of large language models, as these models are capable of memorizing and reconstructing sensitive examples contained in 
 % the training data~\citep{DBLP:journals/corr/ZhangBHRV16, carlini2020extracting}.
 
-As a result of these concerns, there has been a large interest in developing
-methods that provide data privacy guarantees for large language models.
-The standard paradigm for providing such a guarantee in machine learning is \textit{Differential Privacy} (DP)~\citep{dwork2006calibrating,dwork2014algorithmic}.
-Unfortunately, DP learning has typically struggled to produce useful models when applied to large language models, resulting in models with either vacuous privacy guarantees \citep{dupuy2021efficient} or performance far below non-private baselines.
+% As a result of these concerns, there has been a large interest in developing
+% methods that provide data privacy guarantees for large language models.
+% The standard paradigm for providing such a guarantee in machine learning is \textit{Differential Privacy} (DP)~\citep{dwork2006calibrating,dwork2014algorithmic}.
+% Unfortunately, DP learning has typically struggled to produce useful models when applied to large language models, resulting in models with either vacuous privacy guarantees \citep{dupuy2021efficient} or performance far below non-private baselines.
 % This is widely attributed to the fact that the core primitive of \textit{Differentially Private Stochastic Gradient Descent} (DP-SGD)~\citep{song2013stochastic,bassily2014differentially,abadi2016deep} injects noise that must scale with the number of parameters, resulting in large noise levels for large language models \citep{yu2021not}.
 
-\Chen{this is too light on attacks.}
+% \Chen{this is too light on attacks.}
 
 \section{Differential Privacy}
 
