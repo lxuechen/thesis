@@ -59,14 +59,27 @@ A smaller $\epsilon$ (or $\delta$) will yield better privacy.
 When $\delta=0$, the randomized algorithm $\M$ is said to satisfy \emph{pure differential privacy}.
 
 The definition of ``neighboring'' could vary based on the context. 
-For this thesis, we say that two datasets $X, X' \in \mathcal{X}$ are neighboring if one could be obtained from the other by including an additional example/record. 
+For this thesis, we say that two datasets $X, X' \in \mathcal{X}$ are neighboring if one could be obtained from the other through the addition of an example. 
 This implies that $X$ and $X'$ always differ by one in terms of the size of the set.\footnote{
 In other text, this is referred to as \emph{unbounded DP}~\cite{kifer2011no}. When ``neighboring'' is defined as two datasets of the same size differ by one element, it is referred to as \emph{bounded DP}.
 Unbounded DP implies bounded DP with a different privacy leakage parameter.
 The reverse direction generally is not true.
 }
 
-\Chen{mention post-processing property, and composition theorem. the first is needed to understand why DP-SGD prevents leakage. the second is need to help understand how this fits the iterative optimization paradigm.}
+DP as a privacy definition enjoys several appealing properties. 
+We recap the relevant ones here for presentation completeness and direct the reader to classic textbooks for additional details~\cite{dwork2014algorithmic,vadhan2017complexity}.
+
+The first property we recall is \emph{post-processing}.
+This property says that no (data-independent) operation on a DP algorithm's output can incur additional privacy leakage (as measured by the privacy parameter) beyond the original leakage of the DP algorithm.
+\begin{prop}[Post-processing]
+Let $\F: \X \to \Y$ be a randomized algorithm that is ($\epsilon, \delta$)-DP.
+Let $\mathcal{G}: \Y \to \Y'$ be an arbitrary mapping. 
+Then, the composed algorithm $\mathcal{G} \circ \F$ is ($\epsilon, \delta$)-DP.
+\end{prop}
+Post-processing holds regardless of whether $\mathcal{G}$ is deterministic or randomized---so long as it doesn't take in any information of the original private dataset~\cite{dwork2014algorithmic}.
+In the machine learning context, post-processing ensures that no additional privacy can be leaked when one queries a model trained with DP.
+
+% \Chen{mention post-processing property, and composition theorem. the first is needed to understand why DP-SGD prevents leakage. the second is need to help understand how this fits the iterative optimization paradigm.}
 
 
 \section[Differentially Private Stochastic Gradient Descent]{\large Differentially Private Stochastic Gradient Descent}
