@@ -15,6 +15,10 @@ Second, many high-value and information-rich datasets contain sensitive informat
 These datasets can range from private user datasets that capture interesting population-level statistics~\cite{google-2019}, or public web scrapes that include PIIs which got accidentally distributed on the public internet~\cite{carlini2020extracting}.
 Private training is a tool to help model developers harvest the value of these datasets while minimizing the privacy risk due to model memorization.
 
+Before studying approaches for private training, it is important to precisely define the privacy guarantee that we are after.
+Thanks to the groundwork in the past decades, we now have the mature formal framework of \emph{Differential Privacy} to work with~\cite[DP]{dwork2006calibrating,dwork2014algorithmic}.
+The remainder of this chapter reviews this framework and its adoption in deep learning.
+We review basic definitions of DP, algorithms for training deep learning models with DP, and past research on deep learning with DP.
 % as recent works demonstrated the potential for large models to leak membership information~\cite{shokri2017membership} and reproduce training data~\cite{carlini2020extracting}.
 
 % Private training can be seen as a tool to harvest the value of private data (at a population level) while mitigating the risks of leaking 
