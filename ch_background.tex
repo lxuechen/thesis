@@ -2,15 +2,29 @@
 \chaptermark{Background}
 
 Privacy in machine learning has a multitude of meanings.
-For example, a hospital may be interested in using an external machine learning service but is afraid that sending input queries with its patient data can breach privacy.
+For example, a hospital may be interested in using an external machine learning service but is afraid that sending input queries with its patient data to the external party can breach privacy.
 This is an example that necessitates \emph{private inference}.
-On the other hand, a tech corporation may be interested in training better predictive models with user data to offer improved services but is afraid that deploying such models can leak sensitive information of individual users.
-This scenario calls for \emph{private training} which is the focus of the present thesis. 
+On the other hand, a tech corporation may be interested in training better predictive models for their services with user data but is afraid that deploying such models would leak sensitive information in the user dataset.
+This scenario calls for \emph{private training} which is the focus of this thesis. 
 
-Early works on private training studied simple models such as logistic regression models~\cite{chaudhuri2008privacy,chaudhuri2011differentially} and support vector machines~\cite{rubinstein2009learning}.
-Subsequent works studied private training for deep learning models~\cite{shokri2015privacy,abadi2016deep,papernot2016semi,papernot2018scalable}.
+% motivation!
+Private training has become ever more relevant for at least two reasons. 
+First, as deep learning models become larger and optimization algorithms become better, the models we obtain tend to \emph{memorize} non-trivial fragments of data on which they were trained.
+This can result in models leaking membership information of data contributors under bespoke privacy attacks~\cite{shokri2017membership} or  reproducing training examples simply after being queried~\cite{carlini2020extracting,nasr2023scalable}.
+Second, many high-value and information-rich datasets contain sensitive information.
+These datasets can range from private user datasets that capture interesting population-level statistics~\cite{google-2019}, or public web scrapes that include PIIs which got accidentally distributed on the public internet~\cite{carlini2020extracting}.
+Private training is a tool to help model developers harvest the value of these datasets while minimizing the privacy risk due to memorization.
+
+% as recent works demonstrated the potential for large models to leak membership information~\cite{shokri2017membership} and reproduce training data~\cite{carlini2020extracting}.
+
+% Private training can be seen as a tool to harvest the value of private data (at a population level) while mitigating the risks of leaking 
+% why is private training important?
 
 % mention membership inference attacks shroki stuff, data reconstruction attacks carlini extracting text 2 papers, papernot privacy papers.
+
+
+% Early works on private training studied simple models such as logistic regression models~\cite{chaudhuri2008privacy,chaudhuri2011differentially} and support vector machines~\cite{rubinstein2009learning}.
+% Subsequent works studied private training for deep learning models~\cite{shokri2015privacy,abadi2016deep,papernot2016semi,papernot2018scalable}.
 
 % Machine learning systems trained on sensitive user data can be vulnerable to privacy attacks~\citep{shokri2017membership,hayes2019logan}.
 % This issue is especially pressing for recent applications of large language models, as these models are capable of memorizing and reconstructing sensitive examples contained in 
