@@ -9,11 +9,11 @@ This scenario calls for \emph{private training} which is the focus of this thesi
 
 % motivation!
 Private training has become ever more relevant for at least two reasons. 
-First, as deep learning models become larger and optimization algorithms become better, the models we obtain tend to \emph{memorize} non-trivial fragments of data on which they were trained.
-This can result in models leaking membership information of data contributors under bespoke privacy attacks~\cite{shokri2017membership} or  reproducing training examples simply after being queried~\cite{carlini2020extracting,nasr2023scalable}.
+First, as deep learning models become larger and optimization algorithms become better, the models we obtain tend to \emph{memorize} non-trivial fragments of the data on which they were trained.
+This can result in models leaking membership information of data contributors under bespoke privacy attacks~\cite{shokri2017membership} or reproducing training examples simply when queried at deploy time~\cite{carlini2020extracting,nasr2023scalable}.
 Second, many high-value and information-rich datasets contain sensitive information.
 These datasets can range from private user datasets that capture interesting population-level statistics~\cite{google-2019}, or public web scrapes that include PIIs which got accidentally distributed on the public internet~\cite{carlini2020extracting}.
-Private training is a tool to help model developers harvest the value of these datasets while minimizing the privacy risk due to memorization.
+Private training is a tool to help model developers harvest the value of these datasets while minimizing the privacy risk due to model memorization.
 
 % as recent works demonstrated the potential for large models to leak membership information~\cite{shokri2017membership} and reproduce training data~\cite{carlini2020extracting}.
 
