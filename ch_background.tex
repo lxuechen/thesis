@@ -103,6 +103,7 @@ Roughly speaking, this makes the privacy leakage $\widetilde{\epsilon}$ grow alm
 
 The formulae for $\widetilde{\epsilon}$ and $\widetilde{\delta}$ in \eqref{eq:strong_composition} are obtained with standard concentration bounds, and the values on the right-hand side of the equations are conservative estimates of the true privacy leakage.
 To derive tighter estimates of the true leakage values, past works have studied alternative privacy constructions such as R\'enyi differential privacy~\cite{mironov2017renyi} or tight numerical composition of trade-off functions~\cite{dong2019gaussian,gopi2021numerical,zhu2022optimal}.
+We use some of these privacy accounting techniques in this work but direct the reader to the original papers for a thorough treatment.
 
 Adaptive privacy composition is important for building iterative optimizers with a DP guarantee, as it reduces the problem of figuring out the overall privacy loss of the iterative procedure to that of figuring out the privacy loss of a single step.
 
@@ -179,7 +180,7 @@ Training large deep learning models with DP requires iterative optimizers that h
 
 
 \section{Why Differential Privacy?}
-\Chen{past work heuristic privacy without def'n all broken. neuracrypt, instahide, texthide, etc. go back to dwork's works on why you need to start with def'n. maybe mention some crypto stuff as well.}
+% \Chen{past work heuristic privacy without def'n all broken. neuracrypt, instahide, texthide, etc. go back to dwork's works on why you need to start with def'n. maybe mention some crypto stuff as well.}
 
 \section{Past Work on Deep Learning with DP}
-\Chen{give some historical context on the performance and runtime overhead.}
+% \Chen{give some historical context on the performance and runtime overhead.}
