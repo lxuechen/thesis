@@ -133,24 +133,25 @@ Training large deep learning models with DP requires iterative optimizers that h
   \State {\bfseries Input:}
   Dataset $D=\{x_i\}_{i=1}^N$, learning rate $\eta$, batch size $B$, norm threshold $C > 0$, training epochs $E$, initial weights $\theta_0\in\R^p$, optimizer state $s_0$, optimizer hyperparameters $H$, privacy parameters $\epsilon, \delta > 0$.
 
-  \State $q = \nicefrac{B}{N}$ \Comment{Derive the sampling rate.}
-  \State $T = \floor{ \nicefrac{E}{q} }$ \Comment{Derive the total iteration count.}
+  \State $q = \nicefrac{B}{N}$ \Comment{ {\color{red} Derive the sampling rate.} }
+  \State $T = \floor{ \nicefrac{E}{q} }$ \Comment{ {\color{red} Derive the total iteration count.}}
   \State Calculate the noise multiplier $\sigma$ based on $\epsilon, \delta, q, E$.
   \For{ $t = 1, \dots, T $ }
     \State Draw a batch $B_t$ via Poisson sampling each element with probability $q$
     \For{ $x_i \in B_t$ }
-        \State $g_t(x_i) \gets \nabla_{\theta_t} \mathcal{L}(x_i)$ \Comment{Compute per-example gradient.}
-        \State $\tilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })$ \Comment{Clip per-example gradient.}
+        \State $g_t(x_i) \gets \nabla_{\theta_t} \mathcal{L}(x_i)$ \Comment{ {\color{red} Compute per-example gradient.}}
+        \State $\tilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })$ \Comment{
+        {\color{red} Clip per-example gradient.}}
     \EndFor
-    \State \(\triangleright\) Estimate the average gradient with the sampled Gaussian mechanism.
+    \State \(\triangleright\) {\color{red} Estimate the average gradient with the sampled Gaussian mechanism.} 
     \State $z_t \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
     \State $\bar{g_t} = \frac{1}{B} \bracks{ 
         \sum_{x_i \in B_t} \tilde{g_t}(x_i) + z_t
     }$
-    \State \(\triangleright\) Update model weights and optimizer state.
+    \State \(\triangleright\) {\color{red} Update model weights and optimizer state.}
     \State $\theta_{t + 1}, s_{t+1} \gets \texttt{WeightUpdate}(\theta_t, s_t, H)$
     \EndFor
-\State \Return $\theta_{T}$ \Comment{Alternatively, return the Polyak average.}
+\State \Return $\theta_{T}$ or $\frac{1}{T}\sum_{t=1}^T \theta_t$
 \end{algorithmic}
 \end{algorithm}
 
