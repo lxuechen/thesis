@@ -9,7 +9,7 @@ This scenario calls for \emph{private training} which is the focus of this thesi
 
 % motivation!
 Private training has become ever more relevant for at least two reasons. 
-First, as deep learning models become larger and optimization algorithms become better, our models tend to \emph{memorize} non-trivial fragments of the data on which they were trained~\cite{}.
+First, as deep learning models become larger and optimization algorithms become better, our models tend to \emph{memorize} non-trivial fragments of the data on which they were trained~\cite{DBLP:journals/corr/ZhangBHRV16,feldman2020neural,feldman2020does,brown2021memorization}.
 This can result in models leaking membership information of data contributors under bespoke privacy attacks~\cite{shokri2017membership} or reproducing training examples simply when queried during deployment~\cite{carlini2020extracting,nasr2023scalable}.
 Second, many high-value and information-rich datasets contain sensitive information.
 These datasets can range from private user datasets that contain interesting and general patterns~\cite{google-2019} to public web scrapes which include PIIs that were accidentally distributed on the public internet~\cite{carlini2020extracting}.
