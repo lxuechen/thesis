@@ -83,23 +83,26 @@ In the machine learning context, post-processing ensures that no additional priv
 
 \subsection{Adaptive Privacy Composition}
 The next property we recall is \emph{privacy composition}.
-The property says that the procedure of jointly releasing the outputs of multiple DP algorithms is also DP.
+The property says that the procedure of jointly releasing the outputs of individual DP algorithms is also DP.
 Here, we consider the \emph{adaptive} case, where each algorithm may take in the outputs of others for producing its own output.
 The privacy leakage of the joint release can be numerically tracked with \emph{privacy composition theorems}.
-Here, we present a version of adaptive composition, where the privacy loss of the joint release grows radically in the number of releases $k$.
+Here, we present an adaptive composition theorem, where the privacy loss of the joint release grows radically in the number of releases $k$.
 \begin{theo}[Strong Composition~\cite{dwork2014algorithmic,kairouz2015composition}]
 Let $\F_1: \X \to \Y_1, \F_2: \X \times \Y_1 \to \Y_2, \dots, \F_k: \X \times \Y_1 \times \cdots \times \Y_{k-1} \to \Y_k$ each be $(\epsilon, \delta)$-DP.
 Then, the joint release $\F: X \mapsto \bracks{ \F_1(X), \dots, \F_k(X)}$ is $(\widetilde{\epsilon}, \widetilde{\delta})$-DP, where
 \eq{
   \widetilde{\epsilon} &= \epsilon \sqrt{2k\log(1/\delta')} + \epsilon k \frac{\exp(\epsilon) - 1}{ \exp(\epsilon) + 1}, \\
   \widetilde{\delta} &= \delta k + \delta',
+  \label{eq:strong_composition}
 }
 for all $\delta' > 0$.
 \end{theo}
 When $\epsilon$ is small (high privacy regime), the first $O(\epsilon \sqrt{k})$ term in $\widetilde{\epsilon}$ becomes the dominant factor of the privacy loss. 
 This is seen from the fact that the second term is $O(\epsilon^2 k)$ and thus much smaller in $\epsilon$.\footnote{This can be obtained with the aim of the standard approximation of $e^x - 1 \approx x$ for small $x$}
-Roughly speaking, this makes the privacy leakage $\widetilde{\epsilon}$ grow almost like $O(\sqrt{k})$.
+Roughly speaking, this makes the privacy leakage $\widetilde{\epsilon}$ grow almost as $O(\sqrt{k})$.
 
+The formulae for $\widetilde{\epsilon}$ and $\widetilde{\delta}$ in \eqref{eq:strong_composition} are obtained with standard concentration bounds, and the values on the right-hand side of the equations are conservative estimates of the true privacy leakage.
+To derive tighter estimates of the true leakage values, past works have studied alternative privacy constructions such as R\'enyi differential privacy~\cite{mironov2017renyi} or tight numerical composition of trade-off functions~\cite{dong2019gaussian,gopi2021numerical,zhu2022optimal}.
 
 \section[Differentially Private Stochastic Gradient Descent]{\large Differentially Private Stochastic Gradient Descent}
 
