@@ -1,7 +1,7 @@
 \chapter{Background}\label{ch_2}
 \chaptermark{Background}
 
-Privacy in machine learning has a multitude of meanings.
+Privacy has a multitude of meanings in machine learning.
 For example, a hospital may be interested in using an external machine learning service but is afraid that sending input queries with its patient data to the external party can breach privacy.
 This is an example that necessitates \emph{private inference}.
 On the other hand, a tech corporation may be interested in training better predictive models for their services with user data but is concerned that deploying such models would leak sensitive information in the training data.
@@ -9,16 +9,16 @@ This scenario calls for \emph{private training} which is the focus of this thesi
 
 % motivation!
 Private training has become ever more relevant for at least two reasons. 
-First, as deep learning models become larger and optimization algorithms become better, the models we obtain tend to \emph{memorize} non-trivial fragments of the data on which they were trained.
-This can result in models leaking membership information of data contributors under bespoke privacy attacks~\cite{shokri2017membership} or reproducing training examples simply when queried at deploy time~\cite{carlini2020extracting,nasr2023scalable}.
+First, as deep learning models become larger and optimization algorithms become better, our models tend to \emph{memorize} non-trivial fragments of the data on which they were trained~\cite{}.
+This can result in models leaking membership information of data contributors under bespoke privacy attacks~\cite{shokri2017membership} or reproducing training examples simply when queried during deployment~\cite{carlini2020extracting,nasr2023scalable}.
 Second, many high-value and information-rich datasets contain sensitive information.
-These datasets can range from private user datasets that contain interesting population-level statistics~\cite{google-2019}, or public web scrapes which include PIIs that were accidentally distributed on the public internet~\cite{carlini2020extracting}.
-Private training is a tool to help model developers harvest the value of these datasets while minimizing the privacy risk due to model memorization.
+These datasets can range from private user datasets that contain interesting and general patterns~\cite{google-2019} to public web scrapes which include PIIs that were accidentally distributed on the public internet~\cite{carlini2020extracting}.
+Private training serves as a tool to unlock the value of these datasets while minimizing the privacy risk due to data memorization for AI and machine learning.
 
 Before studying approaches for private training, it is important to precisely define the privacy guarantee that we aim to achieve.
-Thanks to the groundwork in past decades, we now have the mature formal framework of \emph{Differential Privacy} (DP) to work with~\cite{dwork2006calibrating,dwork2014algorithmic}.
+Thanks to the groundwork in the past decades, we now have the mature formal framework of \emph{Differential Privacy} (DP) to work with~\cite{dwork2006calibrating,dwork2014algorithmic}.
 The remainder of this chapter reviews this framework and its adoption in deep learning.
-We review definitions of DP, common algorithms for training deep learning models with DP, and limitations of past research.
+We review definitions of DP, common algorithms for training deep learning models with DP, and challenges faced by past research.
 % as recent works demonstrated the potential for large models to leak membership information~\cite{shokri2017membership} and reproduce training data~\cite{carlini2020extracting}.
 
 % Private training can be seen as a tool to harvest the value of private data (at a population level) while mitigating the risks of leaking 
@@ -45,7 +45,7 @@ We review definitions of DP, common algorithms for training deep learning models
 \section{Differential Privacy}
 The privacy goal of DP is that when releasing information about a sensitive dataset, anything that can be learned about an individual example from the released information can be learned without that individual example.
 DP formalizes this intuitive goal with a probabilistic statement that views any release procedure as a \emph{randomized algorithm} operating on datasets.
-Therefore, DP is a property of release procedures (randomized algorithms)---and not a property of released artifacts (algorithm outputs).
+DP is a property of release procedures (randomized algorithms) and not of released artifacts (algorithm outputs).
 Below, we give the classic definition of approximate-DP (also known as $(\epsilon, \delta)$-DP).
 \begin{defi}[Approximate-DP]
 A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-differentially private if for all neighboring datasets $X, X'\in\mathcal{X}$ and all $Y \subset \Y$, 
@@ -71,25 +71,29 @@ We recap the relevant ones here for presentation completeness and direct the rea
 
 \subsection{Post-Processing}
 The first property we recall is \emph{post-processing}.
-This property says that no (data-independent) operation on a DP algorithm's output can incur additional privacy leakage (as measured by the privacy parameter) beyond the original leakage of the DP algorithm.
-\begin{prop}[Post-processing]
+This property says that no (data-independent) operation on a DP algorithm's output can incur additional privacy leakage (measured by the privacy parameters) beyond the leakage of the original DP algorithm.
+\begin{prop}[Post-Processing]
 Let $\F: \X \to \Y$ be a randomized algorithm that is ($\epsilon, \delta$)-DP.
 Let $\mathcal{G}: \Y \to \Y'$ be an arbitrary mapping. 
 Then, the composed algorithm $\mathcal{G} \circ \F$ is ($\epsilon, \delta$)-DP.
 \end{prop}
 Post-processing holds regardless of whether $\mathcal{G}$ is deterministic or randomized---so long as it doesn't take in any information of the original private dataset~\cite{dwork2014algorithmic}.
-In the machine learning context, post-processing ensures that no additional privacy can be leaked no matter how one queries a model that is trained with DP.
+In the machine learning context, post-processing ensures that no additional privacy can be leaked no matter how one queries a model that is trained with a DP algorithm.
 
 
 \subsection{Adaptive Privacy Composition}
 The next property we recall is \emph{privacy composition}.
 The property says that the procedure of jointly releasing the outputs of individual DP algorithms is also DP.
-Here, we consider the \emph{adaptive} case, where each algorithm may take in the outputs of others for producing its own output.
-The privacy leakage of the joint release can be numerically tracked with \emph{privacy composition theorems}.
-Here, we present an adaptive composition theorem, where the privacy loss of the joint release grows radically in the number of releases $k$.
+Here, we consider the more general \emph{adaptive} case, where each algorithm takes in some outputs of others for producing its own output.
+The privacy leakage of the joint release can be numerically tracked with a \emph{privacy composition theorem}.
+Here, we present an adaptive composition theorem, where the privacy loss of the joint release grows radically in the number of releases $k$ (as opposed to linear with \emph{basic composition}~\cite{dwork2014algorithmic}).
 \begin{theo}[Strong Composition~\cite{dwork2014algorithmic,kairouz2015composition}]
 Let $\F_1: \X \to \Y_1, \F_2: \X \times \Y_1 \to \Y_2, \dots, \F_k: \X \times \Y_1 \times \cdots \times \Y_{k-1} \to \Y_k$ each be $(\epsilon, \delta)$-DP.
-Then, the joint release $\F: X \mapsto \bracks{ \F_1(X), \dots, \F_k(X)}$ is $(\widetilde{\epsilon}, \widetilde{\delta})$-DP, where
+Then, the joint release $\F: X \mapsto \bracks{ Y_1, \dots, Y_k }$ defined by  
+\eq{
+  Y_1 = \F_1(X), \quad Y_2 = \F_2(X, Y_1), \quad \dots , \quad Y_k = \F_k(X, Y_1, \dots, Y_{k-1})
+}
+is $(\widetilde{\epsilon}, \widetilde{\delta})$-DP, where
 \eq{
   \widetilde{\epsilon} &= \epsilon \sqrt{2k\log(1/\delta')} + \epsilon k \frac{\exp(\epsilon) - 1}{ \exp(\epsilon) + 1}, \\
   \widetilde{\delta} &= \delta k + \delta',
@@ -97,13 +101,13 @@ Then, the joint release $\F: X \mapsto \bracks{ \F_1(X), \dots, \F_k(X)}$ is $(\
 }
 for all $\delta' > 0$.
 \end{theo}
-When $\epsilon$ is small (high privacy regime), the first $O(\epsilon \sqrt{k})$ term in $\widetilde{\epsilon}$ becomes the dominant factor of the privacy loss. 
-This is seen from the fact that the second term is $O(\epsilon^2 k)$ and thus much smaller in $\epsilon$.\footnote{This can be obtained with the standard approximation of $e^x - 1 \approx x$ for small $x$}
-Roughly speaking, this makes the privacy leakage $\widetilde{\epsilon}$ grow almost as $O(\sqrt{k})$.
+When $\epsilon$ is small (the high privacy regime), the first term in $\widetilde{\epsilon}$ scales as $O(\epsilon \sqrt{k})$ and becomes the dominant factor of the privacy loss. 
+This can be seen from the fact that the second term scales as $O(\epsilon^2 k)$ and is thus much smaller due to the quadratic dependence on $\epsilon$.\footnote{To study the asymptotics of the second term, recall the standard approximation $e^x - 1 \approx x$ for small $x$.}
+% Roughly speaking, this makes the privacy leakage $\widetilde{\epsilon}$ grow almost as $O(\sqrt{k})$.
 
-The formulae for $\widetilde{\epsilon}$ and $\widetilde{\delta}$ in \eqref{eq:strong_composition} are obtained with standard concentration bounds, and the values on the right-hand side of the equations are conservative estimates of the true privacy leakage.
-To derive tighter estimates of the true leakage values, past works have studied alternative privacy constructions such as R\'enyi differential privacy~\cite{mironov2017renyi} or tight numerical composition of trade-off functions~\cite{dong2019gaussian,gopi2021numerical,zhu2022optimal}.
-We use some of these privacy accounting techniques in this work but direct the reader to the original papers for a thorough treatment.
+The formulae for $\widetilde{\epsilon}$ and $\widetilde{\delta}$ in \eqref{eq:strong_composition} are obtained with standard concentration bounds, and the values on the right-hand side are conservative estimates of the true privacy leakage.
+To derive tighter estimates, past works have studied privacy composition under alternative privacy constructions (such as R\'enyi differential privacy~\cite{mironov2017renyi}) or numerical composition of trade-off functions~\cite{dong2019gaussian,gopi2021numerical,zhu2022optimal}.
+We use some of these privacy accounting techniques in this work for their tightness but direct the reader to the original papers for a thorough treatment.
 
 Adaptive privacy composition is important for building iterative optimizers with a DP guarantee, as it reduces the problem of figuring out the overall privacy loss of the iterative procedure to that of figuring out the privacy loss of a single step.
 
