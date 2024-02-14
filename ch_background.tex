@@ -109,12 +109,12 @@ Adaptive privacy composition is important for building iterative optimizers with
 \section[Differentially Private Stochastic Gradient Descent]{\large Differentially Private Stochastic Gradient Descent}
 
 Training large deep learning models with DP requires iterative optimizers that have DP guarantees.
-The privatization step ensures that parameter updates leak limited information about training examples through their gradients.
-Specifically, this step clips per-example gradients with a norm constraint $C$, and adds Gaussian noise $z\sim\mathcal{N}(0, C^2\sigma^2 I_p)$ to the sum of clipped gradients.
-Here, $\sigma$ is the \textit{noise multiplier} determined from the privacy budget $(\epsilon, \delta)$, number of gradient updates $S$, and sampling rate $q=\tfrac{B}{N}$ for a batch size of $B$ and a dataset size of $N$.\footnote{Since we adopted the definition of ``neighboring'' based on addition/removal, the batch size here should be interpreted as the lot size~\citep{abadi2016deep} or, equivalently stated, the expected size of a batch drawn with Poisson sampling.}
-Intuitively, clipping individual gradients ensures that each example has bounded influence on the parameter update, whereas noising the gradient prevents exact tracing of particular examples.
-The noise being isotropic implies that larger models would experience heavier noise per update, as the norm of the $p$-dimensional Gaussian $\normtwo{z}$ scales as $C \sigma \sqrt{p}$.
-This is widely believed to be the cause for DP optimization to perform poorly at training high-dimensional deep learning models~\citep{gautum14,yu2021not}.
+% The privatization step ensures that parameter updates leak limited information about training examples through their gradients.
+% Specifically, this step clips per-example gradients with a norm constraint $C$, and adds Gaussian noise $z\sim\mathcal{N}(0, C^2\sigma^2 I_p)$ to the sum of clipped gradients.
+% Here, $\sigma$ is the \textit{noise multiplier} determined from the privacy budget $(\epsilon, \delta)$, number of gradient updates $S$, and sampling rate $q=\tfrac{B}{N}$ for a batch size of $B$ and a dataset size of $N$.\footnote{Since we adopted the definition of ``neighboring'' based on addition/removal, the batch size here should be interpreted as the lot size~\citep{abadi2016deep} or, equivalently stated, the expected size of a batch drawn with Poisson sampling.}
+% Intuitively, clipping individual gradients ensures that each example has bounded influence on the parameter update, whereas noising the gradient prevents exact tracing of particular examples.
+% The noise being isotropic implies that larger models would experience heavier noise per update, as the norm of the $p$-dimensional Gaussian $\normtwo{z}$ scales as $C \sigma \sqrt{p}$.
+% This is widely believed to be the cause for DP optimization to perform poorly at training high-dimensional deep learning models~\citep{gautum14,yu2021not}.
 
 % We use DP-Adam throughout. DP-Adam works just like regular Adam~\citep{kingma2014adam} but performs updates and moment accumulation with privatized gradients. 
 % The gradient privatization part is the same as that performed in DP-SGD~\citep{song2013stochastic,abadi2016deep}.
@@ -126,56 +126,56 @@ This is widely believed to be the cause for DP optimization to perform poorly at
 \caption{DP Optimization}
 \begin{algorithmic}[1]
   \State {\bfseries Input:}
-  Data $\D=\{x_i\}_{i=1}^N$, learning rate $\eta$, noise multiplier $\sigma$, batch size $B$, Euclidean norm threshold for gradients $C$, epochs $E$, initial parameter vector $\theta_0\in\R^p$, initial moment estimates $m_0, v_0 \in \R^p$,
-  exponential decay rates $\beta_1, \beta_2 \in \R$,
-  avoid division-by-zero constant $\gamma\in \R$.
+  Dataset $D=\{x_i\}_{i=1}^N$, learning rate $\eta$, batch size $B$, norm threshold $C > 0$, training epochs $E$, initial weights $\theta_0\in\R^p$, optimizer state $s_0$, optimizer hyperparameters $H$, privacy parameters $\epsilon, \delta > 0$.
 
-  \For{ $t \in [E \cdot \nicefrac{N}{B}]$ }
-
-    \State Draw a batch $B_t$ via Poisson sampling; each element has probability $\nicefrac{B}{N}$ of being selected
+  \State $q = \nicefrac{B}{N}$ \Comment{Derive the sampling rate.}
+  \State $T = \floor{ \nicefrac{E}{q} }$ \Comment{Derive the total iteration count.}
+  \State Calculate the noise multiplier $\sigma$ based on $\epsilon, \delta, q, E$.
+  \For{ $t = 1, \dots, T $ }
+    \State Draw a batch $B_t$ via Poisson sampling each element with probability $q$
     \For{ $x_i \in B_t$ }
-        \State
-        $
-        g_t(x_i) \gets \nabla_{\theta_t} \mathcal{L}(x_i), \quad
-        \tilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })
-        $
+        \State $g_t(x_i) \gets \nabla_{\theta_t} \mathcal{L}(x_i)$ \Comment{Compute per-example gradient.}
+        \State $\tilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })$ \Comment{Clip per-example gradient.}
     \EndFor
+    \State \(\triangleright\) Estimate the average gradient with the sampled Gaussian mechanism.
     \State $z_t \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
     \State $\bar{g_t} = \frac{1}{B} \bracks{ 
-        \sum_{i=1}^N \tilde{g_t}(x_i) + z_t
+        \sum_{x_i \in B_t} \tilde{g_t}(x_i) + z_t
     }$
-    \State $\theta_{t + 1}, m_{t+1}, v_{t+1} \gets \text{AdamUpdate}(\theta_t, m_{t}, v_{t}, \bar{g_t}, \beta_1, \beta_2, \gamma)$
+    \State \(\triangleright\) Update model weights and optimizer state.
+    \State $\theta_{t + 1}, s_{t+1} \gets \texttt{WeightUpdate}(\theta_t, s_t, H)$
     \EndFor
-\State \Return $\theta_{\nicefrac{TN}{B}}$
+\State \Return $\theta_{T}$ \Comment{Alternatively, return the Polyak average.}
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}[H]\label{algo:adam_update}
-\centering
-\caption{AdamUpdate}
-\begin{algorithmic}[1]
-  \State {\bfseries Input:}
-  $\theta_t, m_t, v_t, \bar{g_t}, \beta_1, \beta_2, \gamma$ 
-  \State
-  $
-  m_{t+1} \leftarrow
-    \beta_{1} \cdot m_{t} + \left(1-\beta_{1}\right) \cdot \bar{g_t}, \quad 
-  v_{t+1} \leftarrow
-    \beta_{2} \cdot v_{t}+\left(1-\beta_{2}\right) \cdot \bar{g_t}^{2}
-  $
-  \State
-  $
-  \widehat{m}_{t+1} \leftarrow m_{t+1} /\left(1-\beta_{1}^{t}\right), \quad
-  \widehat{v}_{t+1} \leftarrow v_{t+1} /\left(1-\beta_{2}^{t}\right)
-  $
-  \State
-  $
-  \theta_{t+1} \leftarrow \theta_{t}-\alpha \cdot \widehat{m}_{t+1} /\left(\sqrt{\widehat{v}_{t+1}}+\gamma\right)
-  $
-  \State  \Return $\theta_{t+1}, m_{t +1}, v_{t + 1}$
-\end{algorithmic}
-\end{algorithm}
-\Chen{algo box should be with generic update. then mention privacy guarantee does not change if you alter the update rule so long as gradient privatization is performed.}
+% \begin{algorithm}[H]\label{algo:adam_update}
+% \centering
+% \caption{AdamUpdate}
+% \begin{algorithmic}[1]
+%   \State {\bfseries Input:}
+%   $\theta_t, m_t, v_t, \bar{g_t}, \beta_1, \beta_2, \gamma$ 
+%   \State
+%   $
+%   m_{t+1} \leftarrow
+%     \beta_{1} \cdot m_{t} + \left(1-\beta_{1}\right) \cdot \bar{g_t}, \quad 
+%   v_{t+1} \leftarrow
+%     \beta_{2} \cdot v_{t}+\left(1-\beta_{2}\right) \cdot \bar{g_t}^{2}
+%   $
+%   \State
+%   $
+%   \widehat{m}_{t+1} \leftarrow m_{t+1} /\left(1-\beta_{1}^{t}\right), \quad
+%   \widehat{v}_{t+1} \leftarrow v_{t+1} /\left(1-\beta_{2}^{t}\right)
+%   $
+%   \State
+%   $
+%   \theta_{t+1} \leftarrow \theta_{t}-\alpha \cdot \widehat{m}_{t+1} /\left(\sqrt{\widehat{v}_{t+1}}+\gamma\right)
+%   $
+%   \State  \Return $\theta_{t+1}, m_{t +1}, v_{t + 1}$
+% \end{algorithmic}
+% \end{algorithm}
+
+% \Chen{algo box should be with generic update. then mention privacy guarantee does not change if you alter the update rule so long as gradient privatization is performed.}
 
 
 \section{Why Differential Privacy?}
