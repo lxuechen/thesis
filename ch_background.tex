@@ -131,13 +131,18 @@ Its $\ell_2$ sensitivity $\Delta_2 \M$ is defined by
   \Delta_2 \M = \max_{\substack{ \mathrm{neighboring}\; X, X' \in \X } } \norm{\M(X) - \M(X') }_2.
 }
 \end{defi}
-
+The sensitivity of a mapping characterizes how much its output changes once the input dataset changes slightly (by one example).
+Intuitively, mappings with low sensitivity are less affected by the presence/absence of individual examples, and thus would be ``more private''.
+However, having low sensitivity does not immediately imply the mapping satisfies the DP statement. 
+This is why we need algorithms such as the Gaussian mechanism to \emph{privatize} mappings.
+The Gaussian mechanism simply adds large noise vectors to high-sensitivity mappings and small noise vectors to low-sensitivity mappings.
+Algorithm~\ref{algo:gauss} presents the pseudocode.
 \begin{algorithm}[H]
 \centering
 \caption{Gaussian Mechanism}
 \begin{algorithmic}[1]
   \State {\bfseries Input:}
-    Release procedure $\M: \X \to \R^p$ with $\ell_2$ sensitivity $C$, input dataset $X$.
+    Mapping $\M: \X \to \R^p$ with $\ell_2$ sensitivity $C$, input dataset $X$, privacy parameters $\epsilon, \delta$.
   \State $\sigma \gets  \sqrt{2 \log(1.25 / \delta) } / \epsilon $
   \State $z \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
   \State $m \gets \M(X) + z$
@@ -145,15 +150,15 @@ Its $\ell_2$ sensitivity $\Delta_2 \M$ is defined by
 \end{algorithmic}
 \label{algo:gauss}
 \end{algorithm}
+\begin{theo}[Gaussian Mechanism~\cite{dwork2014algorithmic}]
+\label{theo:gauss}
+Algorithm~\ref{algo:gauss} is $(\epsilon, \delta)$-DP.
+\end{theo}
 
 % The algorithm takes in a set of vectors, clips each by a norm threshold, and returns the noisy average of the clipped vectors where the noise is an isotropic Gaussian. Algorithm~\ref{algo:gauss} contains the pseudocode.
 
 % \Chen{sensitivity of a non-private algorithm -> Gaussian mechanism -> Gaussian mechanism for mean -> why is this useful for iterative optimization.}
 
-The Gaussian mechanism will be used to obtain private estimates of the mean of gradients for DP optimizers.
-Below, we prove that the Gaussian mechanism is DP.
-\begin{theo}[Gaussian Mechanism~\cite{dwork2014algorithmic}]
-\end{theo}
  % requires iterative optimizers that have DP guarantees.
 % The privatization step ensures that parameter updates leak limited information about training examples through their gradients.
 % Specifically, this step clips per-example gradients with a norm constraint $C$, and adds Gaussian noise $z\sim\mathcal{N}(0, C^2\sigma^2 I_p)$ to the sum of clipped gradients.
