@@ -122,8 +122,8 @@ Typical first-order optimizers iterate over many steps of parameter update, each
 (1) is a function of the private dataset and incurs a privacy loss.
 But if (1) is DP, (2) incurs no privacy loss due to post-processing.
 Thus, it suffices to ensure the gradient computation step is DP.
-
-We recall the \emph{Gaussian mechanism} for vector-valued functions, which will be used to privatize gradient computation.
+The \emph{Gaussian mechanism} is a DP algorithm can serve this purpose.
+Below, we define the concept of \emph{sensitivity}, present the algorithm, and give conditions under which it is $(\epsilon, \delta)$-DP.
 \begin{defi}[$\ell_2$ Sensitivity]
 Let $\M: \X \to \R^p$ be a mapping with vector outputs.
 Its $\ell_2$ sensitivity $\Delta_2 \M$ is defined by
