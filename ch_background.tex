@@ -132,8 +132,8 @@ Its $\ell_2$ sensitivity $\Delta_2 \M$ is defined by
 }
 \end{defi}
 The sensitivity of a mapping characterizes how much its output changes once the input dataset changes slightly (by one example).
-Intuitively, mappings with low sensitivity are less affected by the presence/absence of individual examples, and thus would be ``more private''.
-However, having low sensitivity does not immediately imply the mapping satisfies the DP statement. 
+Intuitively, mappings with low sensitivity are less affected by the presence/absence of individual examples, and thus would be ``more private.''
+However, having low sensitivity does not immediately imply the mapping satisfies the DP statement.\footnote{Here's an example of a low-sensitivity release procedure that is not private at all. Imagine a group of people each with a positive number below 0.1. Everyone in the group except Bob has a rational number. We aim to release the sum of a subset of these numbers. The sensitivity is 0.1 and thus small, but whether Bob was included in the subset can be easily inferred (Bob is included if the sum is irrational).}
 This is why we need algorithms such as the Gaussian mechanism to \emph{privatize} mappings.
 The Gaussian mechanism simply adds large noise vectors to high-sensitivity mappings and small noise vectors to low-sensitivity mappings.
 Algorithm~\ref{algo:gauss} presents the pseudocode.
