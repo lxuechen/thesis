@@ -8,9 +8,7 @@ We showed that adaptive clipping algorithms can mitigate known utility losses as
 % It is an interesting open question to design provable group-wise clipping algorithms that can pareto-dominate flat clipping or disprove such schemes can exist. 
 Designing group-wise clipping algorithms that can Pareto-dominate flat clipping in terms of privacy vs utility (or show impossibility) is an interesting future direction.
 
-\section*{Limitations}
 Group-wise clipping schemes offer various advantages but are not without limitations and drawbacks.
 First, group-wise clipping algorithms tend to have a few extra hyperparameters. This could lead to a need of additional tuning when optimal hyperparameters differ across tasks and domains (although we showed that across the tasks we studied, the optimal values for most of the additional hyperparameters remained stable). 
 Second, the per-layer clipping scheme gives limited efficiency improvements in non-distributed settings when only few parameters are fine-tuned.
 Lastly, care must be taken during implementation to fully realize the gains of adaptive per-layer clipping in practice. 
-
