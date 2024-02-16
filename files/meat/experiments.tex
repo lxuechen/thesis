@@ -28,7 +28,7 @@ In this experiment, we fine-tune RoBERTa-base (125M) and RoBERTa-large (355M)~\c
 We set $\epsilon\in \{3,8\}$ and $\delta=1/n^{1.1}$, where $n$ is the size of training set.
 We tune the learning rate, batch size, and target quantile on SST-2's training data and transfer the best hyperparameters to other tasks. 
 We use $r=0.1$ of the privacy budget for quantile estimation, choose the target quantile $q$ from $\{0.5, 0.75, 0.85\}$, and set the number of training epochs $E=20$.  %
-Table~\ref{table:glue} shows that adaptive per-layer clipping obtains accuracies competitive with established approaches in the literature under fixed privacy constraints.
+Table~\ref{table:glue_main} shows that adaptive per-layer clipping obtains accuracies competitive with established approaches in the literature under fixed privacy constraints.
 
 Our second controlled experiment shows that adaptive per-layer clipping gives utility that is competitive with flat clipping under fixed training epochs (when both approaches fine-tune the same set of parameters), effectively verifying its wall time advantage. 
 In this experiment, we constrain the number of training epochs $E$ to be one of $\{3, 10, 20, 30\}$ and fine-tune RoBERTa models on SST-2 with the two clipping methods.
