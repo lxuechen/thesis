@@ -112,7 +112,8 @@ We take advantage of the tightness of these privacy accounting techniques in thi
 
 Adaptive privacy composition is important for building iterative optimizers with a DP guarantee, as it reduces the problem of figuring out the overall privacy loss of the iterative procedure to that of figuring out the privacy loss of a single step.
 
-\section[Differentially Private Stochastic Gradient Descent]{\large Differentially Private Stochastic Gradient Descent}
+\section[Differentially Private First-Order Optimization]{\large Differentially Private First-Order Optimization}
+\label{sec:dp_first_order}
 We review common algorithms for training deep learning models with DP, focusing on iterative first-order optimizers such as DP-SGD and its siblings.
 The release procedure here is the training algorithm that takes in a (private) dataset and outputs weights of the trained model.
 In many scenarios, models weights are not actually released by model developers---instead, they are gated behind an API service that offers query access.

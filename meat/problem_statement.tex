@@ -24,10 +24,10 @@ This is widely believed to be the cause for DP optimization to perform poorly at
 
 Our starting point for building DP language models is (public) pretrained models. 
 Pretrained language models tend to contain general knowledge of language~\citep{manning2020emergent} and thus should make the downstream private learning problem easier.
-We fine-tune these models with DP-Adam~\citep{abadi2016deep,kingma2014adam} (see Appendix~\ref{app:dp_sgd} for details) and track privacy loss through R\'enyi DP~\citep{mironov2017renyi}, but also report the converted $\epsilon$ from a Gaussian DP central limit theorem~\citep{dong2019gaussian} and from accurately composing tradeoff functions via fast Fourier transform~\citep{gopi2021numerical}.
+We fine-tune these models with DP-Adam~\citep{abadi2016deep,kingma2014adam} (see Chapter~\ref{sec:dp_first_order} for details) and track privacy loss through R\'enyi DP~\citep{mironov2017renyi}, but also report the converted $\epsilon$ from a Gaussian DP central limit theorem~\citep{dong2019gaussian} and from accurately composing tradeoff functions via fast Fourier transform~\citep{gopi2021numerical}.
 We consider privacy levels $\epsilon \in \{3,8\}$ and $\delta = \tfrac{1}{2 |\mathcal{D}_\text{train}|}$ throughout
-for a training set of size $|\mathcal{D}_\text{train}|$ (see Appendix~\ref{app:privacy_accounting} for further details).
-We tune hyperparameters on a text generation task (E2E; introduced below) and transfer these to remaining tasks.
+for a training set of size $|\mathcal{D}_\text{train}|$.
+We tune hyperparameters on a text generation task (E2E; introduced below) and transfer these to the remaining tasks.
 We outline two broad classes of NLP problems considered in this paper and define what constitutes a record below.
 
 \paragraph{Sentence Classification.}
@@ -40,4 +40,3 @@ The goal is to learn a model that generates natural language sentences given som
 For table-to-text generation tasks such as E2E~\citep{novikova2017e2e} and DART~\citep{nan2020dart}, each example/record in the training data consists of a pair of table entry and corresponding text description to be predicted. 
 For a dialogue generation task such as Persona-Chat~\citep{zhang2018personalizing}, each example/record consists of metadata, a dialogue history, and a response to be predicted. 
 We fine-tune GPT-2~\citep{radford2019language} and variants of different sizes for these problems, as this model family is known to work well for text generation. 
-
