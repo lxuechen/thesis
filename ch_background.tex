@@ -139,6 +139,7 @@ However, having low sensitivity does not immediately imply the mapping satisfies
 This is why we need algorithms such as the Gaussian mechanism to \emph{privatize} mappings.
 The Gaussian mechanism simply adds large noise vectors to high-sensitivity mappings and small noise vectors to low-sensitivity mappings.
 Algorithm~\ref{algo:gauss} presents the pseudocode and Theorem~\ref{theo:gauss} gives its privacy guarantee.
+Algorithm~\ref{algo:gauss_grad} applies the algorithm to privately estimate the mean of a batch of gradient vectors.
 \begin{algorithm}[H]
 \centering
 \caption{Gaussian Mechanism}
@@ -160,36 +161,22 @@ Algorithm~\ref{algo:gauss} is $(\epsilon, \delta)$-DP.
 
 \begin{algorithm}[H]
 \centering
-\caption{Gaussian Mechanism}
+\caption{Gaussian Mechanism for Private Gradient Estimation}
 \begin{algorithmic}[1]
   \State {\bfseries Input:}
-    Mapping $\M: \X \to \R^p$ with $\ell_2$ sensitivity $C$, input dataset $X$, privacy parameters $\epsilon, \delta$.
+  Norm threshold $C > 0$, gradients $G = \{g_i\}_{i=1}^N$, privacy parameters $\epsilon, \delta$.
+  \For{ $g_i \in G$ }
+      \State $\widetilde{g_i} \gets g_i \cdot \min(1, \nicefrac{C}{ \normtwo{g_i} })$ 
+  \EndFor
   \State $\sigma \gets  \sqrt{2 \log(1.25 / \delta) } / \epsilon $
   \State $z \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
-  \State $m \gets \M(X) + z$
-  \State \Return $m$
+  \State $\widebar{g} \gets \frac{1}{N}\bracks{\sum_{i=1}^N \widetilde{g}_i + z}$
+  \State \Return $\widebar{g}$
 \end{algorithmic}
-\label{algo:gauss}
+\label{algo:gauss_grad}
 \end{algorithm}
 
-% The algorithm takes in a set of vectors, clips each by a norm threshold, and returns the noisy average of the clipped vectors where the noise is an isotropic Gaussian. Algorithm~\ref{algo:gauss} contains the pseudocode.
-
-% \Chen{sensitivity of a non-private algorithm -> Gaussian mechanism -> Gaussian mechanism for mean -> why is this useful for iterative optimization.}
-
- % requires iterative optimizers that have DP guarantees.
-% The privatization step ensures that parameter updates leak limited information about training examples through their gradients.
-% Specifically, this step clips per-example gradients with a norm constraint $C$, and adds Gaussian noise $z\sim\mathcal{N}(0, C^2\sigma^2 I_p)$ to the sum of clipped gradients.
-% Here, $\sigma$ is the \textit{noise multiplier} determined from the privacy budget $(\epsilon, \delta)$, number of gradient updates $S$, and sampling rate $q=\tfrac{B}{N}$ for a batch size of $B$ and a dataset size of $N$.\footnote{Since we adopted the definition of ``neighboring'' based on addition/removal, the batch size here should be interpreted as the lot size~\citep{abadi2016deep} or, equivalently stated, the expected size of a batch drawn with Poisson sampling.}
-% Intuitively, clipping individual gradients ensures that each example has bounded influence on the parameter update, whereas noising the gradient prevents exact tracing of particular examples.
-% The noise being isotropic implies that larger models would experience heavier noise per update, as the norm of the $p$-dimensional Gaussian $\normtwo{z}$ scales as $C \sigma \sqrt{p}$.
-% This is widely believed to be the cause for DP optimization to perform poorly at training high-dimensional deep learning models~\citep{gautum14,yu2021not}.
-
-% We use DP-Adam throughout. DP-Adam works just like regular Adam~\citep{kingma2014adam} but performs updates and moment accumulation with privatized gradients. 
-% The gradient privatization part is the same as that performed in DP-SGD~\citep{song2013stochastic,abadi2016deep}.
-% To determine the noise multiplier, we account privacy through R\'enyi differential privacy (RDP)~\citep{mironov2017renyi,mironov2019r}.
-% For completeness, we include the pseudocode for DP-Adam below. 
-
-DP-SGD and its siblings follow the paradigm described above: They apply the Gaussian mechanism to privatize each gradient computation step, rely on post-processing for the privacy guarantee for weight updates, and resort to adaptive composition for the overall privacy guarantee. 
+DP-SGD and its siblings follow the paradigm described above: They apply the Gaussian mechanism to privatize each gradient computation step, rely on post-processing for the privacy guarantee of weight updates, and resort to adaptive composition for the overall privacy guarantee. 
 Algorithm~\ref{algo:dp_first_order} makes this precise in pseudocode.
 \begin{algorithm}[H]
 \centering
