@@ -12,20 +12,20 @@ Due to the permissive nature of the data collection for some of these models, th
 We selected off-the-shelf models as they are widely accessible to ensure our results are reproducible.
 When considering applying DP fine-tuning to real world settings, one should consider and create more curated public corpora for pretraining.
 
-\paragraph{Hyperparameter Tuning.}
-We studied how choices of basic hyperparameters affect the performance of DP-Adam for fine-tuning.
-Our study is by no means comprehensive or complete.
-In particular, we did not study how weight decay, learning rate schedule, clipping norm schedule, or batch size schedule affect private learning. 
-Custom setups for these knobs have been found helpful for other private learning tasks~\citep{anil2021large}. 
+% \paragraph{Hyperparameter Tuning.}
+% We studied how choices of basic hyperparameters affect the performance of DP-Adam for fine-tuning.
+% Our study is by no means comprehensive or complete.
+% In particular, we did not study how weight decay, learning rate schedule, clipping norm schedule, or batch size schedule affect private learning. 
+% Custom setups for these knobs have been found helpful for other private learning tasks~\citep{anil2021large}. 
 
-Overall, our studies revealed that hyperparameter values can affect private fine-tuning in significant ways.
-This calls for more transparency in reporting hyperparameter choices, analyses of hyperparameter transferability across tasks and architectures, and accounting of the privacy loss for hyperparameter tuning when hyperparameters aren't transferred across workloads.
+% Overall, our studies revealed that hyperparameter values can affect private fine-tuning in significant ways.
+% This calls for more transparency in reporting hyperparameter choices, analyses of hyperparameter transferability across tasks and architectures, and accounting of the privacy loss for hyperparameter tuning when hyperparameters aren't transferred across workloads.
 
-\paragraph{Pretraining and Its Relation to Private Learning.}
-Our model scaling results (Figure~\ref{fig:fig1}) suggest that using larger pretrained models improves performance. 
-This argument, however, is dependent on the particular choice of pretrained models.
-How pretraining helps private learning and whether better pretrained models for private learning could be built are interesting future avenues.
+% \paragraph{Pretraining and Its Relation to Private Learning.}
+% Our model scaling results (Figure~\ref{fig:fig1}) suggest that using larger pretrained models improves performance. 
+% This argument, however, is dependent on the particular choice of pretrained models.
+% How pretraining helps private learning and whether better pretrained models for private learning could be built are interesting future avenues.
 
-\paragraph{Scaling Laws for Private Learning.}
-While scaling laws~\citep{kaplan2020scaling} for non-private deep learning have become prevalent, we are unaware of a case study in the private learning realm. 
-Studies on how the dimensionality of models (and pretraining) generally affect private deep learning in precise terms will likely be a useful tool in trading off compute budget and model quality.
+% \paragraph{Scaling Laws for Private Learning.}
+% While scaling laws~\citep{kaplan2020scaling} for non-private deep learning have become prevalent, we are unaware of a case study in the private learning realm. 
+% Studies on how the dimensionality of models (and pretraining) generally affect private deep learning in precise terms will likely be a useful tool in trading off compute budget and model quality.

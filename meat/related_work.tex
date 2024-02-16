@@ -12,3 +12,38 @@ However, they did not attempt fine-tuning large pretrained models with DP-SGD.
 \cite{dupuy2021efficient} studied private BERT fine-tuning on datasets of utterances, but reported results with $\epsilon$ on the order of at least 100. 
 Orthogonally, many works considered training language models that satisfy empirical notions of privacy~\citep{xu2021utilitarian,coavoux2018privacy,mireshghallah2021privacy,melamud2019towards}.
 Our work is distinct from all works mentioned above in that we study fine-tuning large language models (with hundreds of millions of parameters) under global DP with stringent guarantees ($\epsilon \in \{3, 8\}$) on smaller datasets (much less than a million examples).
+
+\paragraph{Differentially Private Deep Learning.}
+DP-SGD has been viewed as ineffective for large models due to the addition of large Gaussian noise to gradient updates. 
+Improvements to the learning procedure mostly fall under two distinct camps: $(i)$ Simplifying the private learning problem, and $(ii)$ reducing the scale of noise. 
+For instance, \cite{papernot2019making,tramer2020differentially,abadi2016deep} consider transferring features learned on public datasets to simplify the subsequent private learning task. 
+On the other hand, \cite{zhou2020bypassing,kairouz2020fast} remove the ambient dimension dependence of DP noise by identifying subspaces in which private gradients lie and would be privatized. 
+\cite{yu2021not,yu2021large} make such ideas practical and demonstrate improved results on private learning benchmarks. 
+\cite{zhang2021wide} applied the sparse vector technique to learning wide neural layers to reduce the amount of injected noise. 
+Our work mostly falls under the first camp -- improving private learning through simplifying the learning task.
+Our work is also distinct from prior works in that we focus on privately fine-tuning large pretrained models. 
+Lastly, there are alternative solutions in the literature that enforces DP which are not based on gradient perturbation~\citep{papernot2018scalable,papernot2016semi}. 
+These methods typically require extra public data and are not the present focus. 
+
+\paragraph{Parameter-Efficient Fine-Tuning.}
+Recent developments of pretrained model adaptation have produced a wide range of parameter-efficient fine-tuning methods for both vision and language tasks.
+We briefly summarize these, grouping by category. 
+Approaches based on optimizing prompt-like constructions for NLP tasks include prefix-tuning~\citep{li2021prefix}, P-tuning~\citep{liu2021gpt}, and prompt-tuning~\citep{lester2021power}.
+Adapter-based methods insert small subnetworks inside pretrained Transformers~\citep{houlsby2019parameter,ruckle2020adapterdrop,pfeiffer2020adapterfusion}.
+Methods that optimize low-rank matrices include the work by~\cite{hu2021lora,mahabadi2021compacter}.
+In addition, there are adaptation methods that only optimize biases for vision~\citep{cai2020tinytl} and language tasks~\citep{ben2021bitfit}.
+Our evaluation in Section~\ref{sec:experiments_main} covered the most representative methods that generally have state-of-the-art non-private learning performance (at the time of writing) for the range of NLP tasks studied in this paper.
+
+\paragraph{Speeding Up DP-SGD.}
+Apart from the work by~\cite{lee2020scaling} and~\cite{subramani2020enabling}, there is an approach that approximates per-example gradient norms through the combination of random projection and forward-mode autodiff~\citep{bu2021fast}.
+While faster than vanilla private learning, this approach has the drawback of increased privacy spending and having an extra hyperparameter.
+Our ghost clipping technique, while only suited for Transformers applied to sequential data, does not introduce new hyperparameters.
+
+\paragraph{Alternative Clipping Strategies.}
+While there are alternative clipping strategies in the literature that show improvements on simple tasks~\citep{pichapati2019adaclip,asi2021private}, we have opted to study the simplest strategy that clips gradients by their Euclidean norm.
+We leave the study of these algorithms for NLP tasks to future work.
+
+\paragraph{DP Synthetic Data Generation.}
+Fine-tuning generative language models on private data under DP can also be viewed as a means of accomplishing DP synthetic data generation -- learning generative models from private data so that synthetic examples could be sampled and used for analysis. 
+Previous work employed generative adversarial networks and focused primarily on image or tabular datasets~\citep{torkzadehmahani2019dp,neunhoeffer2020private,chen2020gs,torfi2020differentially}. 
+Perhaps more related is the work by~\cite{bommasani19towards} which attempted fine-tuning GPT-2 on medical datasets to generate synthetic records but did not report any quantitative results. 
