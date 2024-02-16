@@ -1,0 +1,40 @@
+
+
+
+
+
+
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{0.75}
+\begin{table}[thb]
+\footnotesize
+\caption{
+Adaptive per-layer clipping matches the performance of flat clipping for full fine-tuning under the same number of training epochs for common privacy levels.
+Results based on fine-tuning GPT-2 on E2E and DART.
+Numbers in the column ``flat'' are reported by~\cite{li2022large}.
+}
+\centering
+\begin{tabular}{l c cc cc}
+\toprule
+\multirow{2}[0]{*}{Metric} & \multirow{2}[0]{*}{DP Guarantee} & \multicolumn{2}{c}{E2E} & \multicolumn{2}{c}{DART} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6}
+ & & {Adaptive per-layer} & {Flat} & {Adaptive per-layer} & {Flat} \\
+
+\midrule
+\multirow{3}[1]{*}{BLEU}
+
+ & $\epsilon=3$ & 61.101 & 61.519     & 31.851 & 31.025  \\
+ & $\epsilon=8$ & 63.416 & 63.189     & 34.166 & 35.057  \\
+ & non-private    & -  & 69.463         & -  & 42.783  \\
+
+\midrule
+\multirow{3}[1]{*}{ROUGE-L}
+
+ & $\epsilon=3$ & 65.120 & 65.670   & 51.519 & 52.063 \\
+ & $\epsilon=8$ & 66.689 & 66.429   & 52.877 & 54.576 \\
+ & non-private    & -  & 71.359         & -  & 56.717   \\
+
+\bottomrule
+\end{tabular}
+\label{table:table2text_trimmed}
+\end{table}

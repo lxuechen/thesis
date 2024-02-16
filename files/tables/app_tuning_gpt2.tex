@@ -1,0 +1,30 @@
+
+
+
+\begin{table*}[ht]
+\footnotesize
+\setlength\tabcolsep{2.4pt}
+\centering 
+\caption{Hyperparameters for full fine-tuning GPT-2 with adaptive per-layer clipping. Numbers in bold are best performing hyperparameters used for reporting final results. 
+} \label{tab:gpt2_tuning}
+\begin{tabular}{l cc}
+\toprule
+\textbf{Model} & \multicolumn{2}{c}{GPT-2} \\
+\textbf{Dataset} & E2E & DART \\ 
+\midrule
+\textbf{Optimizer} & \multicolumn{2}{c}{Adam} \\
+\textbf{Adam ($\beta_1$, $\beta_2$)} & \multicolumn{2}{c}{(0.9, 0.999)}   \\
+\textbf{Adam ($\epsilon$)} & \multicolumn{2}{c}{1e-8}   \\
+\textbf{Weight Decay} & \multicolumn{2}{c}{0} \\
+\textbf{Learning Rate Schedule} & \multicolumn{2}{c}{Linear Decay} \\
+\textbf{Batch Size} & 1000 & 1500 \\
+\textbf{Max Epochs} & 10 & 15 \\
+\textbf{Learning Rate} & \multicolumn{2}{c}{$2 \times 10^{-3}$ } \\
+\textbf{Allocation Method} & \multicolumn{2}{c}{Global} \\
+\textbf{Init Threshold} & \multicolumn{2}{c}{0.01} \\
+\textbf{Private Quantile Relative Budget $r$} & \multicolumn{2}{c}{1\%} \\
+\textbf{Quantile Learning Rate $\eta$} & \multicolumn{2}{c}{0.3} \\
+\textbf{Target Quantile $q$} & $\{\mathbf{0.3}, 0.5, 0.7, 0.9\}$ & reuse best of left \\
+\bottomrule
+\end{tabular}
+\end{table*}

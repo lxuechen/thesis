@@ -1,0 +1,53 @@
+\section{Introduction}
+Recent works on deep learning with differential privacy (DP) have substantially improved the computational efficiency~\citep{subramani2021enabling,anil2021large} and privacy-utility trade-off~\citep{li2022does,yu2022differentially,de2022unlocking,mehta2022large}, resulting in cost-effective private learning workflows with favourable utility under common levels of privacy guarantee. 
+Common to most of these works is the use of differentially private stochastic gradient descent (DP-SGD) which clips per-example gradients (herein referred to as \emph{flat clipping}) and noises their average before performing the parameter update based on a minibatch~\citep{song2013stochastic,bassily2014private,abadi2016deep}.
+We explore whether further improvements in computational efficiency and privacy-utility trade-off are possible and provide affirmative answers for both directions, leveraging two instantiations of \emph{group-wise clipping} for DP-SGD. 
+
+
+DP-SGD is known to be computationally costly due to clipping per-example gradients.
+Instantiating per-example gradients and (potentially) normalizing them can incur both high memory and time costs in standard machine learning frameworks~\citep{paszke2019pytorch,frostig2018compiling}, and thus private machine learning with DP-SGD is reportedly much more memory demanding and/or slower than its non-private counterpart~\citep{carlini2019secret,hoory2021learning}. 
+Recent works have considerably improved the memory and time efficiency of DP-SGD with better software primitives~\citep{subramani2021enabling} and algorithms~\citep{yousefpour2021opacus,lee2021scaling,li2022large,bu2022scalable}.
+Nevertheless, private learning still shows non-trivial increases in either memory usage or compute time when compared to non-private learning head-to-head. 
+For instance, better software primitives do not eliminate the inherent increase in memory spending~\citep{subramani2021enabling}, and improved algorithms only remove this memory overhead at the cost of extra runtime~\citep{li2022large}. 
+The first research question we study is therefore
+\renewenvironment{quote}
+  {\list{}{\rightmargin=0.1in \leftmargin=0.1in}%
+  \item\relax}
+  {\endlist}
+\begin{quote}
+	\centering
+	\emph{Can private learning be as memory and time efficient (per epoch) as non-private learning?}
+\end{quote}
+
+We answer the above question affirmatively by giving an efficient implementation of \emph{per-layer clipping} which had been studied in past works but not from a computational efficiency perspective~\citep{mcmahan2018learning,dupuy2022efficient}. 
+Clipping per-example gradients of separate neural networks layers (e.g., linear, convolution) separately allows clipping to be performed in conjunction with backpropagation. 
+This results in private learning that is as memory-efficient and almost as time-efficient per training update as non-private learning for many small to moderate scale workflows of practical interest. 
+While per-layer clipping with static clipping thresholds chosen by hand tends to underperform flat clipping, we show that per-layer clipping with adaptively estimated thresholds matches or outperforms flat clipping under given training epoch constraints, hence attaining similar or better task performances with less wall time.
+
+
+DP-SGD is known to (possibly) incur substantial performance losses compared to non-private learning.
+To improve the privacy-utility trade-off, several past works have leveraged large-scale publicly pretrained models~\citep{yu2022differentially,li2022large,de2022unlocking,mehta2022large}.
+These works observe that the privacy-utility trade-off improves with the use of larger (and thus better) pretrained models.\footnote{While size does not equate quality, there is strong correlation between the two under currently popular pretraining techniques~\citep{liu2019roberta,brown2020language}. We're optimistic that future smaller models pretrained with improved techniques can be as performant as current large models~\citep{hoffmann2022training}. 
+}
+We extend this research and study a second research question 
+\begin{quote}
+	\centering
+	\emph{Can the privacy-utility trade-off be further improved with even better / larger pretrained models?}
+\end{quote}
+To study this, we scale DP fine-tuning to work with one of the largest and most performant pretrained language models to date---the original 175 billion-parameter GPT-3.
+Weights of this model cannot be hosted in the memory of a single accelerator (e.g., GPU) and must be distributed across multiple devices. 
+This presents challenges for flat clipping which calls for communicating per-example gradient norms across devices. To bypass these challenges, we turn to \emph{per-device clipping}, where each device is prescribed a clipping threshold for clipping per-example gradients of the hosted model piece.
+Per-device clipping incurs no additional communication cost and allowed us to obtain with GPT-3 a private fine-tuning performance at $\epsilon=1$ that is better than what is attainable by non-privately fine-tuning the largest GPT-2 on a challenging summarization task. 
+
+Our contributions are summarized below. 
+\begin{itemize}[leftmargin=6mm]
+\item[(1)] We show per-layer clipping enables clipping to be done in conjunction with backpropagation in DP optimization and results in private learning that is as memory-efficient and almost as fast per training update as non-private learning for many small to moderate scale workflows of interest.
+\item[(2)] We show adaptive per-layer clipping matches or outperforms flat clipping under fixed training epoch constraints, and thus attains similar or better task performances with less wall time.
+\item[(3)] We bypass scaling challenges associated with communicating per-example gradient norms with per-device clipping, with which we scale DP fine-tuning to work with the 175 billion-parameter GPT-3 and obtain improved task performance for a challenging summarization task at $\epsilon=1$.
+\end{itemize}
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+\clearpage
+\newpage
+\section{Additional Experiments Comparing Adaptive Per-layer Against Flat Clipping}
+\label{app:glue_controlled_complementary}
+
+This section complements the results in Table~\ref{table:glue_epoch_sst_2} and follows the same experimental protocol for those experiments except now we consider $\epsilon=8$. 
+The goal is to provide further evidence showing that adaptive per-layer clipping has a privacy-utility tradeoff that is comparable to flat clipping when both methods are used to train models for the same number of training epochs. 
+
+
+Table~\ref{table:glue_epoch_sst_2_complementary} shows that for full fine-tuning and across the epoch constraints we considered, adaptive per-layer clipping is competitive with flat clipping in terms of accuracy for different privacy budgets.
+Note the results we obtain for flat clipping in Table~\ref{table:glue_epoch_sst_2_complementary} are higher than those reported by~\cite{li2022large}.
+This is because to ensure that we are not unfairly disfavouring flat clipping for this  SST-2 task, we tuned hyperparameters on this task (details in Appendix~\ref{app:glue}); recall~\cite{li2022does} didn't tune on SST-2, but instead relied on hyperparameter transfer from the E2E task. 
+
+\begin{table}[thb]
+\newcommand{\bb}[1]{\textbf{#1}}
+\setlength\tabcolsep{2.4pt}
+\caption{
+Adaptive per-layer clipping matches or outperforms flat clipping in accuracy (\%) on SST-2 under fixed epoch ($E$) constraints. 
+This experiment performs full fine-tuning with both clipping approaches.
+Numbers in parentheses are standard deviations from three independent runs. 
+}
+\centering
+\begin{tabular}{l c cccc cccc}
+\toprule
+\multirow{2}[2]{*}{Model} &
+\multirow{2}[2]{*}{Method} & 
+\multicolumn{4}{c}{\text{$\epsilon=8$}} \\
+\cmidrule(lr){3-6} 
+& & $E=3$ & $E=10$ & $E=20$ & $E=30$ \\
+\midrule
+\multirow{2}{*}{RoBERTa-base} %
+& Flat clipping (tuned) & $89.13 (0.64)$ & $91.53 (0.12)$ & $91.97 (0.67)$ & $92.10 (0.56)$  \\
+& Adaptive per-layer & $90.83 (1.39)$ & $92.27 (0.76)$ & $92.63 (0.32)$ & $92.87 (0.12)$ \\
+\midrule
+\multirow{2}{*}{RoBERTa-large} & Flat clipping (tuned) & $92.43 (0.32)$ & $93.50 (0.20)$ & $94.57 (0.55)$ & $94.87 (0.76)$ \\
+& Adaptive per-layer &  $93.20 (0.36)$ & $93.53 (0.47)$ & $94.37 (0.15)$ & $94.33 (0.38)$ \\
+\bottomrule
+\end{tabular}
+\label{table:glue_epoch_sst_2_complementary}
+\end{table}

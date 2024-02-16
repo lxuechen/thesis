@@ -1,0 +1,16 @@
+\vspace{-2mm}
+\section{Conclusion}
+\vspace{-2mm}
+% We studied group-wise clipping as an effective tool to improve speed and memory performance of DP-SGD, and to decrease the communication overhead in distributed model-parallel training of gigantic models that do not fit in a single GPU. 
+We showed that group-wise clipping schemes are effective tools to improve the efficiency of DP-SGD for small- to moderate-scale workflows that run on single accelerators, and to avoid overheads in private distributed pipeline parallel training of models that do not fit on single accelerators. 
+We showed that adaptive clipping algorithms can mitigate known utility losses associated with using fixed and hand-tuned thresholds. 
+% Despite these benefits, group-wise clipping introduces new algorithmic challenges in the form of tuning the clipping thresholds, noise allocation to groups, and the optimal partitioning (grouping) of model parameters. 
+% It is an interesting open question to design provable group-wise clipping algorithms that can pareto-dominate flat clipping or disprove such schemes can exist. 
+Designing group-wise clipping algorithms that can Pareto-dominate flat clipping in terms of privacy vs utility (or show impossibility) is an interesting future direction.
+
+\section*{Limitations}
+Group-wise clipping schemes offer various advantages but are not without limitations and drawbacks.
+First, group-wise clipping algorithms tend to have a few extra hyperparameters. This could lead to a need of additional tuning when optimal hyperparameters differ across tasks and domains (although we showed that across the tasks we studied, the optimal values for most of the additional hyperparameters remained stable). 
+Second, the per-layer clipping scheme gives limited efficiency improvements in non-distributed settings when only few parameters are fine-tuned.
+Lastly, care must be taken during implementation to fully realize the gains of adaptive per-layer clipping in practice. 
+

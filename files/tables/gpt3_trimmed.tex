@@ -1,0 +1,28 @@
+\begin{wraptable}[14]{r}{6.3cm}
+\footnotesize
+\caption{Fine-tuning GPT-3 with DP LoRA achieves improved privacy-utility trade-off. Metrics are ROUGE scores.}
+\vspace{-3mm}
+\begin{tabular}{l c ccc}\\
+\toprule
+Model+Method+DP guarantee & R-1 & R-2 & R-L \\
+\midrule
+\textbf{Flat clipping} & & & \\
+\hspace{1mm} GPT-2-xl LoRA ($\epsilon= 0.25$) & 8.0 & 2.7 & 6.8 \\
+\hspace{1mm} GPT-2-xl LoRA ($\epsilon=1$)     & 30.0 & 11.0 & 25.3 \\
+\hspace{1mm} GPT-2-xl LoRA ($\epsilon=4$)     & 35.4 & 14.3 & 29.9 \\
+GPT-2-xl LoRA (non-private)     & 46.2 & 23.7 & 39.4 \\
+\midrule
+\textbf{Per-device clipping} & & & \\
+\hspace{1mm} GPT-3 LoRA ($\epsilon= 0.25$) & 42.0 & 20.4 & 35.7 \\
+\hspace{1mm} GPT-3 LoRA ($\epsilon= 1$)    & 48.0 & 25.4 & 41.3 \\
+\hspace{1mm} GPT-3 LoRA ($\epsilon= 4$)    & 48.5 & 26.4 & 42.0 \\
+GPT-3 LoRA (non-private) & 53.8 & 29.8 & 45.9 \\
+
+\midrule
+GPT-3 0-shot             & 27.4 & 9.0 & 20.9 \\
+GPT-3 4-shot             & 42.1 & 19.6 & 34.2 \\
+
+\bottomrule
+\end{tabular}
+\label{table:gpt3_trimmed}
+\end{wraptable}

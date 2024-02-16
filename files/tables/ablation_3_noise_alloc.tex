@@ -1,0 +1,25 @@
+\begin{table}[thb]
+
+\newcommand{\bb}[1]{\textbf{#1}}
+
+
+\footnotesize
+\setlength\tabcolsep{2.4pt}
+\caption{Accuracy (in \%) on SST-2 dev set with different noise allocation strategies. }
+\centering
+\begin{tabular}{l c ccc ccc}
+\toprule
+\multirow{2}[2]{*}{Model} &
+\multirow{2}[2]{*}{Strategy} & 
+\multicolumn{2}{c}{\text{$\epsilon=3$}} & 
+\multicolumn{2}{c}{\text{$\epsilon=8$}} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6} 
+& & Training & Validation  &  Training & Validation \\
+\midrule
+\multirow{3}{*}{RoBERTa-base} & Global & \bb{89.2} & \bb{92.0} & \bb{89.7} & \bb{92.3} \\
+& Equal Budget & 88.3 & 91.4 & 89.0 & 91.7 \\
+& Weighted (equal SNR) & 89.0 & 91.7 & 89.6 & 91.9 \\
+\bottomrule
+\end{tabular}
+\label{table:ablation_3_noise_alloc}
+\end{table}

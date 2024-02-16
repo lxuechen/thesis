@@ -13,3 +13,4 @@ main.pdf
 *.fdb_latexmk
 *.fls
 *.sublime-workspace
+.DS_Store

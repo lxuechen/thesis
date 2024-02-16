@@ -1,0 +1,6 @@
+\section{Noise Allocation Comparison} \label{app:noise-allocation}
+
+We compare the noise allocation strategies empirically. Apart from the \emph{global strategy} where $\gamma_k =1 $ for all $k\in [K]$ and the \emph{equal budget strategy} where $\gamma_k=C_k$ for all $k\in [K]$ that are discussed in Section~\ref{sec:adaptive-clipping}, we also consider another \emph{weighted strategy}: $\gamma_k = C_k/\sqrt{d_k}$ for $k\ \in [K]$. In this case,  the number of parameter plays a role so that each coordinate would roughly have the same signal to noise ratio and the total noise has squared $\ell_2$ norm $V_{E}\propto (\sum_{k=1}^{K}d_{k})\cdot (\sum_{k=1}^{K}C_k^{2})$.
+
+We fine-tune RoBERTa-base models on the SST-2 sentence classification task. The hyper-parameters are searched for each strategy separately where the ranges follow Appendix~\ref{app:hyperparameter}. Results are presented in Table~\ref{table:ablation_3_noise_alloc}. We can see that three strategies achieves comparable performance and the global strategy is slightly better. Therefore, we use global strategy for all the experiment except for GPT-3 where  the equal budget strategy is used to eliminate the concern of communication across devices.
+ \input{files/tables/ablation_3_noise_alloc}

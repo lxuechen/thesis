@@ -1,0 +1,59 @@
+\section{Experiments}\label{sec:experiment}
+
+Previous sections verified that per-layer clipping has an efficiency advantage over flat clipping. 
+We now show that adaptive per-layer clipping is competitive in terms of privacy vs utility.
+Our experiments cover training wide ResNets from scratch, fine-tuning RoBERTa on GLUE tasks, and fine-tuning GPT-2 and GPT-3 for table-to-text generation and summarization tasks. For private quantile estimation, we use the geometric update rule by \cite{andrew2019differentially} and set $\eta=0.3$ for all experiments.
+Reported numbers are averaged over three seeds unless otherwise stated.
+
+
+
+\subsection{Privately Learn WideResNets for CIFAR-10 Classification}\label{subsec:cifar10}
+
+We train a wide ResNet (WRN16-4, 2.8M trainable parameters) \citep{zagoruyko2016wide} from scratch for CIFAR-10 classification with differential privacy. We follow the implementation by  \cite{de2022unlocking}, e.g.,  batch normalization are replaced with group normalization and weight standardization is applied for convolutional layers, except that we do not use augmentation multiplicity for simplicity.
+We set privacy parameter $\delta= 10^{-5}$ and choose $\epsilon$ from $\{1,3,5,8\}$, which are typical privacy parameters used in previous works.
+
+We compare the performance of adaptive per-layer clipping with that of flat clipping. 
+For both algorithms, we use  hyperparameters suggested by \cite{de2022unlocking}  and tune learning rates. %
+We use a fraction $r=0.01$ of privacy budget for quantile estimation and choose the target quantile $q$ from $\{0.5, 0.6, 0.7\}$. For both algorithms we train for 300 epochs. 
+We summarize the details in Appendix \ref{app:cifar}.  
+Table~\ref{table:cifar_acc} shows that adaptive per-layer clipping achieves  training and validation accuracies on par with flat clipping for multiple choices of $\epsilon$. %
+
+
+\input{files/tables/cifar}
+
+\subsection{Privately Fine-tune RoBERTa on GLUE Tasks} \label{subsec:roberta}
+
+Our first experiment aims to show that adaptive per-layer clipping is broadly competitive with existing approaches in the literature in terms of the privacy-utility tradeoff. 
+In this experiment, we fine-tune RoBERTa-base (125M) and RoBERTa-large (355M)~\citep{liu2019roberta} on SST-2, QNLI, QQP, and MNLI from the GLUE benchmark~\citep{wang2018glue} with differential privacy. 
+We set $\epsilon\in \{3,8\}$ and $\delta=1/n^{1.1}$, where $n$ is the size of training set.
+We tune the learning rate, batch size, and target quantile on SST-2's training data and transfer the best hyperparameters to other tasks. 
+We use $r=0.1$ of the privacy budget for quantile estimation, choose the target quantile $q$ from $\{0.5, 0.75, 0.85\}$, and set the number of training epochs $E=20$.  %
+Table~\ref{table:glue} shows that adaptive per-layer clipping obtains accuracies competitive with established approaches in the literature under fixed privacy constraints.
+
+Our second controlled experiment shows that adaptive per-layer clipping gives utility that is competitive with flat clipping under fixed training epochs (when both approaches fine-tune the same set of parameters), effectively verifying its wall time advantage. 
+In this experiment, we constrain the number of training epochs $E$ to be one of $\{3, 10, 20, 30\}$ and fine-tune RoBERTa models on SST-2 with the two clipping methods.
+Table~\ref{table:glue_epoch_sst_2} shows that adaptive per-layer clipping is 
+on par with flat clipping in accuracy for all setups and justifies the wall time advantage claim given that adaptive per-layer clipping is faster per epoch. 
+
+\cite{li2022large} demonstrated that the performance of private fine-tuning for text classification with various algorithms improves with a text infilling formulation. 
+The infilling technique reformulates the optimization problem and is orthogonal to the algorithmic aspects under study. 
+To ensure our comparisons are fair, all experiments in this section follow the usual BERT fine-tuning setup without text infilling. 
+Additional details of the two experiments can be found in Appendix \ref{app:glue}.
+
+\input{files/tables/glue}
+
+\subsection{Privately Fine-tune on Langauge Generation Tasks} \label{subsec:gpt}
+
+\input{files/tables/table2text_trimmed_v2}
+\paragraph{Table-To-Text Generation.}
+We compare adaptive per-layer clipping against flat clipping for full fine-tuning with GPT-2 on the E2E~\citep{novikova2017e2e} and DART~\citep{nan2020dart} table-to-text generation tasks. 
+Since~\cite{li2022large} performed extensive tuning on these tasks for flat clipping, we recall their results here.
+For runs with adaptive per-layer clipping, we reused hyperparameter values tuned for SST-2, but re-tuned the target quantile with the E2E validation set and constrained the batch size and number of training epochs to be the same as that for flat clipping; see Appendix~\ref{app:lang_gen} for details.
+Table~\ref{table:table2text_trimmed} confirms that DP learning with adaptive per-layer clipping performs comparably to flat clipping under a given epoch constraint.
+\input{files/tables/gpt3_trimmed}
+\paragraph{Dialog Summarization.}\label{exp:summarization}
+We use the SAMSum dialog summarization task as a testbed for studying model scaling~\citep{gliwa2019samsum}.\footnote{We believe the chance of contamination occurring for this task to be small. See Appendix~\ref{app:per_device_clipping} for discussions.}
+This task is more challenging than previously tested ones since its training set is small (less than 15k examples) and inputs are long. 
+We fine-tune both GPT-2-xl and the (original) 175 billion-parameter GPT-3 with LoRA~\citep{hu2021lora} with and without DP, and compare them against in-context learning with GPT-3~\citep{brown2020language}.
+Table~\ref{table:gpt3_trimmed} shows that GPT-3 fine-tuned at $\epsilon=1$ outperforms non-privately fine-tuned GPT-2-xl and in-context learning with 4 demonstrations (the maximum that can be fitted within the context window of 2048 tokens). 
+See Appendix~\ref{app:per_device_clipping} for more details.

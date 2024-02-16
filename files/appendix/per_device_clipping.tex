@@ -1,0 +1,109 @@
+\newpage
+\section{More on Per-device Clipping and Experiments with GPT-3}\label{app:per_device_clipping}
+
+\subsection{Additional Comments on Per-device Clipping}
+Algorithm~\ref{alg:perdevice} details the private pipeline parallel training procedure with per-device clipping covered in the main text.
+The algorithm adopts the equal budget noise allocation strategy to avoid incurring extra communication across devices.
+For simplicity, the pseudocode covers a single update and omits any subprocedures for adapting clipping thresholds. 
+Extending this pseudocode to adaptive threshold clipping based on quantile estimation is straightforward. 
+Lastly, the pseudocode assumes that the model has already been partitioned into chunks of consecutive layers, where each chunk $\vtheta_k$ is hosted on device $k$. 
+
+\begin{algorithm}
+\caption{Single Update of Private Pipeline Parallel Training With Per-Device Clipping}
+\label{alg:perdevice}
+\begin{algorithmic}[1]
+
+\STATE \textbf{INPUT}:  
+Minibatch $\mathcal{S}$; 
+iterate $\vtheta$; 
+per-device parameters $\{\vtheta_1, \cdots, \vtheta_K\}$ hosted on $K$ devices;  
+clipping thresholds $\{C_1,\dots, C_K\}$; 
+noise multiplier $\sigma$; 
+learning rate $\eta$; 
+number of microbatches per minibatch $J$
+
+\STATE Partition minibatch $\mathcal{S}$ into $J$ microbatches $\{ \mathcal{S}_1, \cdots, \mathcal{S}_J \}$
+
+\STATE Create an empty execution schedule $\mathcal{C}$ 
+
+\FOR{$j = 1$ to $J$}
+
+\STATE Stage microbatch $\mathcal{S}_j$'s $\texttt{LocalForward}$ and $\texttt{LocalBackward}$ calls in the schedule $\mathcal{C}$, ensuring the stages are executed sequentially for this microbatch
+\ENDFOR
+
+\STATE Organize the schedule $\mathcal{C}$ based on pipeline parallel rules, allowing different devices to process different microbatches simultaneously
+
+\STATE Execute the schedule $\mathcal{C}$
+
+\STATE Synchronize all devices
+
+\FOR{$k = 1$ to $K$}
+\STATE $\vtheta_k' \gets \vtheta_k -{\eta} u_k $.
+\ENDFOR
+
+\STATE \textbf{return} $\vtheta' = (\vtheta_1', \cdots, \vtheta_K') $
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{minipage}{0.46\textwidth}
+\begin{algorithm}[H]
+    \centering
+    \caption{ \texttt{LocalForward} }
+    \begin{algorithmic}[1]
+        \STATE \textbf{INPUT}: Device id $k$; microbatch index $j$ 
+        \STATE Wait for activations $a_{k-1}^{(j)}$ from device $k-1$ if $k > 1$; otherwise transfer microbatch $\mathcal{S}_j$ onto device $k$
+        \STATE Perform forward pass with $a_{k-1}^{(j)}$ and model piece $\vtheta_i$ (stored on device $k$) to obtain outputs $a_{k}^{(j)}$
+        \STATE Store a copy of $a_{k}^{(j)}$ on CPU if not already saved
+        \STATE Communicate activations $a_{k}^{(j)}$ to device $k+1$ if $k < K$
+    \end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}{0.46\textwidth}
+\begin{algorithm}[H]
+    \centering
+    \caption{ \texttt{LocalBackward} }
+    \begin{algorithmic}[1]
+        \STATE \textbf{INPUT}: Device id $k$; microbatch index $j$
+        \STATE Transfer activations $a_{k-1}^{(j)}$ from CPU to device $k$
+        \STATE Wait for output gradients $o_{k}^{(j)}$ if device $k < K$
+        \STATE Rematerialize activations by performing extra forward pass
+        \STATE Clip and sum per-example gradients $\{ \tilde{\vg}_k^{(i)} \}_i$ of local model piece $\vtheta_k$ by backpropagating based on $o_{k}^{(j)}$ or the loss values with threshold $C_k$; add this to a local accumulator $u_k$ (stored on device $k$)
+        \STATE If $j=1$, add noise to accumulator $u_k$ to guarantee DP
+        \STATE Compute gradients with respect to input $o_{k-1}^{(j)}$ and communicate this to device $k-1$ if $k > 1$. 
+    \end{algorithmic}
+\end{algorithm}
+\end{minipage}
+
+
+
+\subsection{Fine-tuning GPT-3 on SAMSum}
+Note the term ``GPT-3'' in the literature is used in multiple occasions and can refer to multiple models. 
+Our experiments are based on fine-tuning or prompting the original GPT-3 model~\citep{brown2020language} and not the more recent variants which had been fine-tuned or adapted in some way (e.g., instruct-GPT-3~\citep{ouyang2022training} labeled with prefix \texttt{instruct-} in OpenAI API). 
+
+
+Larger models are known to have better fine-tuned performance when inputs and outputs are formatted as instructions and responses~\citep{wei2021finetuned,sanh2021multitask}. 
+We observed similar results when fine-tuning with differential privacy, and thus augmented the training and test sets by prepending the inputs with the instruction ``Summarize the following dialogue'' and the outputs with the delimiter ``TL;DR''. 
+To ensure a fair comparison, we used this instruction-augmented dataset for all experiments. 
+
+For decoding from models, we used beam search with a beam size of 4 for both GPT-3 and GPT-2-xl (including in-context learning experiments). 
+
+To ensure we account for the variability in performance with different prompts for in-context learning, we sampled 3 sets of prompts for the 4-shot learning experiments and reported the average metric over runs. 
+
+Without access to the original pretraining corpus, we cannot completely rule out the possibility of data contamination, which refers to the unfortunate outcome that parts of the fine-tuning or evaluation data occur in the pretraining corpus.
+Nevertheless, we believe the chances of this happening are small due to two reasons. 
+First, zero-shot prompting GPT-3 with both low temperature sampling and beam search based on instruction-augmented inputs tended to result in completions which either repeated or extended the instruction or the dialog (e.g., ``the following is a dialog between...''), or attempted to continue the dialog but digressed. 
+In the limited number of examples we inspected, we were unable to find an instance where the output looked similar to a high-quality summary. Second, we looked up the initial time when the SAMSum paper was released to arXiv (late Nov. 2019). 
+Given that the GPT-3 model we based our experiments off were pretrained with shards of Common Crawl uploaded (possibly) at the end of 2019~\citep{brown2020language}, we performed simple searches of the SAMSum paper with their url index in the Dec. 2019 crawl archive of Common Crawl and were not able to find the link of the paper.
+Notably the SAMSum dataset was crafted by linguists and highly curated (as opposed to collected based on web data). 
+
+For fine-tuning GPT-3 with DP LoRA on SAMSum, we reused hyperparameters adopted by~\cite{hu2021lora}, but re-tuned the learning rate based on preliminary runs for another dataset.
+We set all per-device clipping threshold to be 1e-5 and adopted the equal budget noise allocation strategy for simplicity. 
+We fine-tuned for 5 epochs in all runs (both GPT-3 and GPT-2-xl; both private and non-private).
+
+For the DP LoRA fine-tuning runs, we used a machine with 16 V100 GPUs each with 32 gigabytes of VRAM. 
+This enabled LoRA fine-tuning with a rank of 32 with a microbatch size of 1 under pipeline parallelism.
+Fine-tuning with DP LoRA for 5 epochs on SAMSum's training set took 15 hours, and decoding with test inputs using beam search further took another 22 hours. 
+
+

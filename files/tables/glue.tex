@@ -1,0 +1,68 @@
+\begin{table}[th]
+
+
+\newcommand{\bb}[1]{\textbf{#1}}
+
+\footnotesize
+\setlength\tabcolsep{1.7pt}
+\caption{
+Adaptive per-layer clipping matches accuracy (in \%) results in the literature on GLUE tasks.\protect\footnotemark
+}
+\centering
+\begin{tabular}{l c cccc cccc}
+\toprule
+\multirow{2}[2]{*}{Model} &
+\multirow{2}[2]{*}{Method} & 
+\multicolumn{4}{c}{\text{$\epsilon=3$}} & 
+\multicolumn{4}{c}{\text{$\epsilon=8$}} \\
+\cmidrule(lr){3-6} \cmidrule(lr){7-10}
+& & MNLI-(m/mm) & QQP & QNLI & SST-2
+& MNLI-(m/mm) & QQP & QNLI & SST-2 \\
+\midrule
+\multirow{ 4}{*}{RoBERTa-base} & \cite{yu2021large} & - & - & - & - & 80.1 & 85.5 & 87.2 & 91.6 \\
+                               & \cite{li2022large} & $82.47/82.10$ & $85.41$ & $84.62$ & $86.12$ & $83.30/83.13$ & $86.15$ & $84.81$ & $85.89$ \\
+                               & \cite{yu2022differentially} & - & - & - & - & $83.5$ & $85.7$ & $87.3$ & $92.2$ \\
+                                & Adaptive per-layer & $82.83/83.27$ & $85.67$ & $86.13$ & $92.03$ & $83.70/83.97$ & $86.23$ & $87.13$ & $92.40$ \\
+\midrule
+\multirow{ 4}{*}{RoBERTa-large} & \cite{yu2021large} & - & - & - & - & 86.1 & 86.7 & 90.0 & 93.0 \\
+                                &  \cite{li2022large} & $85.53/85.81$ & $86.65$ & $88.94$ & $90.71$ & $86.28/86.54$ & $87.49$ & $89.42$ & $90.94$ \\
+                                & \cite{yu2022differentially} & - & - & - & - & $87.8$	& $87.4$ & $90.8$ & $95.3$ \\
+                                & Adaptive per-layer & $87.10/87.20$ & $86.80$ & $89.80$ & $93.87$ & $87.67/87.57$ & $87.20$ & $90.77$ & $94.03$ \\
+\bottomrule
+\end{tabular}
+\label{table:glue}
+\end{table}
+\footnotetext{Results in \cite{yu2021large,yu2022differentially} on MNLI are the average of the matched and mismatched accuracy.}
+
+
+
+
+\begin{table}[th]
+\centering
+\newcommand{\bb}[1]{\textbf{#1}}
+\footnotesize
+\setlength\tabcolsep{2.4pt}
+\caption{Adaptive per-layer clipping is competitive with flat clipping on SST-2 in accuracy (\%) under fixed fine-tuning epochs ($E$). Models are full fine-tuned.
+Numbers in parentheses are standard deviations from three independent runs. 
+See results for $\epsilon=8$ in Appendix~\ref{app:glue_controlled_complementary}.
+}
+\begin{tabular}{l c cccc}
+\toprule
+\multirow{2}[2]{*}{Model} &
+\multirow{2}[2]{*}{Method} & 
+\multicolumn{4}{c}{\text{$\epsilon=3$}} \\
+\cmidrule(lr){3-6}
+& & $E=3$ & $E=10$ & $E=20$ & $E=30$  \\
+\midrule
+\multirow{2}{*}{RoBERTa-base} %
+& Flat clipping (tuned) & $88.70 (0.52)$ & $90.17 (1.10)$ & $91.47 (1.07)$ & $91.60 (0.95)$\\
+& Adaptive per-layer & $90.50 (1.21)$ & $91.90 (0.72)$ & $92.33 (0.42)$ & $92.23 (0.06)$ \\
+\midrule
+\multirow{2}{*}{RoBERTa-large} & Flat clipping (tuned) & $92.20 (0.26)$ & $93.07 (0.75)$ & $93.67 (0.40)$ & $94.23 (0.67)$ \\
+& Adaptive per-layer & $91.73 (0.59)$ & $93.27 (0.45)$ & $93.90 (0.26)$ & $94.13 (0.38)$ \\
+\bottomrule
+\end{tabular}
+\label{table:glue_epoch_sst_2}
+\end{table}
+
+

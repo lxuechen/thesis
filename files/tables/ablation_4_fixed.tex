@@ -1,0 +1,56 @@
+\begin{table}[h]
+\footnotesize
+\setlength\tabcolsep{2.4pt}
+\caption{Adaptivity helps flat clipping but not as much as for per-layer clipping. Averaged accuracy and standard deviation are given by 3 independent runs.}
+
+\newcommand{\bb}[1]{\textbf{#1}}
+
+\begin{subtable}[h]{0.45\textwidth}
+\centering
+\caption{CIFAR-10}
+\begin{tabular}{l ccc ccc}
+\toprule
+{Method} & 
+\text{$\epsilon=3$} & 
+\text{$\epsilon=8$} \\
+\midrule
+\textbf{Flat clipping} \\
+\hspace{4mm} fixed & $63.1_{(0.22)}$ & $73.9_{(0.87)}$ \\ 
+\hspace{4mm} adaptive & - & - \\[1.5mm] %
+ & \bb{+$0$} & \bb{+$0$} \\ 
+\midrule
+\textbf{Per-layer clipping} \\
+\hspace{4mm} fixed & $60.6_{(0.79)}$ & $67.8_{(1.20)}$ \\ %
+\hspace{4mm} adaptive & $63.7_{(0.34)}$ & $73.5_{(0.87)}$ \\[1.5mm] %
+  & \bb{+$3.1$} & \bb{+$5.7$} \\
+\bottomrule
+\end{tabular}
+\label{table:ablation_4_fixed_perlayer_cifar10}
+\end{subtable}
+\hfill
+\begin{subtable}[h]{0.45\textwidth}
+\centering
+\caption{SST-2}
+\begin{tabular}{l ccc ccc}
+\toprule
+{Method} & 
+\text{$\epsilon=3$} & 
+\text{$\epsilon=8$} \\
+\midrule
+\textbf{Flat clipping} \\
+\hspace{4mm} fixed & $91.5_{(1.07)}$ & $92.0_{(0.67)}$ \\ %
+\hspace{4mm} adaptive & $92.2_{(0.70)}$ & $92.6_{(0.46)}$ \\[1.5mm] %
+  & \bb{+$0.7$} & \bb{+$0.6$} \\ 
+\midrule
+\textbf{Per-layer clipping} \\
+\hspace{4mm} fixed & $89.4_{(1.04)}$ & $89.7_{(0.70)}$ \\ 
+\hspace{4mm} adaptive & $92.0_{(0.23)}$ & $92.4_{(0.44)}$ \\[1.5mm] %
+  & \bb{+$2.6$} & \bb{+$2.7$} \\ 
+\bottomrule
+\end{tabular}
+\label{table:ablation_4_fixed_perlayer_sst2}
+\end{subtable}
+
+\label{table:ablation_4_fixed_perlayer}
+\end{table}
+

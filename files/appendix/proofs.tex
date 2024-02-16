@@ -1,0 +1,17 @@
+
+\section{Proofs} \label{app:proofs}
+We present the proof for Proposition~\ref{prop:noise-multiplier}. For easy reference, we restate the proposition here.
+\NewNoiseMultiplier*
+\begin{proof}
+The proof is based on direct calculation, a simple version of which is given in \cite{andrew2019differentially}. First, we note that the clip counts $b_k^{(i)}$ is either 0 or 1 (see line 10 in Algorithm \ref{alg:perlayer-DPSGD}). One can make it to be symmetric by using $b_k^{(i)} -\frac{1}{2}$, whose sensitivity is $\frac{1}{2}$. Suppose the gradient has sensitivity $S$. 
+
+For the Gaussian mechanism, to keep the privacy budget constant we have 
+\begin{flalign*}
+S^2/(S\sigma)^2 = S^2/(S\sigma_{\text{new}})^2 + K\cdot \frac{(1/2)^2}{\sigma_b^2}.
+\end{flalign*}
+Simplifying the above expression, we get $\sigma_{\text{new}}$.
+
+
+We can further compute the fraction $r$ of budget that is used to privately estimate quantiles by  
+$r=K\cdot \frac{(1/2)^2}{\sigma_b^2}/(1/\sigma^2)$. We can also derive the value of $\sigma_b$ given $r$ from the above formula.
+\end{proof}

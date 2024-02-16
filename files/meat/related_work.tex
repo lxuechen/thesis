@@ -1,0 +1,17 @@
+\section{Related Work}
+
+
+Training large deep learning models with DP has gained momentum in the recent years. For instance, \cite{anil2021large} privately pretrained BERT models, and \cite{kurakin2022toward} privately trained deep ResNets on ImageNet.
+Recent works have also investigated private fine-tuning \citep{kerrigan2020differentially,tian2021seqpate,senge2021one,hoory2021learning,basu2021benchmarking,yu2021large} and observed that one can achieve favourable privacy-utility trade-offs with large pretrained models for image classification \citep{luo2021scalable,tramer2021differentially,golatkar2022mixed,de2022unlocking,mehta2022large} and tasks in NLP \citep{yu2022differentially,li2022large,li2022does}.
+Group-wise clipping schemes considered in our work improve the efficiency of DP-SGD and further this line of research by making scaling private learning easier.
+
+
+Several works considered adjusting the clipping threshold of DP-SGD adaptively during training \citep{pichapati2019adaclip,asi2021private}. 
+The most related to us is that by \cite{andrew2019differentially} who set the threshold for flat clipping as privately estimated quantile of gradient norms.
+They showed that doing so eased hyperparameter tuning without affecting the final model performance.
+Different from these works, ours considers per-layer clipping, where adapting the clipping threshold plays a more crucial role for obtaining good utility. More discussion on related work is in Appendix~\ref{app:more_related}.
+
+
+
+
+

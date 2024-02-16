@@ -1,0 +1,45 @@
+\section{Preliminaries} \label{sec:preliminary}
+This section aims to cover background on gradient clipping in DP optimization and explain why alternate group-wise clipping strategies can be attractive from a computational efficiency standpoint.
+
+Our work trains machine learning models (more precisely deep neural networks) with optimizers that guarantee DP. 
+For completeness, we recap the definition of approximate DP/$(\epsilon, \delta)$-DP below.
+\begin{defi}[$(\epsilon,\delta)$-DP]
+A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-DP if for all neighboring datasets $\mathbb{D}, \mathbb{D}'\in \X$ and all $Y \subset \Y$, it holds that 
+$
+\Prob{\M(\mathbb{D}) \in Y} \le 
+\exp( \epsilon ) \cdot \Prob{ \M(\mathbb{D}') \in Y } + \delta.
+\label{eq:epsilon_delta_dp}
+$
+\end{defi}
+In our case, $\M$ is an optimization algorithm which outputs the learned model parameters $\vtheta$. 
+Widely used DP optimizers (e.g., DP-SGD) usually introduce two additional steps before each parameter update to privatize gradients:
+(1) clip per-example gradients of a minibatch by their Euclidean norms according to some threshold $C$;
+(2) add Gaussian noise to the sum of clipped gradients. 
+In practice, the clipping threshold $C$ can be either a tunable hyperparameter or set to some (privatized) statistic estimated from data. 
+The standard deviation of the Gaussian noise is determined by the clipping threshold $C$ and the noise multiplier $\sigma$, the latter of which is set by a privacy accounting procedure given target privacy parameters $(\epsilon, \delta)$, the number of iterations $T$, and the subsampling rate $\rho$~\citep{abadi2016deep,mironov2017renyi, dong2019gaussian, gopi2021numerical}. 
+We now present background on different per-example gradient clipping strategies in DP optimization.
+
+\textbf{Flat Clipping.}
+This is the clipping scheme used in the original DP-SGD algorithm~\citep{abadi2016deep}.
+Here, the gradient of example $s_i$'s loss $\ell(\vtheta, s_i)$ with respect to model parameters $\vg^{(i)}:= {\partial \ell(\vtheta, s_i)} / {\partial \vtheta}$ is normalized if its magnitude exceeds the threshold $C$.
+Thus, the actual contribution (up to scaling) of the $i$th instance to the noisy gradient is
+$\widetilde{\vg}^{(i)} := \vg^{(i)}\cdot \min \{1, C /  {\|\vg^{(i)}\| } \}$.
+Flat clipping cannot be performed until the gradient norms $\{\|\vg^{(i)}\|\}_i$ are computed. 
+Since the latter quantities are only known after backpropagation completes, flat clipping necessitates a second-round of computation after backpropagation to conditionally rescale the gradients. 
+This is a source of overhead and presents complications when model weights don't fit on a single device. 
+
+
+
+\textbf{Group-Wise Clipping.} 
+This scheme partitions the set of parameters $\vtheta \in \R^d$ into $K$ disjoint groups $\{\vtheta_k  \}_{k=1}^K$ with  $\vtheta_k \in \sR^{d_k}$ for $k\in [K]$.
+For each group $k$, the scheme prescribes a clipping threshold $C_k$. 
+Denote example $s_i$'s gradient for the $k$th group by $\vg_k^{(i)}:= {\partial \ell(\vtheta, s_i)} / {\partial \vtheta_k}$.
+Under group-wise clipping, the $k$th clipped gradient for $s_i$ is 
+$\tilde{\vg}_k^{(i)} := \vg_k^{(i)}\cdot \min\{1, C_k / {\|\vg_k^{(i)}\|}\}$.
+Next, we present two instantiations of group-wise clipping that are computationally advantageous in different settings.
+
+
+
+
+
+

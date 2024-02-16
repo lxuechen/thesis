@@ -1,0 +1,16 @@
+\clearpage
+\newpage
+\section{Additional Related Work}
+\label{app:more_related}
+
+\paragraph{Faster DP-SGD.} Improving the efficiency of DP-SGD is an active research area. One line of works improve the implementation  without changing the algorithm such as using better parallelism and compile-time optimization \citep{subramani2021enabling,anil2021large}. 
+\cite{subramani2021enabling} show that the running time of carefully implemented DP-SGD is comparable  to non-private SGD for small-size models. 
+However, the high memory cost of storing per-example gradients still limits the throughput of DP-SGD when the model size is large \citep{li2022large}. 
+Another line of works avoids instantiating per-example gradients by running backpropagation twice \citep{goodfellow2015efficient,lee2021scaling,bu2021fast,li2022large,bu2022scalable}. The high-level idea is to compute or estimate per-example gradient norms in the first backpropagation and reweight loss functions before the second backpropagation.  Although these works achieve memory efficiency, they add computational overhead because of the additional backpropagation.
+
+\paragraph{DP-SGD with Per-layer Clipping.} Per-layer clipping (or more generally group-wise clipping)  has been studied in~\cite{abadi2016deep,mcmahan2018general, mcmahan2018learning, dupuy2022efficient}. However, the advantage of per-layer clipping has not yet been fully understood because of two reasons. Firstly, previous work does not focus on computational efficiency, leaving the empirical advantage of group-wise clipping unexplored. Secondly, these works simply adopt fixed thresholds for per-layer clipping and hence generally observe performance drops compared to flat clipping. In this work, we use adaptive thresholds to improve the privacy-utility tradeoff of per-layer clipping. Moreover, we give an efficient implementation of per-layer clipping to demonstrate its superior empirical advantage. 
+
+\paragraph{Privacy Attacks Against Deep Models.} Deep models may unintentionally leak sensitivie information about their training data \citep{shokri2017membership,hitaj2017deep,zhu2019deep,song2019privacy,carlini2020extracting,choquette2021label,carlini2022membership,balle2022reconstructing}. For instance, \cite{carlini2020extracting} show that GPT-2 outputs its training data when short prefixs are provided. Training deep models with differential privacy has become a popular choice  to prevent data leakage \citep{abadi2016deep,papernot2016semi,mcmahan2018learning,zhu2020private}. In addition to theoretical guarantee, differentially private models are also very robust to empirical privacy attacks \citep{bernau2019assessing,carlini2019secret,yu2021large}. 
+
+
+\paragraph{Adapting to the Geometry of Gradients in DP-SGD.} Using adaptive clipping thresholds in DP-SGD fits more broadly into a line of work that adapts the geometry of gradients to clipping and noising. The gradients of machine learning models usually have much smaller intrinsic dimensions than the model sizes. This property has been used to prove better theoretical bounds for DP-SGD or improve its empirical performance~\citep{kairouz2020fast,song2020characterizing,zhou2021bypassing,yu2021do,li2022does,ma2022dimension}.

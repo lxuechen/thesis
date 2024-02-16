@@ -1,0 +1,31 @@
+
+\begin{table*}[ht]
+\footnotesize
+\setlength\tabcolsep{2.4pt}
+\centering 
+\caption{Hyper-parameters of per-layer clipping for RoBERTa on SST-2 dataset, where the \textbf{text in bold} denotes the hyper-parameters we eventually use.} \label{tab:roberta_tuning_sst2}
+\begin{tabular}{l cc cc}
+\toprule
+\textbf{Model} & \multicolumn{2}{c}{RoBERTa-base} & \multicolumn{2}{c}{RoBERTa-large}  \\
+\textbf{Method} & Adaptive & Fixed  & Adaptive & Fixed \\ 
+\midrule
+\textbf{Optimizer} & \multicolumn{4}{c}{Adam} \\
+\textbf{Adam ($\beta_1$, $\beta_2$)} & \multicolumn{4}{c}{(0.9, 0.98)}   \\
+\textbf{Adam $\epsilon$} & \multicolumn{4}{c}{$10^{-6}$}   \\ 
+\textbf{Weight Decay} & \multicolumn{4}{c}{0}   \\ 
+\textbf{Warm-up Ratio} & \multicolumn{4}{c}{0.06} \\ 
+\textbf{Learning Rate Schedule} & \multicolumn{4}{c}{Linear Decay}   \\ 
+\textbf{Dropout} & \multicolumn{4}{c}{0.1} \\ 
+\textbf{Attention Dropout} & \multicolumn{4}{c}{0.1} \\ 
+\textbf{Max Epochs} & \multicolumn{4}{c}{20} \\
+\midrule
+\textbf{Peak Learning Rate} & $\{1,\textbf{2},4\}\times10^{-4}$ & $\{\textbf{1},2,4\}\times10^{-4}$ & $\{1,\textbf{2},4\}\times10^{-4}$ & $\{1,\textbf{2},4\}\times10^{-4}$\\ 
+\textbf{Batch Size} & $\{1,\textbf{2},4\}\times2^{9}$ & $\{\textbf{1},2,4\}\times2^{9}$ & $\{\textbf{1},2,4\}\times2^{9}$ & $\{\textbf{1},2,4\}\times2^{9}$  \\ 
+\textbf{Allocation Method} & \multicolumn{4}{c}{Global} \\
+\textbf{Init Threshold} & 1.0 & \{\textbf{0.1}, 0.5, 1.0\} & 1.0 & \{0.1, 0.5, \textbf{1.0}\} \\
+\textbf{Private Quantile Relative Budget $r$} & 10\% & - & 10\% & - \\ 
+\textbf{Quantile Learning Rate $\eta$} & 0.3 & - & 0.3 & - \\ 
+\textbf{Target Quantile $q$} & \{0.5, 0.75, \textbf{0.85}\} & -  & \{0.5, 0.75, \textbf{0.85}\} & -  \\
+\bottomrule
+\end{tabular}
+\end{table*}

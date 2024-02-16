@@ -1,0 +1,37 @@
+\section{Efficient Private Pipeline Parallelism with Per-device Clipping}
+\label{sec:per_device_clipping}
+Past works have shown that DP fine-tuning yields improved privacy-utility trade-offs with the use of larger / better pretrained models. 
+We study whether this trend continues to hold as one leverages larger pretrained models by scaling DP training to work with one of the largest pretrained language models to date---the 175 billion-parameter GPT-3. 
+The sheer size of this model presents challenges in computational efficiency, since model weights cannot be fit on a single device (e.g., GPU) and existing approaches for distributing computation don't tend to play well with flat clipping. 
+
+We base our distributed DP training strategy off the popular \emph{pipeline parallelism} used in non-private training~\citep{huang2019gpipe,rasley2020deepspeed}.\footnote{Alternate parallelization schemes can be more flat clipping friendly (e.g., FSDP~\citep{fsdp}), but current open source implementations of these schemes are generally not light-weight fine-tuning friendly.}
+We summarize the idea of pipeline parallelism here and defer to the cited works for the specifics. 
+Pipeline parallelism first partitions the model into chunks of consecutive layers / blocks and distributes each onto a single accelerator. 
+Forward computation with a microbatch (created through splitting a minibatch) then chains together local computations with each model piece (hosted on each accelerator) by communicating activations across accelerators. 
+Backward computation (backpropagation) roughly reverses the above process, but on each accelerator, intermediate forward activations of the model piece are recomputed to reduce peak memory \cite[Section 2.3]{huang2019gpipe}.
+Most importantly, pipeline parallelism simultaneously performs computation with different microbatches on different accelerators to reduce the overall idle time.
+Devices synchronize after all microbatches finish their forward and backward computation and before the optimizer invokes the parameter update. 
+
+
+Flat clipping necessitates computing per-example gradient norms to compute factors that rescale gradients. 
+This calls for the communication of per-example norms of local gradients on each device and leads to an inherent overhead in pipeline parallelism. 
+We outline two potential approaches for accomplishing communication, both of which unfortunately lead to non-trivial slowdowns as well as complications in implementation.
+The first approach synchronizes all devices after the full backward pass finishes for each microbatch (within a minibatch) so that each device will retain the same gradient norms for computing the scaling factor in clipping.
+This approach incurs as many extra synchronization steps as the number of microbatches per minibatch and reduces training efficiency when the number of microbatches is large.
+While executing primitives like all-gather with local gradient norms is not costly per se, the disruption these calls bring to the pipeline schedule is. 
+Concretely, devices need to perform one of the following: (i) retain the unclipped local per-example gradients for a microbatch---and become idle due to pausing its processing of subsequent microbatches to avoid memory errors---until synchronization for the microbatch is called; (ii) offload the unclipped local per-example gradients to CPU only to transport them back on synchronization; (iii) rematerialize the microbatch's local gradient on synchronization. 
+(i) is costly since it forces devices to be idle, (ii) is costly due to slow CPU-GPU data transfer, and (iii) is costly due to performing the extra round of backpropagation. 
+To reduce the frequency of synchronization, a second approach may instead ask devices to only synchronize after the last microbatch has been processed. 
+This approach, however, does not bypass the complications in the subsequent gradient rescaling step which requires local per-example gradients either be offloaded to CPU and moved back later or rematerialized on synchronization.
+
+
+
+
+
+As the first attempt at experimenting with DP fine-tuning on huge models, we instead turn to an alternative \emph{per-device clipping} scheme, where each device is prescribed a clipping threshold for clipping per-example gradients of the hosted model piece.
+Leveraging the equal budget strategy, the noise level added to gradients on each device is agnostic of the clipping thresholds of other devices (thus, no extra communication incurred). 
+We present the full pseudocode of the algorithm in Appendix~\ref{app:per_device_clipping}. 
+Notably, per-device clipping with DP LoRA fine-tuning allowed us to obtain improved results for a challenging summarization task (see Section~\ref{exp:summarization}). 
+
+
+
