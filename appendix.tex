@@ -1,5 +1,7 @@
-\section{Derivation of the Frobenius norm identity}
-\label{app:frobenius}
+\appendix
+\section{Supplementary for Chapter 3}
+
+\subsection{Derivation of the Frobenius norm identity} \label{app:frobenius}
 Recall $a \in \R^{B\times T \times d}$ is the input to a linear layer with weight matrix $W \in \R^{p \times d}$, and $g \in \R^{B \times T \times p}$ is the gradient of the loss w.r.t. the output. The identity follows from trivial algebra:
 \eqn{
 \normf{ \nabla_W \mathcal{L}_i }^2 = \normf{ g_i^\top a_i }^2
@@ -27,4 +29,39 @@ Note that when $T=1$, the identity takes the form of
 = 
     \normtwo{a_i}^2 \normtwo{g_i}^2. 
 }
-This is exactly what is used in the \cite{goodfellow2015efficient} trick. 
+This is the \cite{goodfellow2015efficient} trick.
+
+\newpage
+
+\subsection{Experiment Details}\label{app:experiments_main}
+
+\paragraph{Sentence Classification.}
+Results for RGP in Table~\ref{table:glue} are taken from documented numbers in their released codebase.\footnote{\url{https://github.com/dayu11/Differentially-Private-Deep-Learning/tree/main/language}}
+These results are under the DP guarantees of $(\epsilon, \delta)=(3, 10^{-5})$ or $(\epsilon, \delta)=(8, 10^{-5})$.
+These guarantees are strictly looser than our guarantees which are based on $\delta=\nicefrac{1}{2 |\D_\text{train}|}$ (recall the smallest dataset in this cohort of tasks has $60$k+ records).
+The RGP numbers in Table~~\ref{table:glue} are higher than those reported in their paper~\citep{yu2021large}, since the latter numbers are not based on fine-tuning the official RoBERTa models.
+
+\paragraph{Table-To-Text Generation.}
+To evaluate models trained on E2E and DART, we evaluate generations from models obtained with beam search with a beam size of $5$.
+For evaluation, we run the official pipeline for E2E,\footnote{\url{https://github.com/tuetschek/e2e-metrics}} and the pipeline used in the GEM benchmark~\citep{gehrmann2021gem} for DART.\footnote{\url{https://github.com/GEM-benchmark/GEM-metrics}}
+
+\paragraph{Chit-Chat Dialog Generation.}
+We built off Huggingface's codebase of the winning entry of the ConvAI2 competition,
+\footnote{\url{https://github.com/huggingface/transfer-learning-conv-ai}}
+\footnote{\url{http://convai.io/2018/}} and used their preprocessed training set with the minor modification of truncating the number of training examples to be a multiple of the batch size.
+The original ConvAI2 competition is aimed at advancing research on building engaging chatbots and also requested models to predict the mostly likely response given a list of candidates.
+The challenge included hits@1 as part of its suite of automatic metrics.
+For simplicity, we skip this step of predicting the most likely response for both training and evaluation. 
+Results for the entry HuggingFace (ConvAI2 winner) in Table~\ref{table:personachat} are taken from the official validation set leader board.\footnote{\url{https://github.com/DeepPavlov/convai/blob/master/leaderboards.md}}
+Our reimplementation of HuggingFace's submission uses the released code for their winning entry, fine-tunes GPT with the default hyperparameters, and removes the classification loss for learning to predict the most likely response given candidates.
+
+We additionally fine-tuned DialoGPT-medium~\citep{zhang2019dialogpt}, since the model was pretrained on conversation-like exchanges extracted from Reddit comment chains. Intuitively, this pretraining corpus is more aligned with the downstream fine-tuning data than WebText~\citep{radford2019language}, and thus would likely improve downstream performance.
+
+To evaluate the F1 score, we obtained predicted responses from trained models using beam search with a beam size of $5$.
+Since past work found that the F1 score can be gamed by always letting the model predict a predetermined phrase~\citep{dinan2019second}, we additionally ask humans to rate generations from the model through Amazon mechanical turk to obtain a more complete picture of model quality.
+When sampling responses for human evaluation, we used nucleus sampling with $p=0.9$~\citep{holtzman2019curious}.
+For human evaluation, we asked 20 turkers to each rate 5 entries.
+For each entry, a turker is asked to rate on a scale of 1 to 5 the quality of predicted responses from privately fine-tuned DialoGPT-medium models, non-privately fine-tuned DialoGPT-medium models, non-privately fine-tuned GPT models (our reimplementation of HuggingFace's entry), and the reference text, given the history of the dialog. 
+Since human evaluation can yield noisy results, we also report the $95\%$ asymptotic confidence interval in Table~\ref{table:personachat}.
+All models were trained and evaluated on the version of Persona-Chat with the original persona.
+All numbers reported in Table~\ref{table:personachat} are obtained on the validation split. 
