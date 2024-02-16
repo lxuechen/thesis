@@ -165,7 +165,7 @@ Algorithm~\ref{algo:gauss} is $(\epsilon, \delta)$-DP.
 
 \begin{algorithm}[H]
 \centering
-\caption{Gaussian Mechanism for Private Estimation of Gradient Mean}
+\caption{Gaussian Mechanism for Private Gradient Mean Estimation}
 \begin{algorithmic}[1]
   \State {\bfseries Input:}
   Norm threshold $C > 0$, gradients $G = \{g_i\}_{i=1}^N$, privacy parameters $\epsilon, \delta$.
@@ -181,31 +181,31 @@ Algorithm~\ref{algo:gauss} is $(\epsilon, \delta)$-DP.
 \end{algorithm}
 
 DP-SGD and its siblings follow the paradigm described above: They apply the Gaussian mechanism to privatize each gradient computation step, rely on post-processing for the privacy guarantee of weight updates, and resort to adaptive composition for the overall privacy guarantee. 
-Algorithm~\ref{algo:dp_first_order} makes this precise in pseudocode.
+Algorithm~\ref{algo:dp_first_order} presents the general pattern of DP first-order optimizers in pseudocode.
 \begin{algorithm}[H]
 \centering
 \caption{DP First-Order Optimization}
 \begin{algorithmic}[1]
   \State {\bfseries Input:}
-  Dataset $D=\{x_i\}_{i=1}^N$, learning rate $\eta$, batch size $B$, norm threshold $C > 0$, training epochs $E$, initial weights $\theta_0\in\R^p$, optimizer state $s_0$, optimizer hyperparameters $H$, privacy parameters $\epsilon, \delta > 0$.
+  Dataset $D=\{x_i\}_{i=1}^N$, learning rate $\eta$, batch size $B$, norm threshold $C > 0$, training epochs $E$, initial weights $\theta_0\in\R^p$, optimizer states $s_0$, optimizer hyperparameters $H$, privacy parameters $\epsilon, \delta > 0$.
 
   \State $q = \nicefrac{B}{N}$ \Comment{ {\color{red} Derive the sampling rate.} }
   \State $T = \floor{ \nicefrac{E}{q} }$ \Comment{ {\color{red} Derive the total iteration count.}}
-  \State Calculate the noise multiplier $\sigma$ from $\epsilon, \delta, q, E$ with adaptive composition and privacy amplification theorems.
+  \State Calculate the noise multiplier $\sigma$ from $\epsilon, \delta, q, T$ with adaptive composition and privacy amplification theorems.
   \For{ $t = 1, \dots, T $ }
-    \State Draw a batch $B_t$ via Poisson sampling each element with probability $q$
+    \State Draw a batch $B_t$ via \emph{Poisson sampling} (sample each element with prob. $q$).
     \For{ $x_i \in B_t$ }
         \State $g_t(x_i) \gets \nabla_{\theta_t} \mathcal{L}(x_i)$ \Comment{ {\color{red} Compute per-example gradient.}}
-        \State $\tilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })$ \Comment{
+        \State $\widetilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })$ \Comment{
         {\color{red} Clip per-example gradient.}}
     \EndFor
     \State \(\triangleright\) {\color{red} Estimate the average gradient with the sampled Gaussian mechanism.} 
     \State $z_t \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
-    \State $\bar{g_t} = \frac{1}{B} \bracks{ 
-        \sum_{x_i \in B_t} \tilde{g_t}(x_i) + z_t
+    \State $\widebar{g_t} = \frac{1}{B} \bracks{ 
+        \sum_{x_i \in B_t} \widetilde{g_t}(x_i) + z_t
     }$
-    \State \(\triangleright\) {\color{red} Update model weights and optimizer state.}
-    \State $\theta_{t + 1}, s_{t+1} \gets \texttt{WeightUpdate}(\theta_t, s_t, H)$
+    \State \(\triangleright\) {\color{red} Update model weights and optimizer states with private gradient.}
+    \State $\theta_{t + 1}, s_{t+1} \gets \texttt{WeightUpdate}(\widebar{g_t}, \theta_t, s_t, H)$
     \EndFor
 \State \Return $\theta_{T}$ or $\frac{1}{T}\sum_{t=1}^T \theta_t$
 \end{algorithmic}
