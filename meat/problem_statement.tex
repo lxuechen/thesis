@@ -1,14 +1,5 @@
 \section{Problem Statement}
-We build models for sentence classification and language generation tasks with datasets of modest sizes under (central/global) approximate-DP (also known as $(\epsilon, \delta)$-DP)~\citep{dwork2014algorithmic}. 
-\begin{defi}[$(\epsilon, \delta)$-DP]
-A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-differentially private if for all adjacent datasets $X, X'\in\mathcal{X}$ and all $Y \subset \Y$, 
-$
-\Prob{\M(X) \in Y} \le \exp( \epsilon ) \Prob{ \M(X') \in Y } + \delta.
-\label{eq:epsilon_delta_dp}
-$
-\end{defi}
-We say that two datasets are adjacent if and only if one can be obtained from the other by including an extra record.\footnote{An alternative definition of adjacency assumes all datasets are of equal size and is based on the replacement of records. This is not the definition we adopt. }
-How a record is defined is task dependent and will be made clear below.
+We build models for sentence classification and language generation tasks with datasets of modest sizes under (central/global) $(\epsilon, \delta)$-DP~\citep{dwork2014algorithmic}.
 
 Intuitively, DP algorithms ensure that random outputs obtained from similar inputs are difficult to distinguish. 
 $\epsilon$ and $\delta$ are \textit{privacy leakage} parameters that measure the loss of privacy and small values imply stronger privacy guarantees.
