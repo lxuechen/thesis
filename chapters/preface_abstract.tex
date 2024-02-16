@@ -7,7 +7,7 @@ However, previous approaches for training deep learning models with DP typically
 This thesis presents improved techniques for DP training that are more efficient and performant.
 These techniques have seen growing interest in industry and have led to the first deployment of differentially private machine learning at Microsoft, protecting users' privacy and providing substantial computational savings.
 
-We show that Differentially Private Stochastic Gradient Descent (DP-SGD), when properly applied to fine-tune pretrained models of increasing size, consistently produces better privacy-utility tradeoffs. Vanilla DP-SGD is memory-intensive and slow. We present algorithms and implementations that are as efficient as standard training for Transformers.
+We show that Differentially Private Stochastic Gradient Descent (DP-SGD), when properly applied to fine-tune pretrained models of increasing size, consistently produces better privacy-utility tradeoffs. Vanilla DP-SGD is memory-intensive and slow. We present algorithms and implementations that are as efficient as standard training for Transformers models.
 In addition, we provide theoretical analyses of our empirical results.
 A prevailing prior belief was that DP-SGD performs poorly when optimizing high-dimensional objectives. 
 This intuition, grounded in previous dimension-dependent bounds for private convex optimization, appears to be at odds with our empirical observations. 
