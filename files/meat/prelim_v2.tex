@@ -1,16 +1,7 @@
 \section{Preliminaries} \label{sec:preliminary}
 This section aims to cover background on gradient clipping in DP optimization and explain why alternate group-wise clipping strategies can be attractive from a computational efficiency standpoint.
 
-Our work trains machine learning models (more precisely deep neural networks) with optimizers that guarantee DP. 
-For completeness, we recap the definition of approximate DP/$(\epsilon, \delta)$-DP below.
-\begin{defi}[$(\epsilon,\delta)$-DP]
-A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-DP if for all neighboring datasets $\mathbb{D}, \mathbb{D}'\in \X$ and all $Y \subset \Y$, it holds that 
-$
-\Prob{\M(\mathbb{D}) \in Y} \le 
-\exp( \epsilon ) \cdot \Prob{ \M(\mathbb{D}') \in Y } + \delta.
-\label{eq:epsilon_delta_dp}
-$
-\end{defi}
+Our work trains machine learning models (more precisely deep neural networks) with optimizers that guarantee $(\epsilon, \delta)$-DP.
 In our case, $\M$ is an optimization algorithm which outputs the learned model parameters $\vtheta$. 
 Widely used DP optimizers (e.g., DP-SGD) usually introduce two additional steps before each parameter update to privatize gradients:
 (1) clip per-example gradients of a minibatch by their Euclidean norms according to some threshold $C$;
