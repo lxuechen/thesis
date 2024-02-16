@@ -1,0 +1,25 @@
+\section{Effective Differentially Private Fine-Tuning}
+By studying the impact of hyperparameters and choice of fine-tuning objective, we demonstrate that the performance of the DP-Adam baseline can be substantially improved, even matching some strong non-private learning results.
+Our analyses reveal common failure modes when straightforwardly applying DP optimization and explain poor results reported in past works that consider these baselines.
+
+
+\subsection{Hyperparameter Tuning}\label{sec:good_hyper_params}
+DP optimization is sensitive to the choice of hyperparameters~\citep{papernot2019making}.
+Our experiments suggest that its performance can vary from being close to that of random initialization with ill-chosen hyperparameters to near state-of-the-art with appropriately chosen ones. As a consequence, we present simple but effective guidelines on setting the most important hyperparameters.
+Unless otherwise stated, the unmentioned hyperparameters are set to defaults documented in Appendix~\ref{app:good_hyper_params}. 
+
+\input{meat/batch_size_new}
+\input{meat/clipping_norm_new}
+
+\subsection{Improving the task alignment helps private learning}\label{sec:task_alignment}
+Our fine-tuned models on language generation tasks work well since the pretraining objective and downstream task are \emph{aligned}: Both involve predicting sequences of tokens.
+This alignment simplifies the task and benefits private learning. 
+While pretrained models are naturally aligned for language generation, it is much less so for classification tasks. The standard approach for adapting language models for classification involves stacking a freshly initialized network on top of the encoding of the special \texttt{[CLS]} token and jointly optimizing all parameters~\citep{devlin2018bert}. 
+This workflow introduces a discrepancy between pretraining and fine-tuning: Pretraining predicts masked out words from a large vocabulary whereas fine-tuning predicts integer labels.
+
+To eliminate the discrepancy, we instead consider learning to predict the missing word during fine-tuning for classification. 
+For example, for sentiment classification, we reframe the problem as filling in the \texttt{[MASK]} token in the sequence ``\texttt{<INPUT>}. It is \texttt{[MASK]}.'' and compare the probabilities of words ``awesome'' and ``terrible''.
+This text infilling task is almost exactly the procedure used for pretraining masked language models, and recent works have demonstrated its effectiveness for knowledge probing~\citep{petroni2019language}, few-shot learning~\citep{gao2020making} and multi-task fine-tuning~\citep{wei2021finetuned}. 
+On SST-2, we found that using the generic template as described above already improved private fine-tuning performance by $3\sim5\%$ across different settings.
+Table~\ref{table:glue} (to be presented) contains additional results and Appendix~\ref{app:task_alignment} includes analyses on choices of label words.
+

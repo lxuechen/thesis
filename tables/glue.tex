@@ -1,0 +1,34 @@
+\begin{table}[th]
+\footnotesize
+\setlength\tabcolsep{2.4pt}
+\caption{
+Full fine-tuning larger pretrained models  with text infilling has best performance.
+Results are dev set accuracies. 
+Best numbers based on two-sample test for each privacy level are in bold.
+}
+\centering
+\begin{tabular}{l cccc cccc}
+\toprule
+\multirow{2}[2]{*}{Method} 
+& \multicolumn{4}{c}{\text{$\epsilon=3$}}
+& \multicolumn{4}{c}{\text{$\epsilon=8$}} \\
+\cmidrule(lr){2-5}
+\cmidrule(lr){6-9}
+ & MNLI-(m/mm) & QQP & QNLI & SST-2
+ & MNLI-(m/mm) & QQP & QNLI & SST-2 \\
+\midrule
+RGP {(RoBERTa-base)} & - & - & - & - & 80.5/79.6 & 85.5 & 87.2 & 91.6 \\
+RGP {(RoBERTa-large)} & - & - & - & - & 86.1/86.0	& 86.7 & 90.0 & 93.0 \\
+\midrule
+full (RoBERTa-base)              & 82.47/82.10 & 85.41 & 84.62 & 86.12 & 83.30/83.13 & 86.15 & 84.81 & 85.89 \\
+full (RoBERTa-large)             & 85.53/85.81 & \textbf{86.65} & 88.94 & 90.71 & 86.28/86.54 & \textbf{87.49} & 89.42 & 90.94 \\
+full + infilling (RoBERTa-base)  & 82.45/82.99 & 85.56 & 87.42 & 91.86 & 83.20/83.46 & 86.08 & 87.94 & 92.09 \\
+full + infilling (RoBERTa-large) & \textbf{86.43/86.46} & 86.43 & \textbf{90.76}  & \textbf{93.04} & \textbf{87.02/87.26} & 87.47 & \textbf{91.10} & \textbf{93.81} \\
+\midrule \midrule
+ $\epsilon\approx$ (Gaussian DP + CLT) &2.52 &2.52 &2.00 &1.73 &5.83 &5.85 &4.75 &4.33\\
+\midrule
+ $\epsilon \approx$ (Compose tradeoff func.) &2.75 &2.75 &2.57 &2.41 &7.15 &7.16 &6.87 &6.69\\
+\bottomrule
+\end{tabular}
+\label{table:glue}
+\end{table}

@@ -1,0 +1,14 @@
+\section{Related Work}
+
+\paragraph{Private NLP.}
+The privacy-preserving NLP space is largely divided by whether or not DP (or its extensions) is considered.
+\cite{mcmahan2017learning} successfully trained small word-level RNNs with 1.35 million parameters in a federated setting with more than 700k users under a global DP guarantee with $(\epsilon, \delta) = (4.6, 10^{-9})$.
+\cite{ramaswamy2020training} train production grade next-word prediction models using DP-FedAvg with millions of users.
+\cite{qu2021privacy} studied fine-tuning BERT for language understanding tasks under local DP. 
+\cite{kerrigan2020differentially} presented initial results that public pretraining is helpful for downstream DP fine-tuning.
+However, they did not attempt fine-tuning large pretrained models with DP-SGD.
+\cite{bommasani2021opportunities} briefly commented on the possibility of achieving cheaper private learning by fine-tuning large pretrained language models. 
+\cite{anil2021large} pretrained BERT under global DP on datasets with hundreds of millions of examples. 
+\cite{dupuy2021efficient} studied private BERT fine-tuning on datasets of utterances, but reported results with $\epsilon$ on the order of at least 100. 
+Orthogonally, many works considered training language models that satisfy empirical notions of privacy~\citep{xu2021utilitarian,coavoux2018privacy,mireshghallah2021privacy,melamud2019towards}.
+Our work is distinct from all works mentioned above in that we study fine-tuning large language models (with hundreds of millions of parameters) under global DP with stringent guarantees ($\epsilon \in \{3, 8\}$) on smaller datasets (much less than a million examples).

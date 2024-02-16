@@ -1,0 +1,28 @@
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{0.75}
+\begin{table}[thb]
+\footnotesize
+\caption{
+Full fine-tuning performs on par with or outperforms others methods that execute gradient update in low dimensional spaces.
+Results are on E2E from fine-tuning GPT-2.
+}
+\centering
+\begin{tabular}{l c c c cccccc}
+\toprule
+\multirow{2}[0]{*}{Metric} & \multirow{2}[0]{*}{DP Guarantee} & Gaussian DP & Compose & \multicolumn{6}{c}{Method}  \\
+ & & + CLT & tradeoff func. & {full} & {LoRA} & {prefix} & {RGP} & {top2} & {retrain} \\
+
+\midrule
+\multirow{3}[1]{*}{BLEU}
+ & $\epsilon=3$ & $\epsilon \approx 2.68$ & $\epsilon \approx 2.75$ & \textbf{ 61.519 } & 58.153 & 47.772 & 58.482 & 25.920 & 15.457\\
+ & $\epsilon=8$ & $\epsilon \approx 6.77$ & $\epsilon \approx 7.27$ & \textbf{63.189} & \textbf{ 63.389 } & 49.263 & 58.455 & 26.885 & 24.247\\
+ & non-private & - & - & 69.463 & 69.682 & 68.845 & 68.328 & 65.752 & 65.731\\
+\midrule
+\multirow{3}[1]{*}{ROUGE-L}
+ & $\epsilon=3$ & $\epsilon \approx 2.68$ & $\epsilon \approx 2.75$ & \textbf{65.670} & \textbf{ 65.773 } & 58.964 & 65.560 & 44.536 & 35.240\\
+ & $\epsilon=8$ & $\epsilon \approx 6.77$ & $\epsilon \approx 7.27$ & \textbf{66.429} & \textbf{ 67.525 } & 60.730 & 65.030 & 46.421 & 39.951\\
+ & non-private & - & - & 71.359 & 71.709 & 70.805 & 68.844 & 68.704 & 68.751\\
+\bottomrule
+\end{tabular}
+\label{table:e2e_trim}
+\end{table}

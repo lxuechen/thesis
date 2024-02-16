@@ -1,0 +1,67 @@
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+\setlength{\tabcolsep}{2.5pt}
+\renewcommand{\arraystretch}{0.75}
+\begin{table}[h]
+\footnotesize
+\caption{
+Full results on E2E from fine-tuning GPT-2.
+}
+\centering
+\begin{tabular}{l c c c ccccc}
+\toprule
+\multirow{2}[0]{*}{Method} & \multirow{2}[0]{*}{DP Guarantee} & Gaussian DP & Compose & \multicolumn{5}{c}{Metrics}  \\
+ & & +CLT & tradeoff func. & 
+\scriptsize{BLEU} &
+\scriptsize{NIST} &
+\scriptsize{METEOR} &
+\scriptsize{ROUGE-L} &
+\scriptsize{CIDEr} \\
+
+\midrule
+\multirow{3}[1]{*}{full}
+ & $\epsilon=3$  & $\epsilon \approx 2.33$  & $\epsilon \approx 2.67$  & 61.519  & 6.697  & 0.384  & 65.670 & 1.761 \\
+ & $\epsilon=8$  & $\epsilon \approx 5.51$  & $\epsilon \approx 6.98$  & 63.189 & 7.444 & 0.400 & 66.429 & 1.919\\
+ & non-private  & -  & -  & 69.463 & 8.780 & 0.461 & 71.359 & 2.422\\
+\midrule
+\multirow{3}[1]{*}{LoRA}
+ & $\epsilon=3$  & $\epsilon \approx 2.68$  & $\epsilon \approx 2.75$  & 58.153 & 5.463 & 0.370 & 65.773  & 1.581\\
+ & $\epsilon=8$  & $\epsilon \approx 6.77$  & $\epsilon \approx 7.28$  & 63.389  & 7.449  & 0.407  & 67.525  & 1.948 \\
+ & non-private  & -  & -  & 69.682 & 8.822 & 0.463 & 71.709 & 2.491\\
+\midrule
+\multirow{3}[1]{*}{prefix}
+ & $\epsilon=3$  & $\epsilon \approx 2.33$  & $\epsilon \approx 2.67$  & 47.772 & 5.775 & 0.331 & 58.964 & 1.300\\
+ & $\epsilon=8$  & $\epsilon \approx 5.51$  & $\epsilon \approx 6.98$  & 49.263 & 6.276 & 0.349 & 60.730 & 1.496\\
+ & non-private  & -  & -  & 68.845 & 8.722 & 0.456 & 70.805 & 2.418\\
+\midrule
+\multirow{3}[1]{*}{RGP}
+ & $\epsilon=3$  & $\epsilon \approx 2.18$  & $\epsilon \approx 2.59$  & 58.482 & 5.249 & 0.363 & 65.560 & 1.507\\
+ & $\epsilon=8$  & $\epsilon \approx 5.19$  & $\epsilon \approx 6.89$  & 58.455 & 5.525 & 0.364 & 65.030 & 1.569\\
+ & non-private  & -  & -  & 68.328 & 8.722 & 0.445 & 68.844 & 2.345\\
+\midrule
+\multirow{3}[1]{*}{top2}
+ & $\epsilon=3$  & $\epsilon \approx 2.68$  & $\epsilon \approx 2.75$  & 25.920 & 1.510 & 0.197 & 44.536 & 0.452\\
+ & $\epsilon=8$  & $\epsilon \approx 6.77$  & $\epsilon \approx 7.28$  & 26.885 & 1.547 & 0.207 & 46.421 & 0.499\\
+ & non-private  & -  & -  & 65.752 & 8.418 & 0.443 & 68.704 & 2.180\\
+\midrule
+\multirow{3}[1]{*}{retrain}
+ & $\epsilon=3$  & $\epsilon \approx 2.33$  & $\epsilon \approx 2.67$  & 15.457 & 0.376 & 0.113 & 35.240 & 0.116\\
+ & $\epsilon=8$  & $\epsilon \approx 5.51$  & $\epsilon \approx 6.98$  & 24.247 & 1.010 & 0.145 & 39.951 & 0.281\\
+ & non-private  & -  & -  & 65.731 & 8.286 & 0.429 & 68.751 & 2.004\\
+\bottomrule
+\end{tabular}
+\label{table:e2e}
+\end{table}

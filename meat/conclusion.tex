@@ -1,0 +1,31 @@
+
+\section{Scope and Limitations}
+
+We presented strategies for fine-tuning large pretrained language models under DP for a wide range of NLP tasks. 
+For researchers and practitioners working on private NLP, our empirical results suggest that DP fine-tuning with a proper setup is a competitive baseline that is worth trying before prematurely shifting to less formal notions of privacy which have not stood against the test of time.
+In addition, since DP fine-tuning generally requires substantially less private data (than training with DP from scratch), we hope this will motivate organizations which are already conducting private learning (e.g., federated learning with DP) to reduce the collection and use of private data to benefit privacy in the long run.
+Below we list limitations and future directions. 
+
+\paragraph{Public Pretraining.}
+Our empirical studies are based on fine-tuning off-the-shelf models such as BERT and GPT-2 that are pretrained on data collected from the internet. 
+Due to the permissive nature of the data collection for some of these models, there can be privacy concerns (e.g., text data scraped expansively from the internet may contain sensitive information such as PIIs~\citep{carlini2020extracting}).
+We selected off-the-shelf models as they are widely accessible to ensure our results are reproducible.
+When considering applying DP fine-tuning to real world settings, one should consider and create more curated public corpora for pretraining.
+
+\paragraph{Hyperparameter Tuning.}
+We studied how choices of basic hyperparameters affect the performance of DP-Adam for fine-tuning.
+Our study is by no means comprehensive or complete.
+In particular, we did not study how weight decay, learning rate schedule, clipping norm schedule, or batch size schedule affect private learning. 
+Custom setups for these knobs have been found helpful for other private learning tasks~\citep{anil2021large}. 
+
+Overall, our studies revealed that hyperparameter values can affect private fine-tuning in significant ways.
+This calls for more transparency in reporting hyperparameter choices, analyses of hyperparameter transferability across tasks and architectures, and accounting of the privacy loss for hyperparameter tuning when hyperparameters aren't transferred across workloads.
+
+\paragraph{Pretraining and Its Relation to Private Learning.}
+Our model scaling results (Figure~\ref{fig:fig1}) suggest that using larger pretrained models improves performance. 
+This argument, however, is dependent on the particular choice of pretrained models.
+How pretraining helps private learning and whether better pretrained models for private learning could be built are interesting future avenues.
+
+\paragraph{Scaling Laws for Private Learning.}
+While scaling laws~\citep{kaplan2020scaling} for non-private deep learning have become prevalent, we are unaware of a case study in the private learning realm. 
+Studies on how the dimensionality of models (and pretraining) generally affect private deep learning in precise terms will likely be a useful tool in trading off compute budget and model quality.

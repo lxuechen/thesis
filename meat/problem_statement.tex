@@ -1,0 +1,43 @@
+\section{Problem Statement}
+We build models for sentence classification and language generation tasks with datasets of modest sizes under (central/global) approximate-DP (also known as $(\epsilon, \delta)$-DP)~\citep{dwork2014algorithmic}. 
+\begin{defi}[$(\epsilon, \delta)$-DP]
+A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-differentially private if for all adjacent datasets $X, X'\in\mathcal{X}$ and all $Y \subset \Y$, 
+$
+\Prob{\M(X) \in Y} \le \exp( \epsilon ) \Prob{ \M(X') \in Y } + \delta.
+\label{eq:epsilon_delta_dp}
+$
+\end{defi}
+We say that two datasets are adjacent if and only if one can be obtained from the other by including an extra record.\footnote{An alternative definition of adjacency assumes all datasets are of equal size and is based on the replacement of records. This is not the definition we adopt. }
+How a record is defined is task dependent and will be made clear below.
+
+Intuitively, DP algorithms ensure that random outputs obtained from similar inputs are difficult to distinguish. 
+$\epsilon$ and $\delta$ are \textit{privacy leakage} parameters that measure the loss of privacy and small values imply stronger privacy guarantees.
+Unlike heuristic privacy notions~\citep{huang2020instahide}, DP allows for the tracking of privacy loss through the calculation of leakage parameters, and ensures privacy under composition~\citep{dwork2014algorithmic}, meaning that the overall privacy loss of multiple DP algorithms releasing multiple statistics can be reasoned in a principled manner.
+
+DP learning typically relies on DP optimizers which privatize gradients before performing updates. 
+The privatization step ensures that parameter updates leak limited information about training examples through their gradients.
+Specifically, this step clips per-example gradients with a norm constraint $C$, and adds Gaussian noise $z\sim\mathcal{N}(0, C^2\sigma^2 I_p)$ to the sum of clipped gradients.
+Here, $\sigma$ is the \textit{noise multiplier} determined from the privacy budget $(\epsilon, \delta)$, number of gradient updates $S$, and sampling rate $q=\tfrac{B}{N}$ for a batch size of $B$ and a dataset size of $N$.\footnote{Since we adopted the definition of ``neighboring'' based on addition/removal, the batch size here should be interpreted as the lot size~\citep{abadi2016deep} or, equivalently stated, the expected size of a batch drawn with Poisson sampling.}
+Intuitively, clipping individual gradients ensures that each example has bounded influence on the parameter update, whereas noising the gradient prevents exact tracing of particular examples.
+The noise being isotropic implies that larger models would experience heavier noise per update, as the norm of the $p$-dimensional Gaussian $\normtwo{z}$ scales as $C \sigma \sqrt{p}$.
+This is widely believed to be the cause for DP optimization to perform poorly at training high-dimensional deep learning models~\citep{gautum14,yu2021not}.
+
+Our starting point for building DP language models is (public) pretrained models. 
+Pretrained language models tend to contain general knowledge of language~\citep{manning2020emergent} and thus should make the downstream private learning problem easier.
+We fine-tune these models with DP-Adam~\citep{abadi2016deep,kingma2014adam} (see Appendix~\ref{app:dp_sgd} for details) and track privacy loss through R\'enyi DP~\citep{mironov2017renyi}, but also report the converted $\epsilon$ from a Gaussian DP central limit theorem~\citep{dong2019gaussian} and from accurately composing tradeoff functions via fast Fourier transform~\citep{gopi2021numerical}.
+We consider privacy levels $\epsilon \in \{3,8\}$ and $\delta = \tfrac{1}{2 |\mathcal{D}_\text{train}|}$ throughout
+for a training set of size $|\mathcal{D}_\text{train}|$ (see Appendix~\ref{app:privacy_accounting} for further details).
+We tune hyperparameters on a text generation task (E2E; introduced below) and transfer these to remaining tasks.
+We outline two broad classes of NLP problems considered in this paper and define what constitutes a record below.
+
+\paragraph{Sentence Classification.}
+The goal is to learn a model that classifies sentences into one of a few categories.
+For these tasks, each example/record consists of input sentences and a label to be predicted.
+We fine-tune models of various sizes in the BERT~\citep{devlin2018bert} and RoBERTa~\citep{liu2019roberta} families, as these models are known to work well in non-private learning.
+
+\paragraph{Language Generation.}
+The goal is to learn a model that generates natural language sentences given some context.
+For table-to-text generation tasks such as E2E~\citep{novikova2017e2e} and DART~\citep{nan2020dart}, each example/record in the training data consists of a pair of table entry and corresponding text description to be predicted. 
+For a dialogue generation task such as Persona-Chat~\citep{zhang2018personalizing}, each example/record consists of metadata, a dialogue history, and a response to be predicted. 
+We fine-tune GPT-2~\citep{radford2019language} and variants of different sizes for these problems, as this model family is known to work well for text generation. 
+

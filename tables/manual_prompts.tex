@@ -1,0 +1,22 @@
+\begin{table}[tbh]
+\begin{center}
+\centering
+\resizebox{0.98\columnwidth}{!}{
+\begin{tabular}{lll}
+\toprule
+\textbf{Task} & \textbf{Template} & \textbf{Label words}\\
+\midrule
+SST-2 &  {\sent} It was {\mask} . & positive: great, negative: terrible\\
+MNLI  & {\firstsent} ? {\mask} , {\secondsent} & entailment: Yes, netural: Maybe, contradiction: No \\
+QNLI  & {\firstsent} ? {\mask} , {\secondsent} & entailment: Yes, not\_entailment: No \\
+QQP   & {\firstsent} {\mask} , {\secondsent} & equivalent: Yes, not\_equivalent: No\\
+\bottomrule
+\end{tabular}
+}
+\end{center}
+\caption{
+Templates and label words borrowed from the work by~\cite{gao2020making}. 
+}
+\label{tab:manual_prompts}
+\vspace{-5pt}
+\end{table}

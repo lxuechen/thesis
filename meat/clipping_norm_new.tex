@@ -1,0 +1,5 @@
+
+\subsubsection{Clipping Norm}
+DP optimization is known to be sensitive to the choice of clipping norm.
+Since the scale of noise depends on this clipping norm (recall its standard deviation is $C \sigma$), picking the threshold $C$ much larger than the actual gradient norm implies more noise is being applied than necessary.
+In practice, we have found that a small clipping norm which enforces almost all gradients to be clipped throughout training leads to the best performing models (see Figure~\ref{fig:app_hyperparameter} in Appendix~\ref{app:good_hyper_params}).

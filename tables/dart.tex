@@ -1,0 +1,60 @@
+
+
+
+
+
+
+
+\setlength{\tabcolsep}{2pt}%
+\renewcommand{\arraystretch}{0.75}%
+\begin{table}[h]
+\footnotesize
+\caption{
+Full results on DART from fine-tuning GPT-2. Trend is consistent with results on E2E.
+}
+\centering
+\begin{tabular}{l c c c ccccccc}
+\toprule
+\multirow{2}[0]{*}{Method} & \multirow{2}[0]{*}{DP Guarantee} & Gaussian DP & Compose & \multicolumn{7}{c}{Metrics}  \\
+ & & + CLT & tradeoff func. & \tiny{METEOR} & \tiny{ROUGE-1} & \tiny{ROUGE-2} & \tiny{ROUGE-L} & \tiny{BLEU} & \tiny{BERTScore} & \tiny{BLEURT} \\
+
+\midrule
+\multirow{3}[1]{*}{full}
+ & $\epsilon=3$  & $\epsilon \approx 2.28$  & $\epsilon \approx 2.65$  & 0.294 & 62.815 & 40.773  & 52.063  & 31.025 & 0.887  & -0.058\\
+ & $\epsilon=8$  & $\epsilon \approx 5.35$  & $\epsilon \approx 6.95$  & 0.319  & 66.423  & 43.609  & 54.576  & 35.057  & 0.901  & 0.043 \\
+ & non-private  & -  & -  & 0.369 & 71.563 & 47.168 & 56.717 & 42.783 & 0.915 & 0.178\\
+
+\midrule
+\multirow{3}[1]{*}{LoRA}
+ & $\epsilon=3$  & $\epsilon \approx 2.68$  & $\epsilon \approx 2.76$  & 0.304  & 63.641  & 40.753 & 52.012 & 32.329  & 0.885 & -0.029 \\
+ & $\epsilon=8$  & $\epsilon \approx 6.68$  & $\epsilon \approx 7.26$  & 0.318 & 66.336 & 43.056 & 54.082 & 34.163 & 0.899 & 0.036\\
+ & non-private  & -  & -  & 0.366 & 71.192 & 47.336 & 57.430 & 42.254 & 0.915 & 0.182\\
+
+\midrule
+\multirow{3}[1]{*}{prefix}
+ & $\epsilon=3$  & $\epsilon \approx 2.28$  & $\epsilon \approx 2.65$  & 0.269 & 59.503 & 38.229 & 49.444 & 25.726 & 0.860 & -0.144\\
+ & $\epsilon=8$  & $\epsilon \approx 5.35$  & $\epsilon \approx 6.95$  & 0.297 & 64.009 & 41.581 & 52.602 & 30.463 & 0.892 & -0.021\\
+ & non-private  & -  & -  & 0.353 & 70.341 & 46.643 & 56.858 & 40.163 & 0.912 & 0.148\\
+
+\midrule
+\multirow{3}[1]{*}{RGP}
+ & $\epsilon=3$  & $\epsilon \approx 2.10$  & $\epsilon \approx 2.54$  & 0.265 & 58.688 & 37.202 & 49.011 & 25.748 & 0.873 & -0.175\\
+ & $\epsilon=8$  & $\epsilon \approx 5.02$  & $\epsilon \approx 6.86$  & 0.279 & 60.005 & 38.258 & 49.835 & 28.304 & 0.874 & -0.141\\
+ & non-private  & -  & -  & 0.324 & 65.667 & 42.617 & 53.477 & 35.551 & 0.895 & 0.022\\
+
+\midrule
+\multirow{3}[1]{*}{top2}
+ & $\epsilon=3$  & $\epsilon \approx 2.68$  & $\epsilon \approx 2.76$  & 0.022 & 3.570 & 2.183 & 3.166 & 0.388 & 0.098 & -1.952\\
+ & $\epsilon=8$  & $\epsilon \approx 6.68$  & $\epsilon \approx 7.26$  & 0.054 & 11.475 & 7.054 & 10.042 & 2.453 & 0.240 & -1.660\\
+ & non-private  & -  & -  & 0.318 & 62.777 & 38.367 & 49.426 & 36.099 & 0.883 & -0.082\\
+
+\midrule
+\multirow{3}[1]{*}{retrain}
+ & $\epsilon=3$  & $\epsilon \approx 2.28$  & $\epsilon \approx 2.65$  & 0.064 & 19.085 & 8.901 & 17.142 & 2.997 & 0.493 & -1.513\\
+ & $\epsilon=8$  & $\epsilon \approx 5.35$  & $\epsilon \approx 6.95$  & 0.093 & 24.971 & 11.938 & 21.680 & 7.765 & 0.573 & -1.302\\
+ & non-private  & -  & -  & 0.232 & 47.782 & 26.361 & 37.864 & 26.794 & 0.806 & -0.593\\
+
+\bottomrule
+\end{tabular}
+\label{table:dart}
+\end{table}

@@ -1,0 +1,58 @@
+\section{Low dimensional updates are not necessarily better}\label{sec:dimensionality}
+Since the norm of the noise injected into gradients during DP learning scales with dimensionality, it is natural to ask whether updating fewer parameters would result in improved performance.
+We decompose this question into two aspects: (1) Do smaller pretrained models lead to better private fine-tuned performance, and (2) do parameter-efficient adaptation methods designed with a reduced dimensionality of updates outperform full fine-tuning?
+Our experiments below show that neither is necessarily true.
+Reported numbers in this section are averaged over three independent seeds.
+
+\subsection{Larger Pretrained Models result in better performance}
+We observe that larger pretrained models lead to better private fine-tuned performance. 
+Specifically, we fully fine-tune four sizes of GPT-2 models (for language generation) and three sizes of BERT/RoBERTa models (for sentence classification) at the same privacy budget with DP-Adam and compare their performances. 
+Since the performance of DP optimization heavily depends on hyperparameter choices, we need to ensure that our hyperparameters are not particularly favoring larger models. 
+We thus tune hyperparameters on the smallest model for each model type and then reuse the same hyperparameters for all fine-tuning workloads for that model type.
+Figure~\ref{fig:fig1} from earlier demonstrates gains from model scaling on E2E and MNLI, and we find similar improvements on 5 additional tasks (deferred to Figure~\ref{fig:fig1_extension} in Appendix~\ref{app:scaling}).
+
+\subsection{Full fine-tuning with DP-Adam matches state-of-the-art}\label{sec:experiments_main}
+There is a range of lightweight fine-tuning methods that reduce the dimensionality of updates, including some that are designed for DP~\citep{yu2021large}.
+Do methods that optimize fewer parameters lead to better results under DP even if they perform similarly non-privately? Empirical results suggest otherwise and that full fine-tuning is a strong baseline that even matches specialized low-dimensional DP learning methods for both classification and generation.
+Below, we study the two sets of tasks separately. 
+For completeness, all experimental details are in Appendix~\ref{app:experiments_main}.
+
+\paragraph{Sentence Classification.}
+We study DP fine-tuning on tasks from the GLUE benchmark that have more than $10$k training examples (MNLI, QQP, QNLI, and SST-2), following the experimental setup of~\cite{yu2021large}. 
+The associated datasets have modest sizes: SST-2 and QNLI have 60k+ and 100k+ training examples, respectively. MNLI and QQP each contains less than 400k examples. 
+Table~\ref{table:glue} shows that using larger pretrained models and the text-infilling objective generally improve classification accuracy. 
+We compare full fine-tuning with \textit{reparameterized gradient perturbation} (RGP)~\citep{yu2021large}, as it is the state-of-the-art for DP fine-tuning on sentence classification at the time the first version of this paper was uploaded to arXiv. 
+The method is designed to privatize gradients projected onto low dimensional subspaces and was motivated to reduce DP noise in high-dimensional models. 
+We note that full fine-tuning with the text infilling objective outperforms well-tuned RGP on all tasks despite being the simplest baseline.\footnote{The careful reader will notice that the original RGP paper~\citep{yu2021large} reported considerably worse full fine-tuning results. We analyzed their released codebase and discovered a bug caused by their use of mixed-precision training. 
+With this bug fixed, their codebase produces results similar to ours for full fine-tuning on SST-2. 
+We detail subtleties of DP mixed-precision training in Appendix~\ref{app:mixed_precision}, and outline our implementation which achieves approximate scale invariance.
+}
+Computationally, while RGP is faster per-update, it requires more than 3 times as many epochs as full fine-tuning---overall, the two methods are comparable in terms of wall time. 
+\input{tables/glue}
+
+
+\paragraph{Table-To-Text Generation.}
+We study different fine-tuning methods under DP for table-to-text generation where the goal is to generate natural language descriptions of table entries. 
+We consider the datasets E2E~\citep{novikova2017e2e} and DART~\citep{nan2020dart}. 
+E2E consists of simple restaurant reviews, whereas DART consists of open-domain table entries from Wikipedia and is more complex. 
+Both datasets are small: E2E has more than 40k training examples, whereas DART has more than 60k.
+Since we are the first to experiment with this task under DP, we compare full fine-tuning (full) against a suite of parameter-efficient approaches which includes LoRA~\citep{hu2021lora}, prefix-tuning~\citep{li2021prefix} (prefix), RGP, and fine-tuning the top 2 Transformer blocks (top2), all of which optimize few parameters. 
+On GPT-2 (125 million parameters), prefix-tuning with default hyperparameters optimizes \mytextapprox10 million parameters; LoRA with rank 4 optimizes \mytextapprox$0.15$  million parameters. 
+We also report results for training from scratch (retrain).
+Hyperparameters of each method were tuned only the E2E dataset; the complete search ranges are in Appendix~\ref{app:hp_search_range}.
+Table~\ref{table:e2e_trim} shows that LoRA and full fine-tuning are generally the most performant on E2E. 
+Tables~\ref{table:e2e} and \ref{table:dart} in Appendix~\ref{app:table2text} contain the full result on E2E and DART and confirm the trend.
+\input{tables/e2e_trim}
+
+\paragraph{Chit-Chat Dialog Generation.}
+We stress-test full fine-tuning under DP on the task of chit-chat dialog generation. This task has the distinct challenge that the response space is intrinsically diverse~\citep{li2015diversity,gao2018neural} since human conversations can be informal and noisy~\citep{zhang2019dialogpt}.
+Moreover, dialog datasets are usually formed with user data which may contain sensitive information.
+We use the Persona-Chat dataset \citep{zhang2018personalizing} as a testbed and build off a processed version that has \mytextapprox{130k} training entries.
+Each entry contains a dialog history, persona descriptions of the respondent, and the response. 
+We fine-tune GPT-2, GPT2-medium, and DialoGPT-medium on this dataset both privately and non-privately by training to predict the response with the dialog history and persona description. 
+We report the F1 score and perplexity on the validation split, and human evaluated quality scores of generations.
+Table~\ref{table:personachat} shows that private models have strong performance. 
+In particular, fine-tuned DialoGPT-medium at $\epsilon=8$ beats the (non-private) winning entry of the ConvAI2 challenge~\citep{dinan2019second} on perplexity and has a human evaluation rating that is close to non-private models.
+Samples from our private models can be found in Appendix~\ref{app:samples}.
+\input{tables/personachat}
+
