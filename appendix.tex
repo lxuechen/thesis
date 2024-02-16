@@ -174,3 +174,149 @@ For Adam, we use the default hyperparamaters set by PyTorch~\citep{paszke2017aut
         \end{tabular}
         \label{tab:hparams_low_rank}
 \end{table}
+
+
+\newpage
+\subsection{Uncurated Samples from fine-tuned models}\label{app:samples}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{tabular}{l | p{0.8\linewidth}}
+\toprule
+Table & name : The Punter | Type : restaurant | food : Indian | price : cheap | customer rating : average | area : riverside | family friendly : no | near : Express by Holiday Inn  \\
+ \hline
+GPT-2 $(\epsilon=3)$ & The Punter is a cheap Indian restaurant near Express by Holiday Inn in the riverside area. It is not family - friendly. \\
+GPT-2 $(\epsilon=8)$ & The Punter is a cheap Indian restaurant near Express by Holiday Inn in the riverside area. It is not family - friendly. \\
+GPT-2-m $(\epsilon=3)$ & The Punter is a cheap Indian restaurant located in the riverside area near Express by Holiday Inn. It has an average customer rating and is not family - friendly. \\
+GPT-2-m $(\epsilon=8)$ & The Punter is a restaurant providing Indian food in the cheap price range. It is located in the riverside area near Express by Holiday Inn. Its customer rating is average. \\
+GPT-2-l $(\epsilon=3)$ & The Punter is a cheap Indian restaurant in the riverside area near Express by Holiday Inn. It is not family - friendly and has an average customer rating. \\
+GPT-2-l $(\epsilon=8)$ & The Punter is a restaurant providing Indian food in the cheap price range. It is located in the riverside area near Express by Holiday Inn. Its customer rating is average. \\
+\hline
+ Reference & The restaurant named The Punter has cheap Indian food and an average customer rating . It is near the Express by Holiday Inn on the riverside and is not family friendly . \\
+\midrule\midrule
+Table & name : The Mill | Type : restaurant | food : English | price : moderate | customer rating : 3 out of 5 | area : city centre | family friendly : yes | near : Café Rouge  \\
+ \hline
+GPT-2 $(\epsilon=3)$ & The Mill is a moderately priced restaurant located in the city centre near Café Rouge. \\
+GPT-2 $(\epsilon=8)$ & The Mill is a moderately priced restaurant located in the city centre near Café Rouge. \\
+GPT-2-m $(\epsilon=3)$ & The Mill is an English restaurant located in the city centre near Café Rouge. It is moderately priced and has a customer rating of 3 out of 5. \\
+GPT-2-m $(\epsilon=8)$ & The Mill is a moderately priced restaurant located in the city centre near Café Rouge. It is child friendly and has a customer rating of 3 out of 5. \\
+GPT-2-l $(\epsilon=3)$ & The Mill is a moderately priced English restaurant in the city centre near Café Rouge. It is child friendly and has a customer rating of 3 out of 5. \\
+GPT-2-l $(\epsilon=8)$ & The Mill is a kid friendly English restaurant in the city centre near Café Rouge. It has a moderate price range and a customer rating of 3 out of 5. \\
+\hline
+ Reference & Serving moderately priced English food with a 3 out of 5 customer approval , The Mill restaurant is kid friendly and conveniently located at the city centre near the Café Rouge . \\
+\midrule\midrule
+Table & name : The Vaults | Type : pub | food : Japanese | price : high | customer rating : 3 out of 5 | area : city centre | family friendly : yes | near : Raja Indian Cuisine  \\
+ \hline
+GPT-2 $(\epsilon=3)$ & Located near Raja Indian Cuisine in the city centre, The Vaults is a family - friendly Japanese pub with a high customer rating. \\
+GPT-2 $(\epsilon=8)$ & The Vaults is a Japanese pub in the city centre near Raja Indian Cuisine. It has a high price range and a customer rating of 3 out of 5. \\
+GPT-2-m $(\epsilon=3)$ & The Vaults is a Japanese pub located in the city centre near Raja Indian Cuisine. It has a high price range and a customer rating of 3 out of 5. \\
+GPT-2-m $(\epsilon=8)$ & The Vaults is a Japanese pub located in the city centre near Raja Indian Cuisine. It has a high price range and a customer rating of 3 out of 5. \\
+GPT-2-l $(\epsilon=3)$ & The Vaults is a Japanese pub in the city centre near Raja Indian Cuisine. It has a high price range and a customer rating of 3 out of 5. \\
+GPT-2-l $(\epsilon=8)$ & The Vaults is a child friendly Japanese pub in the city centre near Raja Indian Cuisine. It has a high price range and a customer rating of 3 out of 5. \\
+\hline
+ Reference & Located near the Raja Indian Cuisine at the city centre , is family - friendly pub The Vaults . Serving Japanese food , The Vaults , is high priced with a 3 out of 5 customer satisfaction rating . \\
+\bottomrule
+\end{tabular}
+\caption{Fully fine-tuned GPT-2, GPT-2-medium, and GPT-2-large generations with E2E test table entries.}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{tabular}{l | p{0.8\linewidth}}
+\toprule
+Table & Real Madrid Castilla : manager : Luis Miguel Ramis | Abner (footballer) : club : Real Madrid Castilla | Abner (footballer) : club : C.D. FAS  \\
+ \hline
+GPT-2 $(\epsilon=3)$ & Luis Miguel Ramis played for Real Madrid Castilla and played for C.D. FAS. \\
+GPT-2 $(\epsilon=8)$ & Luis Miguel Ramis is the manager of Abner (footballer) who plays for Real Madrid Castilla. \\
+GPT-2-m $(\epsilon=3)$ & Luis Miguel Ramis is the manager of Real Madrid Castilla. He plays for C.D. FAS. \\
+GPT-2-m $(\epsilon=8)$ & Luis Miguel Ramis is the manager of Real Madrid Castilla. He plays for C.D. FAS. \\
+GPT-2-l $(\epsilon=3)$ & Luis Miguel Ramis is the manager of Real Madrid Castilla and C.D. FAS. \\
+GPT-2-l $(\epsilon=8)$ & Luis Miguel Ramis is the manager of Real Madrid Castilla and Abner (footballer) plays for C.D. FAS. \\
+\hline
+ Reference & Footballer, Abner, plays C.D. FAS. and Real Madrid Castilla, the manager of which, is Luis Miguel Ramis. \\
+\midrule\midrule
+Table & United States : ethnic\_group : Asian Americans | United States : capital : Washington, D.C. | Albany, Oregon : is\_part\_of : Benton County, Oregon | Albany, Oregon : country : United States  \\
+ \hline
+GPT-2 $(\epsilon=3)$ & The capital of the United States is Washington, D.C. and is part of Benton County, Oregon. \\
+GPT-2 $(\epsilon=8)$ & The capital of the United States is Washington, D.C. and is part of Benton County, Oregon. \\
+GPT-2-m $(\epsilon=3)$ & Albany, Oregon is part of Benton County, Oregon in the United States where Asian Americans are an ethnic group. \\
+GPT-2-m $(\epsilon=8)$ & Albany, Oregon is part of Benton County, Oregon in the United States where Asian Americans are an ethnic group. \\
+GPT-2-l $(\epsilon=3)$ & Albany, Oregon is part of the United States where Asian Americans are an ethnic group and the capital is Washington D.C. \\
+GPT-2-l $(\epsilon=8)$ & Albany, Oregon is part of the United States where Asian Americans are an ethnic group and the capital is Washington D.C. \\
+\hline
+ Reference & The Asian Americans are an ethnic group in the United States, which has the capital city of Washington DC. It is also the location of Albany, part of Benton County in Oregon. \\
+\midrule\midrule
+Table & A Loyal Character Dancer : language : English language | English language : spoken\_in : Great Britain | A Loyal Character Dancer : country : United States | United States : ethnic\_group : Native Americans in the United States  \\
+ \hline
+GPT-2 $(\epsilon=3)$ & A Loyal Character Dancer is an English language spoken in the United States where Native Americans are the ethnic group. \\
+GPT-2 $(\epsilon=8)$ & A Loyal Character Dancer is written in English and is spoken in Great Britain. Native Americans are an ethnic group in the United States. \\
+GPT-2-m $(\epsilon=3)$ & A Loyal Character Dancer is written in English and is written in the United States where Native Americans are an ethnic group. \\
+GPT-2-m $(\epsilon=8)$ & A Loyal Character Dancer is written in English and is written in the United States where Native Americans are an ethnic group. \\
+GPT-2-l $(\epsilon=3)$ & A Loyal Character Dancer is written in English and is written in the United States where Native Americans are an ethnic group. \\
+GPT-2-l $(\epsilon=8)$ & A Loyal Character Dancer is written in English, which is spoken in Great Britain and the United States. Native Americans are an ethnic group in the United States. \\
+\hline
+ Reference & A Loyal Character Dancer is written in English which is spoken in Great Britain. The book is published in the United States where the Native Americans are an ethnic group. \\
+\bottomrule
+\end{tabular}
+\caption{Fully fine-tuned GPT-2, GPT-2-medium, and GPT-2-large generations with DART test table entries.}
+\end{table}
+
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\footnotesize
+\begin{tabular}{l | p{0.8\linewidth}}
+\toprule
+Persona & ['i am 40 years old.', 'i work as a car salesman.', 'my wife spends all my money.', 'i hate my job.', "i'm planning on getting a divorce."] \\
+ \hline
+History & ['i know the struggle, i volunteer at a homeless shelter', "great, i hope you don't get to see me there.", 'i hope not either, would not wish it on my worse enemy', 'between wife, job with no money, i am thinking now of divorce.', "i've given it a few thoughts before"] \\
+ \hline
+GPT-2-m $(\epsilon=3)$ & i wish i had a better idea . \\
+GPT-2-m $(\epsilon=8)$ & i think i will . what are your thoughts on divorce ? \\
+DialoGPT-medium $(\epsilon=3)$ & i'm sorry to hear that . i hope you don't have any financial problems . \\
+DialoGPT-medium $(\epsilon=8)$ & i don't have any money , i do not know how i could manage . \\
+\hline
+ Reference & do you give demonstrations of your skills ? \\
+\midrule\midrule
+Persona & ['my mother is a dentist.', 'my favourite artist is travis scott.', 'i have one older sister.', 'i am currently looking for a job preferably at a restaurant.', 'i like playing basketball.'] \\
+ \hline
+History & ['hello, how are you tonight?'] \\
+ \hline
+GPT-2-m $(\epsilon=3)$ & i'm good , good luck \\
+GPT-2-m $(\epsilon=8)$ & i am good , just listening to travis scott . what about you ? \\
+DialoGPT-medium $(\epsilon=3)$ & i'm good . just got back from a dentist visit . \\
+DialoGPT-medium $(\epsilon=8)$ & i am doing well . just got back from a dentist visit \\
+\hline
+ Reference & i am good . about to go to basketball practice . \\
+\midrule\midrule
+Persona & ['my mom passed away when i was young.', 'i work in the insurance business.', 'my father is in the army.', 'i recently was fired and had to get a new job.'] \\
+ \hline
+History & ["god isn't really real", 'to each their own, but i believe he is.', 'my children are gone now', 'i lost my mom at a young age', 'my wife took them all'] \\
+ \hline
+GPT-2-m $(\epsilon=3)$ & she was a great mother \\
+GPT-2-m $(\epsilon=8)$ & they were so young , they were so crazy \\
+DialoGPT-medium $(\epsilon=3)$ & that is horrible . my mom was a soldier \\
+DialoGPT-medium $(\epsilon=8)$ & what happened to her ? \\
+\hline
+ Reference & sorry to hear that . i barely see my dad he's in the army \\
+\midrule\midrule
+Persona & ['i am also a graduate student.', 'i walk dogs for a living.', 'my parents taught me survival skills.', 'i am an avid kayaker.', 'i enjoy reading journals and guides related to psychology.'] \\
+ \hline
+History & ['hi, how are you today?', "good evening. how are you tonight? i'm well.", 'i am doing good, i just finished playing ping pong.', 'i am trying to write invoices for my dog walking business.', 'that seems like hare work, i like to play the violin in my free time.'] \\
+ \hline
+GPT-2-m $(\epsilon=3)$ & i have a lot of dogs , i walk them on my walks . \\
+GPT-2-m $(\epsilon=8)$ & that is a very rewarding hobby . i have a dog named jasper . \\
+DialoGPT-medium $(\epsilon=3)$ & oh , that is a nice hobby . what do you do for a living ? \\
+DialoGPT-medium $(\epsilon=8)$ & it is . i love learning to play the violin . \\
+\hline
+ Reference & i love the violin . i do not play anything . i kayak for fun however . \\
+\bottomrule
+\end{tabular}
+\caption{Fully fine-tuned GPT-2-medium and DialoGPT-medium generations for Persona-Chat validation examples.}
+\end{table}
