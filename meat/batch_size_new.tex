@@ -2,17 +2,17 @@
 Our experiments suggest that batch size is one of the most important hyperparameters to set correctly, and the dependence of the optimal batch size on the learning rate and training epochs makes its selection complex.
 We first describe batch size selection in realistic, compute-bound settings and then describe how the complexity of identifying the optimal batch size in these situations arise due to constraints on the number of training epochs.
 
-\begin{wrapfigure}[20]{r}{0.5\textwidth}
+\begin{figure}[htbp]
 \centering
-\vspace{-2mm}
-{\includegraphics[width=0.45\textwidth]{figs/bs_vs_lr_BLEU.pdf}}
+\includegraphics[width=0.8\textwidth]{figs/bs_vs_lr_BLEU.pdf}
 \caption{
 Large batches and learning rates lead to good performance when the number of epochs is fixed.
-Red lines divide heat map into four panels. Top and bottom correspond to low and high learning rate regimes; left and right correspond to small and large batch regimes.
+Red lines divide the heat map into four panels. Top and bottom correspond to low and high learning rate regimes; left and right correspond to small and large batch regimes.
 Numbers are BLEU scores on the test split of E2E; higher is better.
 }
 \label{fig:bs_vs_lr}
-\end{wrapfigure}
+\end{figure}
+
 \paragraph{Fixed Training Epochs $E$.}
 We first describe a very practical situation in which there is a constraint on the compute budget.
 For the case of DP-SGD, this compute budget constraint often loosely translates to a constraint on the number of examples processed for gradient updates.\footnote{This is because DP-SGD often necessitates microbatching, in which case the number of backward passes is independent of the actual batch size for gradient updates but dependent on numbers of passes through the data.} 
