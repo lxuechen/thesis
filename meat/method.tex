@@ -5,8 +5,32 @@ Our analyses reveal common failure modes when straightforwardly applying DP opti
 
 \subsection{Hyperparameter Tuning}\label{sec:good_hyper_params}
 DP optimization is sensitive to the choice of hyperparameters~\citep{papernot2019making}.
-Our experiments suggest that its performance can vary from being close to that of random initialization with ill-chosen hyperparameters to near state-of-the-art with appropriately chosen ones. As a consequence, we present simple but effective guidelines on setting the most important hyperparameters.
-Unless otherwise stated, the unmentioned hyperparameters are set to defaults documented in Appendix~\ref{app:good_hyper_params}. 
+Our experiments suggest that its performance can vary from being close to that of random initialization with ill-chosen hyperparameters to near state-of-the-art with appropriately chosen ones. As a consequence, we present simple but effective guidelines for setting the most important hyperparameters.
+Unless otherwise stated, the unmentioned hyperparameters are set to defaults documented in Table~\ref{tab:hparams_default}.
+
+\begin{table}[H]
+	\centering
+	\setlength{\tabcolsep}{7pt}
+	\renewcommand{\arraystretch}{1.2}
+	\caption{Default hyperparameters for ablation studies. }
+	\begin{tabular}{@{} l c @{}}
+		\toprule
+		Method & Full \\
+		\midrule
+		DP guarantee $(\epsilon, \delta)$ &
+		$(3, \nicefrac{1}{2|\mathcal{D}_{\text{train}}|})$ \\
+		Clipping norm $C$ &0.1 \\
+		Batch size $B$ & 1024 \\
+		Learning rate $\eta$ & $10^{-3}$ \\
+		Learning rate decay & no \\
+        Epochs $E$ & 10 for E2E; 3 for SST-2 \\
+		Weight decay $\lambda$ & 0 \\
+		Noise scale $\sigma$ & 
+		\multicolumn{1}{c}{calculated numerically based on $(\epsilon, \delta)$-DP budget} \\
+		\bottomrule
+    	\end{tabular}
+		\label{tab:hparams_default}
+\end{table}
 
 \input{meat/batch_size_new}
 \input{meat/clipping_norm_new}
@@ -21,5 +45,4 @@ To eliminate the discrepancy, we instead consider learning to predict the missin
 For example, for sentiment classification, we reframe the problem as filling in the \texttt{[MASK]} token in the sequence ``\texttt{<INPUT>}. It is \texttt{[MASK]}.'' and compare the probabilities of words ``awesome'' and ``terrible''.
 This text infilling task is almost exactly the procedure used for pretraining masked language models, and recent works have demonstrated its effectiveness for knowledge probing~\citep{petroni2019language}, few-shot learning~\citep{gao2020making} and multi-task fine-tuning~\citep{wei2021finetuned}. 
 On SST-2, we found that using the generic template as described above already improved private fine-tuning performance by $3\sim5\%$ across different settings.
-Table~\ref{table:glue} (to be presented) contains additional results and Appendix~\ref{app:task_alignment} includes analyses on choices of label words.
-
+Table~\ref{table:glue} (to be presented) contains additional results.

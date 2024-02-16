@@ -30,7 +30,6 @@ This implies that na\"ively fine-tuning pretrained language models privately usi
 Recently, \cite{tramer2020differentially} studied how the batch size and learning rate jointly affect learning private image classifiers while holding other hyperparameters fixed.
 They heuristically suggested a \textit{linear scaling rule}: Scaling the learning rate together with the batch size by the same constant should yield models with almost the same performance. 
 However, Figure~\ref{fig:bs_vs_lr} indicates that this fails to hold consistently as it falsely predicts that large batch and high learning rate (top right entry) would have equal performance to small batch and low learning rate (bottom left entry).
-We explain why linear scaling fails to predict performance for the small batch regime in Appendix~\ref{app:linear_scaling}. 
 
 \paragraph{Fixed Update Steps $S$.}
 In the fixed epoch setting, we saw that the optimal batch size was complex due to the trade-off between batch size and number of gradient updates.

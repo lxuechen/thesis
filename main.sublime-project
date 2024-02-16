@@ -4,6 +4,9 @@
         {
             "path": ".",
         },
+        {
+			"path": "/Users/xuechenli/Desktop/papers/private-lm-paper/appendix"
+		},
     ],
     "settings":
     {
