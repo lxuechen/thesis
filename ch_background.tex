@@ -3,7 +3,7 @@
 
 Privacy has a multitude of meanings in machine learning.
 For example, a hospital may be interested in using an external machine learning service but is afraid that sending input queries with its patient data to the external party can breach privacy.
-This is an example that necessitates \emph{private inference}.
+This is an example that necessitates \emph{private inference}~\cite{tramer2018slalom,h100_confidential_computing}.
 On the other hand, a tech corporation may be interested in training better predictive models for their services with user data but is concerned that deploying such models would leak sensitive information in the training data.
 This scenario calls for \emph{private training} which is the focus of this thesis. 
 
@@ -12,8 +12,8 @@ Private training has become ever more relevant for at least two reasons.
 First, as deep learning models become larger and optimization algorithms become better, our models tend to \emph{memorize} non-trivial fragments of the data on which they were trained~\cite{DBLP:journals/corr/ZhangBHRV16,feldman2020neural,feldman2020does,brown2021memorization}.
 This can result in models leaking membership information of data contributors under bespoke privacy attacks~\cite{shokri2017membership} or reproducing training examples simply when queried during deployment~\cite{carlini2020extracting,nasr2023scalable}.
 Second, many high-value and information-rich datasets contain sensitive information.
-These datasets can range from private user datasets that contain interesting and general patterns~\cite{google-2019} to public web scrapes which include PIIs that were accidentally distributed on the public internet~\cite{carlini2020extracting}.
-Private training serves as a tool to unlock the value of these datasets while minimizing the privacy risk due to data memorization for AI and machine learning.
+These datasets can range from private user data that contain interesting and general patterns~\cite{google-2019} to public web scrapes which include PIIs that were accidentally distributed on the public internet~\cite{carlini2020extracting}.
+Private training serves as a tool to unlock the value of these datasets while minimizing the privacy risk due to data memorization.
 
 Before studying approaches for private training, it is important to precisely define the privacy guarantee that we aim to achieve.
 Thanks to the groundwork in the past decades, we now have the mature formal framework of \emph{Differential Privacy} (DP) to work with~\cite{dwork2006calibrating,dwork2014algorithmic}.
@@ -46,8 +46,8 @@ We review definitions of DP, common algorithms for training deep learning models
 The privacy goal of DP is that when releasing information about a sensitive dataset, anything that can be learned about an individual example from the released information can be learned without that individual example.
 DP formalizes this intuitive goal with a probabilistic statement that views any release procedure as a \emph{randomized algorithm} operating on datasets.
 DP is a property of release procedures (randomized algorithms) and not of released artifacts (algorithm outputs).
-Below, we give the classic definition of approximate-DP (also known as $(\epsilon, \delta)$-DP).
-\begin{defi}[Approximate-DP]
+Below, we define $(\epsilon, \delta)$-DP.
+\begin{defi}[$(\epsilon, \delta)$-Differential Privacy]
 A randomized algorithm $\M: \X \to \Y$ is ($\epsilon, \delta$)-differentially private if for all neighboring datasets $X, X'\in\mathcal{X}$ and all $Y \subset \Y$, 
 $$
 \Prob{\M(X) \in Y} \le \exp( \epsilon ) \Prob{ \M(X') \in Y } + \delta.
@@ -56,6 +56,7 @@ $$
 \end{defi}
 In the above, $\epsilon \ge 0$ and $\delta \ge 0$ are the \emph{privacy parameters}.
 A smaller $\epsilon$ (or $\delta$) will yield better privacy.
+($\epsilon, \delta$)-DP is also known as approximate-DP.
 When $\delta=0$, the randomized algorithm $\M$ is said to satisfy \emph{pure differential privacy}.
 
 The definition of ``neighboring'' could vary based on the context. 
@@ -112,18 +113,19 @@ We take advantage of the tightness of these privacy accounting techniques in thi
 Adaptive privacy composition is important for building iterative optimizers with a DP guarantee, as it reduces the problem of figuring out the overall privacy loss of the iterative procedure to that of figuring out the privacy loss of a single step.
 
 \section[Differentially Private Stochastic Gradient Descent]{\large Differentially Private Stochastic Gradient Descent}
-We review common algorithms for training deep learning models with DP, focusing on iterative optimizers such as DP-SGD and its siblings.
-The release procedure here is the training algorithm that takes in (private) datasets and outputs weights of the trained model.
-In many practical scenarios, models weights might not actually be released by model developers---instead, they are gated behind an API service that offers query access.
-But recall when the training algorithm is DP, by virtue of the post-processing property, any interaction with the trained model leaks no privacy.
+We review common algorithms for training deep learning models with DP, focusing on iterative first-order optimizers such as DP-SGD and its siblings.
+The release procedure here is the training algorithm that takes in a (private) dataset and outputs weights of the trained model.
+In many scenarios, models weights are not actually released by model developers---instead, they are gated behind an API service that offers query access.
+But recall when the training algorithm is DP, by virtue of the post-processing property, no interaction with the trained model leaks privacy.
 
-As alluded to earlier, to design an iterative DP algorithm, it suffices to design a single step of the algorithm and rely on privacy composition for an overall privacy guarantee.
-Typical first-order optimizers iterate over many steps of parameter update, each of which has two high-level procedures: (1) computing the gradient of the loss, and (2) updating model weights based on the gradient.
+To design an iterative DP algorithm, it suffices to design a single step of the algorithm and rely on privacy composition for an overall privacy guarantee.
+Typical first-order optimizers iterate over many steps of parameter update.
+Each step has two high-level procedures: (1) computing the gradient of the loss, and (2) updating model weights based on the gradient.
 (1) is a function of the private dataset and incurs a privacy loss.
 But if (1) is DP, (2) incurs no privacy loss due to post-processing.
 Thus, it suffices to ensure the gradient computation step is DP.
-The \emph{Gaussian mechanism} is a DP algorithm can serve this purpose.
-Below, we define the concept of \emph{sensitivity}, present the algorithm, and give conditions under which it is $(\epsilon, \delta)$-DP.
+The \emph{Gaussian mechanism} is a DP algorithm that can serve this purpose.
+Below, we define the concept of \emph{sensitivity}, present the Gaussian mechanism algorithm, and give conditions under which it is $(\epsilon, \delta)$-DP.
 \begin{defi}[$\ell_2$ Sensitivity]
 Let $\M: \X \to \R^p$ be a mapping with vector outputs.
 Its $\ell_2$ sensitivity $\Delta_2 \M$ is defined by
@@ -150,10 +152,25 @@ Algorithm~\ref{algo:gauss} presents the pseudocode and Theorem~\ref{theo:gauss} 
 \end{algorithmic}
 \label{algo:gauss}
 \end{algorithm}
+
 \begin{theo}[Gaussian Mechanism~\cite{dwork2014algorithmic}]
 \label{theo:gauss}
 Algorithm~\ref{algo:gauss} is $(\epsilon, \delta)$-DP.
 \end{theo}
+
+\begin{algorithm}[H]
+\centering
+\caption{Gaussian Mechanism}
+\begin{algorithmic}[1]
+  \State {\bfseries Input:}
+    Mapping $\M: \X \to \R^p$ with $\ell_2$ sensitivity $C$, input dataset $X$, privacy parameters $\epsilon, \delta$.
+  \State $\sigma \gets  \sqrt{2 \log(1.25 / \delta) } / \epsilon $
+  \State $z \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
+  \State $m \gets \M(X) + z$
+  \State \Return $m$
+\end{algorithmic}
+\label{algo:gauss}
+\end{algorithm}
 
 % The algorithm takes in a set of vectors, clips each by a norm threshold, and returns the noisy average of the clipped vectors where the noise is an isotropic Gaussian. Algorithm~\ref{algo:gauss} contains the pseudocode.
 
