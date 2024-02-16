@@ -21,12 +21,12 @@ for a training set of size $|\mathcal{D}_\text{train}|$.
 We tune hyperparameters on a text generation task (E2E; introduced below) and transfer these to the remaining tasks.
 We outline two broad classes of NLP problems considered in this paper and define what constitutes a record below.
 
-\paragraph{Sentence Classification.}
+\paragraph{Sentence classification.}
 The goal is to learn a model that classifies sentences into one of a few categories.
 For these tasks, each example/record consists of input sentences and a label to be predicted.
 We fine-tune models of various sizes in the BERT~\citep{devlin2018bert} and RoBERTa~\citep{liu2019roberta} families, as these models are known to work well in non-private learning.
 
-\paragraph{Language Generation.}
+\paragraph{Language generation.}
 The goal is to learn a model that generates natural language sentences given some context.
 For table-to-text generation tasks such as E2E~\citep{novikova2017e2e} and DART~\citep{nan2020dart}, each example/record in the training data consists of a pair of table entry and corresponding text description to be predicted. 
 For a dialogue generation task such as Persona-Chat~\citep{zhang2018personalizing}, each example/record consists of metadata, a dialogue history, and a response to be predicted. 

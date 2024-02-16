@@ -35,7 +35,7 @@ Unless otherwise stated, the unmentioned hyperparameters are set to defaults doc
 \input{meat/batch_size_new}
 \input{meat/clipping_norm_new}
 
-\subsection{Improving the task alignment helps private learning}\label{sec:task_alignment}
+\subsection{Improving the Task Alignment Helps Private Learning}\label{sec:task_alignment}
 Our fine-tuned models on language generation tasks work well since the pretraining objective and downstream task are \emph{aligned}: Both involve predicting sequences of tokens.
 This alignment simplifies the task and benefits private learning. 
 While pretrained models are naturally aligned for language generation, it is much less so for classification tasks. The standard approach for adapting language models for classification involves stacking a freshly initialized network on top of the encoding of the special \texttt{[CLS]} token and jointly optimizing all parameters~\citep{devlin2018bert}. 

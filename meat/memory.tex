@@ -1,5 +1,5 @@
 
-\section{Ghost Clipping: Clipping without per-example gradients}
+\section{\large Clipping Without Materializing Per-Example Gradients}
 DP-SGD has high memory overhead due to clipping \textit{per-example} gradients.
 Na\"ively implemented, this step instantiates a giant gradient vector for each example during optimization and can be prohibitively expensive.
 For example, \cite{hoory2021learning} pretrained BERT with DP optimization and reported memory issues when using the large batches necessary to achieve high performance.
@@ -32,7 +32,7 @@ Overall, the per-example gradient norm of any network without parameter sharing 
 
 
 
-\subsection{Ghost clipping for Transformers with sequential data}\label{sec:our_ghost}
+\subsection{Ghost Clipping for Transformers With Sequential Data}\label{sec:our_ghost}
 The trick by~\cite{lee2020scaling} still requires instantiating the per-example gradient of individual layers (although not simultaneously). 
 This can be problematic in terms of memory for Transformers with large embedding layers.\footnote{
 	For GPT-2, per-example gradients w.r.t. the embedding for ten examples alone occupy \mytextapprox{1.5}GB of memory.

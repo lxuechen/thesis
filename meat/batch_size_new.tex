@@ -13,7 +13,7 @@ Numbers are BLEU scores on the test split of E2E; higher is better.
 \label{fig:bs_vs_lr}
 \end{figure}
 
-\paragraph{Fixed Training Epochs $E$.}
+\paragraph{Fixed training epochs $E$.}
 We first describe a very practical situation in which there is a constraint on the compute budget.
 For the case of DP-SGD, this compute budget constraint often loosely translates to a constraint on the number of examples processed for gradient updates.\footnote{This is because DP-SGD often necessitates microbatching, in which case the number of backward passes is independent of the actual batch size for gradient updates but dependent on numbers of passes through the data.} 
 In this fixed training epoch setting, the learning rate and batch size jointly affect performance, since using larger batches implies performing fewer gradient updates. 
@@ -31,7 +31,7 @@ Recently, \cite{tramer2020differentially} studied how the batch size and learnin
 They heuristically suggested a \textit{linear scaling rule}: Scaling the learning rate together with the batch size by the same constant should yield models with almost the same performance. 
 However, Figure~\ref{fig:bs_vs_lr} indicates that this fails to hold consistently as it falsely predicts that large batch and high learning rate (top right entry) would have equal performance to small batch and low learning rate (bottom left entry).
 
-\paragraph{Fixed Update Steps $S$.}
+\paragraph{Fixed update steps $S$.}
 In the fixed epoch setting, we saw that the optimal batch size was complex due to the trade-off between batch size and number of gradient updates.
 We now show that the complexity of setting batch sizes arises almost entirely from this tradeoff by considering a different setting, where the total number of gradient updates (rather than epochs) is fixed.
 In this case, using larger batches implies training for more epochs.
