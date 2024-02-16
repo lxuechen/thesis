@@ -139,7 +139,11 @@ However, having low sensitivity does not immediately imply the mapping satisfies
 This is why we need algorithms such as the Gaussian mechanism to \emph{privatize} mappings.
 The Gaussian mechanism simply adds large noise vectors to high-sensitivity mappings and small noise vectors to low-sensitivity mappings.
 Algorithm~\ref{algo:gauss} presents the pseudocode and Theorem~\ref{theo:gauss} gives its privacy guarantee.
-Algorithm~\ref{algo:gauss_grad} applies the algorithm to privately estimate the mean of a batch of gradient vectors.
+
+To privately estimate the mean of a batch of gradients, one first clips each gradient by a pre-determined norm threshold $C > 0$, and then apply the Gaussian mechanism to the gradient sum operation. 
+Since the gradients are clipped to have norm less than $C$, the gradient sum has a sensitivity of $C$. 
+One adds appropriate Gaussian noise in proportion to $C$.
+Algorithm~\ref{algo:gauss_grad} clarifies this with pseudocode.
 \begin{algorithm}[H]
 \centering
 \caption{Gaussian Mechanism}
