@@ -1,0 +1,30 @@
+\section{Derivation of the Frobenius norm identity}
+\label{app:frobenius}
+Recall $a \in \R^{B\times T \times d}$ is the input to a linear layer with weight matrix $W \in \R^{p \times d}$, and $g \in \R^{B \times T \times p}$ is the gradient of the loss w.r.t. the output. The identity follows from trivial algebra:
+\eqn{
+\normf{ \nabla_W \mathcal{L}_i }^2 = \normf{ g_i^\top a_i }^2
+&= \normf{ \sum_{k=1}^T g_{i, k} a_{i, k}^\top }^2 \\
+&=
+    \sum_{r=1}^d \sum_{s=1}^p \bracks{
+        \sum_{k=1}^T a_{i, k, r} g_{i, k, s}
+    }^2 \\
+&=
+    \sum_{r=1}^d \sum_{s=1}^p \sum_{k_1=1}^T \sum_{k_2=1}^T 
+        a_{i, k_1, r} g_{i, k_1, s}
+        a_{i, k_2, r} g_{i, k_2, s} \\
+&=
+    \sum_{k_1=1}^T \sum_{k_2=1}^T
+        \bracks{ \sum_{r=1}^d a_{i, k_1, r} a_{i, k_2, r} }
+        \bracks{ \sum_{s=1}^p g_{i, k_1, s} g_{i, k_2, s} } \\
+&=
+    \mathrm{vec}(a_{i} a_{i}^\top)^\top \mathrm{vec}( g_i g_i^\top ). 
+}
+Note that when $T=1$, the identity takes the form of 
+\eqn{
+\normf{ \nabla_W \mathcal{L}_i }^2
+= 
+    \mathrm{vec}(a_{i} a_{i}^\top)^\top \mathrm{vec}( g_i g_i^\top )
+= 
+    \normtwo{a_i}^2 \normtwo{g_i}^2. 
+}
+This is exactly what is used in the \cite{goodfellow2015efficient} trick. 

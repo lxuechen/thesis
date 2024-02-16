@@ -59,7 +59,7 @@ Implemented with common primitives in machine learning libraries, \eqref{eq:bett
 In addition, more sophisticated solutions may even avoid instantiating $a_{i} a_{i}^\top$ and $g_{i} g_{i}^\top$ entirely by trading in more run-time. Custom CUDA kernels are likely needed to make these solutions fast in practice.
 } as opposed to $\mathcal{O}(Bpd)$ in the na\"ive approach which goes through instantiating \eqref{eq:seq_per_example_grad}.\footnote{We omitted the cost of storing $a_i$ and $g_i$, since our goal is to compare the additional cost induced by computing gradient norms.}
 
-The memory efficiency of this procedure is exemplified with off the shelf pretrained language models, most of which have large embedding layers. 
+The memory efficiency of this procedure is exemplified with off-the-shelf pretrained language models, most of which have large embedding layers. 
 For instance, for GPT-2, $d\approx50,000$ and $p=768$ for the embedding layer, and the context window $T\le 1024$.\footnote{In practice, for fine-tuning tasks, the maximum sequence length is usually a few hundred. } 
 Our method in theory reduces the memory cost associated with this large embedding layer by at least a factor of $22$ compared to when the per-example gradient is na\"ively instantiated.
 Overall, we also observe significant savings, since embedding layers can be a major source of memory spending for training large language models.\footnote{While there are alternative approaches for reducing the memory footprint of embedding layers during training,  
