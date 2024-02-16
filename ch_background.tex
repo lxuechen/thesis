@@ -221,36 +221,41 @@ For details on the machinery of privacy accounting under subsampling, we direct 
 Second, privacy composition theorems are usually presented in the privacy parameter ``$\epsilon$-space,'' and not in the noise multiplier ``$\sigma$-space,'' but line 4 aims to derive the right noise multiplier under privacy composition.
 In practice, this step is performed numerically with binary search---search over $\sigma$ until the privacy spending of the overall procedure is just under the given $\epsilon$ (and $\delta$)---thanks to the monotone relation that increasing noise multiplier $\sigma$ implies stronger privacy and smaller $\epsilon$.
 
-Third, \texttt{WeightUpdate} on line 15 is generic. Most common first-optimizers such as SGD, Adam, and Adafactor fits this pattern. 
-We give the Adam update in this format below.
+Third, \texttt{WeightUpdate} on line 15 is intentionally left generic. 
+Most common first-optimizers such as SGD, Adam, and Adafactor have a weight update rule that fits this pattern. 
+Below, we use Adam as an example and present its pseudocode in Algorithm~\ref{algo:adam_update}.
+The resulting algorithm of plugging \texttt{AdamUpdate} into Algorithm~\ref{algo:dp_first_order} is sometimes known as DP-Adam in the literature~\cite{li2022large}.
+Most importantly, using different update rules won't change the privacy characteristics of Algorithm~\ref{algo:dp_first_order}, but may affect the efficiency of optimization or the performance of the resulting model.
 
-% \begin{algorithm}[H]\label{algo:adam_update}
-% \centering
-% \caption{AdamUpdate}
-% \begin{algorithmic}[1]
-%   \State {\bfseries Input:}
-%   $\theta_t, m_t, v_t, \bar{g_t}, \beta_1, \beta_2, \gamma$ 
-%   \State
-%   $
-%   m_{t+1} \leftarrow
-%     \beta_{1} \cdot m_{t} + \left(1-\beta_{1}\right) \cdot \bar{g_t}, \quad 
-%   v_{t+1} \leftarrow
-%     \beta_{2} \cdot v_{t}+\left(1-\beta_{2}\right) \cdot \bar{g_t}^{2}
-%   $
-%   \State
-%   $
-%   \widehat{m}_{t+1} \leftarrow m_{t+1} /\left(1-\beta_{1}^{t}\right), \quad
-%   \widehat{v}_{t+1} \leftarrow v_{t+1} /\left(1-\beta_{2}^{t}\right)
-%   $
-%   \State
-%   $
-%   \theta_{t+1} \leftarrow \theta_{t}-\alpha \cdot \widehat{m}_{t+1} /\left(\sqrt{\widehat{v}_{t+1}}+\gamma\right)
-%   $
-%   \State  \Return $\theta_{t+1}, m_{t +1}, v_{t + 1}$
-% \end{algorithmic}
-% \end{algorithm}
-
-% \Chen{algo box should be with generic update. then mention privacy guarantee does not change if you alter the update rule so long as gradient privatization is performed.}
+\begin{algorithm}[H]
+\centering
+\caption{ \texttt{AdamUpdate} }
+\begin{algorithmic}[1]
+  \State {\bfseries Input:}
+  Gradient $g \in \R^p$, weights $\theta_t \in \R^p$, optimizer states $s_t = (m_t, v_t)$, optimizer hyperparameters $\epsilon, \delta$.
+  % $\theta_t, m_t, v_t, \bar{g_t}, \beta_1, \beta_2, \gamma$ 
+  \State
+  $
+  m_{t+1} \leftarrow
+    \beta_{1} \cdot m_{t} + \left(1-\beta_{1}\right) \cdot g$
+  \State
+  $v_{t+1} \leftarrow
+    \beta_{2} \cdot v_{t}+\left(1-\beta_{2}\right) \cdot g \odot g
+  $
+  \State
+  $
+  \widehat{m}_{t+1} \leftarrow m_{t+1} /\left(1-\beta_{1}^{t}\right)$
+  \State
+  $\widehat{v}_{t+1} \leftarrow v_{t+1} /\left(1-\beta_{2}^{t}\right)$
+  \State
+  $
+  \theta_{t+1} \leftarrow \theta_{t}-\alpha \cdot \widehat{m}_{t+1} /\left(\sqrt{\widehat{v}_{t+1}}+\gamma\right)
+  $
+  \State $s_{t+1}\gets (m_{t +1}, v_{t + 1})$
+  \State  \Return $\theta_{t+1}, s_{t+1}$
+\end{algorithmic}
+\label{algo:adam_update}
+\end{algorithm}
 
 
 \section{Why Differential Privacy?}
