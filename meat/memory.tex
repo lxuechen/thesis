@@ -71,7 +71,7 @@ We include the \texttt{JAX} baseline since a recent study showed that DP optimiz
 Figure~\ref{fig:ghost_clipping} (a) shows that for typical inputs, our technique is the most memory friendly and allows fitting batches almost as large as those in non-private training. 
 Since ghost clipping allows us to fit larger batches but with a run-time penalty, a natural question is whether it improves throughput with the use of larger batches. 
 Figure~\ref{fig:ghost_clipping} (b) shows that while ghost clipping only provides minor gains compared to \texttt{Opacus} for smaller models, it allows processing \mytextapprox{10\%} more examples compared to the approach by~\cite{lee2020scaling} for fitting GPT-2-large, a model that neither \texttt{Opacus} or \texttt{JAX} could handle. 
-See Appendix~\ref{app:memory} for the setup of these experiments.
+% See Appendix~\ref{app:memory} for the setup of these experiments.
 \begin{figure}[htb]
 \begin{center}
 \begin{minipage}[t]{0.48\linewidth}
