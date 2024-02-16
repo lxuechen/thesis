@@ -32,7 +32,6 @@ Note that when $T=1$, the identity takes the form of
 This is the \cite{goodfellow2015efficient} trick.
 
 \newpage
-
 \subsection{Experiment Details}\label{app:experiments_main}
 
 \paragraph{Sentence Classification.}
@@ -65,3 +64,22 @@ For each entry, a turker is asked to rate on a scale of 1 to 5 the quality of pr
 Since human evaluation can yield noisy results, we also report the $95\%$ asymptotic confidence interval in Table~\ref{table:personachat}.
 All models were trained and evaluated on the version of Persona-Chat with the original persona.
 All numbers reported in Table~\ref{table:personachat} are obtained on the validation split. 
+
+\newpage
+\subsection{Subtleties of implementing DP mixed precision training}
+\label{app:mixed_precision}
+Mixed precision training~\citep{micikevicius2017mixed} accelerates updates by storing certain tensors in half-precision.
+To mitigate negative effects caused by potential arithmetic underflow, usual implementations upscale the loss with an adaptive factor pre-backpropagation and downscale the gradients with the same factor post-backpropagation. 
+The scaling factor is adapted based on whether underflow is observed during training.
+
+Special care needs to be taken when combining gradient privatization with mixed precision training.
+One implementation that ensures similar results across full and mixed precision training 
+(1) upscales the loss with the adaptive factor $K$, (2) clips per-example gradients by $C K$, (3) adds to the sum of clipped gradients the usual Gaussian noise multiplied by $K$, and (4) downscales the noisy gradient by $K$.
+This is the implementation that we adopt, and we were able to obtain similar results on the E2E dataset with and without mixed precision. 
+
+One alternative implementation (a) upscales the loss with the adaptive factor $K$, (b) clips per-example gradients by $C$, (c) adds the usual Gaussian noise to the sum of clipped gradients, and (d) downscales noisy gradients by $K$. 
+The main difference between this procedure and the prior is whether the factor $K$ is considered during clipping and noising.
+This procedure, while having the same DP guarantee, typically does not result in similar results as full precision when the same hyperparameters are used across the two settings (even with an optimizer like Adam which self-adjusts the magnitude of updates with accumulated empirical second moments).
+We also identified that this implementation is also the primary reason that a prior work's code does not produce good results with full fine-tuning using our near-optimal hyperparameters.\footnote{
+    \url{https://github.com/dayu11/Differentially-Private-Deep-Learning}
+}
