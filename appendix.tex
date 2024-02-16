@@ -83,3 +83,94 @@ This procedure, while having the same DP guarantee, typically does not result in
 We also identified that this implementation is also the primary reason that a prior work's code does not produce good results with full fine-tuning using our near-optimal hyperparameters.\footnote{
     \url{https://github.com/dayu11/Differentially-Private-Deep-Learning}
 }
+
+\newpage
+\subsection{Hyperparameter Search Ranges}\label{app:hp_search_range}
+We compare different adaptation methods by reporting task specific metrics on the test split using hyperparameters that maximize validation BLEU on E2E.
+For sentence classification tasks, we reused the same hyperparameters, except for the number of training epochs and batch size.
+For SST-2, we reused the same batch size as for private E2E fine-tuning, and the number of epochs exactly as in typical non-private fine-tuning for SST-2 (number of epochs equals to 3 in this case).
+For remaining classification tasks, we use a batch size such that the sampling rate is the same as for SST-2, and a number of training epochs that is roughly proportional to the dataset size.
+Appendix~\ref{app:hp_transfer} outlines why we transfer the sampling rate as opposed to the batch size.
+We list the range of hyperparameters that we searched over for each individual adaptation method on E2E considered in the paper. 
+Prefix-tuning has two additional hyperparameters: the length of the prefix and the dimensionality of the hidden layer. 
+We set these to the default used by~\cite{li2021prefix} (10 for the former and 512 for the latter).
+For Adam, we use the default hyperparamaters set by PyTorch~\citep{paszke2017automatic}. 
+
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{0.7pt}
+    \renewcommand{\arraystretch}{1.2}
+    \caption{Hyperparameter search range for different methods.}
+    \begin{tabular}{@{} l c c c c @{}}
+        \toprule
+        Method & Full & Prefix & Linear & FT2\\
+        \midrule
+        Guarantee $(\epsilon, \delta)$ &
+        $(3, \nicefrac{1}{2|\mathcal{D}_{\text{train}}|})$ & 
+        $(3, \nicefrac{1}{2|\mathcal{D}_{\text{train}}|})$ & 
+        $(3, \nicefrac{1}{2|\mathcal{D}_{\text{train}}|})$ & 
+        $(3, \nicefrac{1}{2|\mathcal{D}_{\text{train}}|})$ \\
+        Clipping norm $C$ &0.1 & 0.1 & 0.1 & 0.1\\
+        Batch size $B$ 
+        &$\{512, 1024\}$ 
+        &$\{512, 1024\}$ 
+        &$\{512, 1024\}$
+        &$\{512, 1024\}$\\
+        Learning rate $\eta$
+        & \tiny $ \{200, 100, 30, 10, 3\} \cdot 10^{-5}$
+        & \tiny $\{200, 100, 30, 10, 3\} \cdot 10^{-5}$
+        & \tiny $\{200, 100, 30, 10, 3\} \cdot 10^{-5}$
+        & \tiny $\{200, 100, 30, 10, 3\} \cdot 10^{-5}$ \\
+        LR decay
+        & $\{ \text{yes}, \text{no}\}$ 
+        & $\{ \text{yes}, \text{no}\}$ 
+        & $\{ \text{yes}, \text{no}\}$ 
+        & $\{ \text{yes}, \text{no}\}$ \\
+        Epochs $E$
+        &$\{10, 30, 50\}$
+        & $\{10, 30, 50\}$
+        & $\{10, 30, 50\}$
+        & $\{10, 30, 50\}$ \\
+        Weight decay $\lambda$ & 0 & 0 & 0 & 0 \\
+        Noise scale $\sigma$ 
+        & \multicolumn{4}{c}{calculated numerically based on $(\epsilon, \delta)$-DP budget} \\
+        \bottomrule
+        \end{tabular}
+        \label{tab:hparams}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{7pt}
+    \renewcommand{\arraystretch}{1.2}
+    \caption{Hyperparameter search range for different methods (continued).}
+    \begin{tabular}{@{} l c c @{}}
+        \toprule
+        Method & LoRA & RGP \\
+        \midrule
+        DP guarantee $(\epsilon, \delta)$ &
+        $(3, \nicefrac{1}{2|\mathcal{D}_{\text{train}}|})$ & 
+        $(3, \nicefrac{1}{2|\mathcal{D}_{\text{train}}|})$ \\
+        Clipping norm $C$ &0.1 & $\{ 0.1, 1, 10\}$ \\
+        Batch size $B$ 
+        &$\{512, 1024\}$ 
+        &$\{512, 1024\}$ \\
+        Learning rate $\eta$ & 
+        $ \{300, 100, 30, 10, 3\} \cdot 10^{-5}$ & 
+        $\{300, 100, 30, 10, 3\} \cdot 10^{-5}$ \\
+        LR decay
+        & $\{ \text{yes}, \text{no}\}$ 
+        & $\{ \text{yes}, \text{no}\}$ \\
+        Epochs $E$
+        &$\{5, 10, 30, 50\}$
+        & $\{5, 10, 30, 50\}$\\
+        Weight decay $\lambda$ & 0 & 0 \\
+        Rank $k$ 
+        &$\{1,2, 4,8\}$ & $\{1,2,4, 8\}$ \\
+        Noise scale $\sigma$ & 
+        \multicolumn{2}{c}{calculated numerically based on $(\epsilon, \delta)$-DP budget} \\
+        \bottomrule
+        \end{tabular}
+        \label{tab:hparams_low_rank}
+\end{table}
