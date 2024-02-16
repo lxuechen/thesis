@@ -189,8 +189,8 @@ Algorithm~\ref{algo:dp_first_order} presents the general pattern of DP first-ord
   \State {\bfseries Input:}
   Dataset $D=\{x_i\}_{i=1}^N$, learning rate $\eta$, batch size $B$, norm threshold $C > 0$, training epochs $E$, initial weights $\theta_0\in\R^p$, optimizer states $s_0$, optimizer hyperparameters $H$, privacy parameters $\epsilon, \delta > 0$.
 
-  \State $q = \nicefrac{B}{N}$ \Comment{ {\color{red} Derive the sampling rate.} }
-  \State $T = \floor{ \nicefrac{E}{q} }$ \Comment{ {\color{red} Derive the total iteration count.}}
+  \State $q \gets \nicefrac{B}{N}$ \Comment{ {\color{red} Derive the sampling rate.} }
+  \State $T \gets \floor{ \nicefrac{E}{q} }$ \Comment{ {\color{red} Derive the total iteration count.}}
   \State Calculate the noise multiplier $\sigma$ from $\epsilon, \delta, q, T$ with adaptive composition and privacy amplification theorems.
   \For{ $t = 1, \dots, T $ }
     \State Draw a batch $B_t$ via \emph{Poisson sampling} (sample each element with prob. $q$).
@@ -201,7 +201,7 @@ Algorithm~\ref{algo:dp_first_order} presents the general pattern of DP first-ord
     \EndFor
     \State \(\triangleright\) {\color{red} Estimate the average gradient with the sampled Gaussian mechanism.} 
     \State $z_t \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
-    \State $\widebar{g_t} = \frac{1}{B} \bracks{ 
+    \State $\widebar{g_t} \gets \frac{1}{B} \bracks{ 
         \sum_{x_i \in B_t} \widetilde{g_t}(x_i) + z_t
     }$
     \State \(\triangleright\) {\color{red} Update model weights and optimizer states with private gradient.}
@@ -211,6 +211,18 @@ Algorithm~\ref{algo:dp_first_order} presents the general pattern of DP first-ord
 \end{algorithmic}
 \label{algo:dp_first_order}
 \end{algorithm}
+
+Before proceeding further, we make several comments about Algorithm~\ref{algo:dp_first_order}.
+First, to reduce compute load, mini-batches are used in practice to approximate the true empirical average gradient during training.
+This is exemplified in Algorithm~\ref{algo:dp_first_order} on line 6 where mini-batches are drawn.
+Different from typical standard training where random shuffling is used, \emph{Poisson sampling} is commonly used in private training for drawing mini-batches for privacy accounting reasons.
+For details on the machinery of privacy accounting under subsampling, we direct the reader to theorems on privacy amplification by subsampling~\cite{balle2018privacy,zhu2019poission,mironov2019r}.\footnote{There are other privacy amplification techniques such as shuffling~\cite{erlingsson2019amplification} or random check-in~\cite{balle2020privacy} which we won't go into.}
+
+Second, privacy composition theorems are usually presented in the privacy parameter ``$\epsilon$-space,'' and not in the noise multiplier ``$\sigma$-space,'' but line 4 aims to derive the right noise multiplier under privacy composition.
+In practice, this step is performed numerically with binary search---search over $\sigma$ until the privacy spending of the overall procedure is just under the given $\epsilon$ (and $\delta$)---thanks to the monotone relation that increasing noise multiplier $\sigma$ implies stronger privacy and smaller $\epsilon$.
+
+Third, \texttt{WeightUpdate} on line 15 is generic. Most common first-optimizers such as SGD, Adam, and Adafactor fits this pattern. 
+We give the Adam update in this format below.
 
 % \begin{algorithm}[H]\label{algo:adam_update}
 % \centering
