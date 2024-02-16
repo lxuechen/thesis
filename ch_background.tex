@@ -183,7 +183,7 @@ Algorithm~\ref{algo:dp_first_order} makes this precise in pseudocode.
 
   \State $q = \nicefrac{B}{N}$ \Comment{ {\color{red} Derive the sampling rate.} }
   \State $T = \floor{ \nicefrac{E}{q} }$ \Comment{ {\color{red} Derive the total iteration count.}}
-  \State Calculate the noise multiplier $\sigma$ from $\epsilon, \delta, q, E$ with composition and amplification theorems.
+  \State Calculate the noise multiplier $\sigma$ from $\epsilon, \delta, q, E$ with adaptive composition and privacy amplification theorems.
   \For{ $t = 1, \dots, T $ }
     \State Draw a batch $B_t$ via Poisson sampling each element with probability $q$
     \For{ $x_i \in B_t$ }
