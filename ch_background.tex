@@ -222,7 +222,7 @@ Second, privacy composition theorems are usually presented in the privacy parame
 In practice, this step is performed numerically with binary search---search over $\sigma$ until the privacy spending of the overall procedure is just under the given $\epsilon$ (and $\delta$)---thanks to the monotone relation that increasing noise multiplier $\sigma$ implies stronger privacy and smaller $\epsilon$.
 
 Third, \texttt{WeightUpdate} on line 15 is intentionally left generic. 
-Most common first-optimizers such as SGD, Adam, and Adafactor have a weight update rule that fits this pattern. 
+Most first-order optimizers such as SGD, Adam~\cite{kingma2014adam}, and Adafactor~\cite{shazeer2018adafactor} have a weight update rule that fits this pattern. 
 Below, we use Adam as an example and present its pseudocode in Algorithm~\ref{algo:adam_update}.
 The resulting algorithm of plugging \texttt{AdamUpdate} into Algorithm~\ref{algo:dp_first_order} is sometimes known as DP-Adam in the literature~\cite{li2022large}.
 Most importantly, using different update rules won't change the privacy characteristics of Algorithm~\ref{algo:dp_first_order}, but may affect the efficiency of optimization or the performance of the resulting model.
