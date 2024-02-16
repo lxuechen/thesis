@@ -1,5 +1,5 @@
 
-\section{\large Clipping Without Materializing Per-Example Gradients}
+\section[Clipping Without Materializing Per-Example Gradients]{\large Clipping Without Materializing Per-Example Gradients}
 DP-SGD has high memory overhead due to clipping \textit{per-example} gradients.
 Na\"ively implemented, this step instantiates a giant gradient vector for each example during optimization and can be prohibitively expensive.
 For example, \cite{hoory2021learning} pretrained BERT with DP optimization and reported memory issues when using the large batches necessary to achieve high performance.
