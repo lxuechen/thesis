@@ -136,7 +136,7 @@ Intuitively, mappings with low sensitivity are less affected by the presence/abs
 However, having low sensitivity does not immediately imply the mapping satisfies the DP statement.\footnote{Here's an example of a low-sensitivity release procedure that is not private at all. Imagine a group of people each with a positive number below 0.1. Everyone in the group except Bob has a rational number. We aim to release the sum of a subset of these numbers. The sensitivity is 0.1 and thus small, but whether Bob was included in the subset can be easily inferred (Bob is included if the sum is irrational).}
 This is why we need algorithms such as the Gaussian mechanism to \emph{privatize} mappings.
 The Gaussian mechanism simply adds large noise vectors to high-sensitivity mappings and small noise vectors to low-sensitivity mappings.
-Algorithm~\ref{algo:gauss} presents the pseudocode.
+Algorithm~\ref{algo:gauss} presents the pseudocode and Theorem~\ref{theo:gauss} gives its privacy guarantee.
 \begin{algorithm}[H]
 \centering
 \caption{Gaussian Mechanism}
@@ -172,16 +172,18 @@ Algorithm~\ref{algo:gauss} is $(\epsilon, \delta)$-DP.
 % To determine the noise multiplier, we account privacy through R\'enyi differential privacy (RDP)~\citep{mironov2017renyi,mironov2019r}.
 % For completeness, we include the pseudocode for DP-Adam below. 
 
+DP-SGD and its siblings follow the paradigm described above: They apply the Gaussian mechanism to privatize each gradient computation step, rely on post-processing for the privacy guarantee for weight updates, and resort to adaptive composition for the overall privacy guarantee. 
+Algorithm~\ref{algo:dp_first_order} makes this precise in pseudocode.
 \begin{algorithm}[H]
 \centering
-\caption{DP Optimization}
+\caption{DP First-Order Optimization}
 \begin{algorithmic}[1]
   \State {\bfseries Input:}
   Dataset $D=\{x_i\}_{i=1}^N$, learning rate $\eta$, batch size $B$, norm threshold $C > 0$, training epochs $E$, initial weights $\theta_0\in\R^p$, optimizer state $s_0$, optimizer hyperparameters $H$, privacy parameters $\epsilon, \delta > 0$.
 
   \State $q = \nicefrac{B}{N}$ \Comment{ {\color{red} Derive the sampling rate.} }
   \State $T = \floor{ \nicefrac{E}{q} }$ \Comment{ {\color{red} Derive the total iteration count.}}
-  \State Calculate the noise multiplier $\sigma$ based on $\epsilon, \delta, q, E$.
+  \State Calculate the noise multiplier $\sigma$ from $\epsilon, \delta, q, E$ with composition and amplification theorems.
   \For{ $t = 1, \dots, T $ }
     \State Draw a batch $B_t$ via Poisson sampling each element with probability $q$
     \For{ $x_i \in B_t$ }
@@ -199,7 +201,7 @@ Algorithm~\ref{algo:gauss} is $(\epsilon, \delta)$-DP.
     \EndFor
 \State \Return $\theta_{T}$ or $\frac{1}{T}\sum_{t=1}^T \theta_t$
 \end{algorithmic}
-\label{algo:dp_adam}
+\label{algo:dp_first_order}
 \end{algorithm}
 
 % \begin{algorithm}[H]\label{algo:adam_update}
