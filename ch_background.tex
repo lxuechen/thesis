@@ -258,6 +258,13 @@ Most importantly, using different update rules won't change the privacy characte
 \end{algorithm}
 
 \section{Challenges to Deep Learning with DP}
+Deep learning with DP has been viewed as difficult to work with for at least two reasons. 
+First, DP training algorithms such as DP-SGD typically incur substantial performance loss on the resulting model~\cite{abadi2016deep,hoory2021learning,kerrigan2020differentially}.
+Most successful cases rely on the dataset being considerably large~\cite{ramaswamy2020training,mcmahan2017learning}.
+Second, DP-SGD and related algorithms can be much more computationally intensive than standard training algorithms.
+The per-example gradient clipping operation can be memory-demaning~\cite{hoory2021learning} and cause slow downs in terms of wall time~\cite{carlini2019secret}.
+This thesis contributes improved techniques to address the two challenges.
 
-\section{Why Differential Privacy?}
+% \section{Why Differential Privacy?}
+
 % \Chen{past work heuristic privacy without def'n all broken. neuracrypt, instahide, texthide, etc. go back to dwork's works on why you need to start with def'n. maybe mention some crypto stuff as well.}
