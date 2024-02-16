@@ -1,0 +1,19 @@
+\section{Related Work}
+DP-ERM and DP-SCO are arguably the most well-studied areas of differential privacy~\cite{chaudhuri2011differentially,kifer2012private,bassily2014private,song2013stochastic,wang17amd,fts17,bassily2019private,mcmahan2017learning,zzmw17,WLKCJN17,FKT20,iyengar2019towards,BFGT20,song2020characterizing,ll21,afkt21,bgn21,gtu22,gll22}. Tight dependence on the number of model parameters and the number of samples is known for both DP-ERM~\cite{bassily2014private} and DP-SCO~\cite{bassily2019private}. 
+In particular, for the error on general convex losses, an explicit polynomial dependence on the number of optimization variables is necessary.
+However, it is shown that if gradients lie in a fixed low-rank subspace $M$, the dependence on dimension $d$ can be replaced by ${\sf rank}(M)$ which can be significantly smaller~\cite{jain2014near,song2020characterizing}. 
+We extend this line of work to show that under a weaker assumption (restricted Lipschitz continuity with decaying coefficients) one can obtain analogous error guarantees that are independent of $d$, but do not require the gradients of the loss to strictly lie in any fixed low-rank subspace $M$. 
+As a consequence, our results provide a plausible explanation for the empirical observation that dense fine-tuning can be effective and that fine-tuning a larger model under DP can generally be more advantageous in terms of utility than fine-tuning a smaller model~\cite{li2021large,yu2021differentially}. 
+A concurrent work shows that the standard dimension dependence of DP-SGD can be replaced by a dependence on the trace of the Hessian assuming the latter quantity is uniformly bounded~\cite{ma2022dimension}.
+
+A complementary line of work designed variants of DP-SGD that either explicitly or implicitly control the subspace in which gradients are allowed to reside~\cite{PDA-DPMD,liu2021leveraging,asi2021private,KRRT21,YZCL21}. 
+They demonstrated improved dependence of the error on the dimension if the true gradients lie in a ``near'' low-rank subspace. 
+Our results are incomparable to this line of work because of two reasons: (i) Our algorithm is vanilla DP-SGD and does not track the gradient subspace either explicitly or implicitly, and hence does not change the optimization landscape. 
+Our improved dependence on dimensions is an artifact of the analysis. 
+(ii) Our analytical results do not need the existence of any public data to obtain tighter dependence on dimensions. All prior works mentioned above need the existence of public data to demonstrate any improvement.
+
+On the empirical front, past works have observed that for image classification tasks, gradients of ConvNets converge to a small subspace spanned by the top directions of the Hessian. In addition, this span remains stable for long periods of time during training~\cite{gur2018gradient}.
+While insightful, this line of work does not look at language model fine-tuning.
+Another line of work measures for language model fine-tuning the \emph{intrinsic dimension}---the minimum dimension such that optimizing in a randomly sampled subspace of such dimension approximately recovers the original performance~\cite{li2018measuring,aghajanyan2020intrinsic}. 
+We note that a small intrinsic dimension likely suggests that gradients are approximately low rank. 
+Yet, this statement should not be interpreted as a strict implication, since the notion of intrinsic dimension is at best vaguely defined (e.g., there's no explicit failure probability threshold over the randomly sampled subspace in the original statement), and the definition involves not a fixed subspace but rather a randomly sampled one.

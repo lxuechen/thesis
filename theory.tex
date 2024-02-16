@@ -1,0 +1,573 @@
+\section{Dimension-Independence via Restricted Lipschitz Continuity}\label{sec:theory}
+In this section, we introduce the restricted Lipschitz continuity condition and derive improved bounds for the excess empirical and population risks for DP-SGD when optimizing convex objectives.
+
+\begin{defi}[Restricted Lipschitz Continuity]
+We say that the loss function $h: \cK \to \R$ is restricted Lipschitz continuous with coefficients $\{G_k\}_{k=0}^d$, if
+for all $k \in \{0, \dots, d\}$, there exists an orthogonal projection matrix $P_k$ with rank $k$ such that 
+\begin{align*}
+    \|(I-P_k)\nabla h(x) \|_2\le G_k,
+\end{align*}
+for all $x \in \cK$ and all subgradients $\nabla h(x) \in \partial h(x)$.
+\end{defi}
+
+Note that any $G$-Lipschitz function is also trivially restricted Lipschitz continuous with coefficients $G = G_0 = G_1 = \cdots = G_d$, since orthogonal projections never increase the $\ell_2$-norm of a vector (generally, it is easy to see that $G = G_{0}\ge G_{1}\geq G_{2}\geq\cdots\geq G_{d}=0$). 
+On the other hand, we expect that a function which exhibits little growth in some subspace of dimension $k$ to have a restricted Lipschitz coefficient $G_{d-k}$ of almost 0.
+Our bounds on DP convex optimization characterize errors through the use of restricted Lipschitz coefficients. 
+We now summarize the main assumption.
+\begin{assu}
+\label{assm:G_k}
+The per-example loss function $f(\cdot; s)$ is convex and $G$-Lipschitz continuous for all $s \in \mathcal{S}$.
+The empirical loss $F(\cdot; \cD)$ is restricted Lipschitz continuous with coefficients $\{G_k\}_{k = 0}^d$.
+\end{assu}
+
+\subsection{Bounds for Excess Empirical Loss}
+We present the main theoretical result on DP-ERM for convex objectives. 
+The result consists of two components:
+Equation~\eqref{eq:erm_general_condition} is a general bound that is applicable to any sequence of restricted Lipschitz coefficients;
+Equation~\eqref{eq:erm_fast_decaying} specializes the previous bound when the sequence of coefficients decays rapidly and demonstrates dimension-independent error scaling.
+\begin{theo}[Excess Empirical Loss]{theorem}{DPERM}
+\label{thm:DPERM}
+Let $ \delta \in (0, \frac{1}{2}]$ and $\epsilon\in(0,10]$.
+Under Assumption~\ref{assm:G_k}, for all $k \in [d]$, 
+setting 
+$T=\Theta(n^2 + d \log^2 d)$, $\sigma=\Theta \bracks{ \frac{\sqrt{T\log(1/\delta)}}{n\epsilon} }$, $\eta=\sqrt{\frac{D^{2}}{T\cdot G_{0}^{2}\cdot k\sigma^{2}}}$
+and $\alpha=\frac{1}{D}\sqrt{\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}}$, where $S = \lfloor \log (d / k) \rfloor + 1$, DP-SGD (Algorithm~\ref{alg:noisy_SGD}) is $(\epsilon,\delta)$-DP, and
+\begin{align}
+\label{eq:erm_general_condition}
+\E \sbracks{  F(\overline{x};\cD)-  \min_x F(x;\cD) } &~ \lesssim \frac{G_{0}D\sqrt{k\log(1/\delta)}}{\epsilon n}+D\sqrt{\sum_{s=1}^{S}s^2 2^{s}G_{2^{s-1}k}^{2}},
+\end{align}
+where $\|x^{(0)}- \argmin_x F(x; \cD) \|_2 \le D$, $\ox$ is the (random) output of DP-SGD (Algorithm~\ref{alg:noisy_SGD}), and the expectation is over the randomness of $\overline{x}$.
+Moreover, if for some $c>1/2$, we have $G_k\leq G_0 k^{-c}$ for all $k \in [d]$, and in addition $ n\geq \epsilon^{-1} \sqrt{\log(1/\delta)}$,
+minimizing the right hand side of \eqref{eq:erm_general_condition} with respect to $k$ yields
+\begin{align}
+\label{eq:erm_fast_decaying}
+\E \sbracks{  F(\overline{x};\cD)-  \min_x F(x;\cD) } \lesssim G_{0}D \cdot \bracks{ 
+        \frac{\sqrt{\log(1/\delta)}}{\epsilon n}
+    }^{2c/(1+2c)
+}.
+\end{align}
+\end{theo}
+We include a sketch of the proof techniques in Subsection~\ref{sec:proof_technique} and defer the full proof to Subsection~\ref{app:dperm_proof}.
+\begin{remark}
+Consider DP-ERM for learning generalized linear models with convex and Lipschitz losses.
+When the (empirical) data covariance is of rank $r < d$, the span of gradients $\text{span}(\{ \nabla_x F(x) \})$ is also of rank $r$. 
+Thus, the average loss is restricted Lipschitz continuous with coefficients where $G_{r'} = 0$ for all $r' > r$. 
+Setting $k = r$ in \eqref{eq:erm_general_condition} yields an excess empirical risk bound of order $O\bracks{ {G_{0}D\sqrt{ r \cdot\log(1/\delta)}} \epsilon^{-1} n^{-1} }$.
+This recovers the previous dimension-independent result in~\cite{song2021evading}.
+\end{remark}
+
+% \begin{remark}
+%     If $\epsilon n<\sqrt{\log(1/\delta)}$, instead of running DP-SGD, one can output the public initial point $x_0$ directly and get the excess empirical risk $G_0D$.
+% \end{remark}
+
+
+The restricted Lipschitz continuity condition can be viewed as a generalized notion of rank.
+The result captured in \eqref{eq:erm_fast_decaying} suggests that the empirical loss achieved by DP-SGD does not depend on the problem dimension if the sequence of restricted Lipschitz coefficients decays rapidly. 
+We leverage these insights to build intuition for understanding privately fine-tuning language models in Section~\ref{sec:experiments}.
+% The quick decaying phenomena of gradient (i.e. $G_{k}\leq \frac{G_{0}}{k^{c}}$) seems to be very common in practice.
+% Our experiment suggests $c = 1$ for the pretrained language model we used. 
+
+
+\subsection{Bounds for Excess Population Loss}
+%Making use of the stability of SGD, we can bound the generalization error and hence the excess population loss for the DP-SCO problem.
+%To prove the utility guarantees in Theorem \ref{thm:DPSCO} 
+For DP-SCO, we make use of the \emph{stability} of DP-SGD to bound its generalization error \cite{BE02}, following previous works \cite{bassily2019private,BFGT20,song2021evading}.
+The bound on the excess population loss follows from combining the bounds on the excess empirical risk and the generalization error.
+
+\begin{restatable}[Excess Population Loss]{theorem}{DPSCO}
+\label{thm:DPSCO}
+Let $ \delta \in (0, \frac{1}{2}]$ and $\epsilon\in (0,10]$.
+Under Assumption~\ref{assm:G_k}, for all $k \in [d]$, 
+by setting
+$T=\Theta(n^2 + d \log^2 d)$,
+$\sigma=\Theta \bracks{ \frac{\sqrt{T\log(1/\delta)}}{n\epsilon} }$, 
+$\eta=\sqrt{\frac{D^{2}}{T\cdot G_{0}^{2}(T/n+k\sigma^{2})}}$
+and $\alpha=\frac{1}{D}\sqrt{\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}}$, where $S = \lfloor \log(d/k) \rfloor + 1$, 
+DP-SGD (Algorithm~\ref{alg:noisy_SGD}) is $(\epsilon,\delta)$-DP, and
+\begin{align*}
+\E \sbracks{
+    F(\ox; \cP) - \min_{x} F(x; \cP)
+}
+\lesssim
+    \frac{G_0D}{\sqrt{n}}+\frac{G_{0}D\sqrt{k\log(1/\delta)}}{\epsilon n}+D\sqrt{\sum_{s=1}^{S}s^2 2^{s}G_{2^{s-1}k}^{2}},
+\end{align*}
+where $\|x^{(0)}- \argmin_x F(x ; \cP) \|_2 \le D$, $\ox$ is the (random) output of DP-SGD (Algorithm~\ref{alg:noisy_SGD}), and the expectation is over the randomness of $\overline{x}$.
+
+Moreover, if for some $c>1/2$, we have $G_k\leq G_0 k^{-c}$ for all $k \in [d]$, and in addition $n>\epsilon^{-1}\sqrt{\log(1/\delta)}$, minimizing the above bound with respect to $k$ yields
+% \begin{align*}
+\eqn{
+\E \sbracks{
+    F(\ox;\cP)- \min_x F(x;\cP)
+}
+\lesssim
+    \frac{G_0D}{\sqrt{n}}+
+    G_{0} D \cdot \bracks{
+        \frac{\sqrt{\log(1/\delta)}}{\epsilon n}
+    }^{2c/(1+2c)}.
+% \end{align*}
+}
+\end{restatable}
+% We refer the reader to Appendix~\ref{app:dpsco_proof} for the full proof.
+
+\begin{remark}
+Our result on DP-SCO also recovers the DP-SCO rank-dependent result for learning generalized linear models with convex and Lipschitz losses~\cite{song2021evading}.
+\end{remark}
+
+\begin{remark}
+When $c>1/2$, $\epsilon = \Theta(1)$ and $\delta = 1/\mathrm{poly}(n)$, the population loss matches the (non-private) informational-theoretical lower bound $\Omega(G_0 D/\sqrt{n})$ \cite{agarwal2009information}.
+\end{remark}
+
+\begin{remark}
+    % DP-SGD considered in our work randomly queries the (sub)gradient of one function uniformly in each iteration.
+    Our results on DP-ERM and DP-SCO naturally generalize to (full-batch) DP-GD.
+\end{remark}
+
+\subsection{Overview of Proof Techniques}\label{sec:proof_technique}
+The privacy guarantees in Theorems \ref{thm:DPERM} and \ref{thm:DPSCO} follow from Lemma~\ref{lm:privacy_guarantee}.
+It suffices to prove the utility guarantees. 
+We give an outline of the main proof techniques first and present full proofs afterwards.
+The following is a sketch of the core technique for deriving~\eqref{eq:erm_fast_decaying} in Theorem~\ref{thm:DPERM}.
+For simplicity, we write $f_j(\cdot)$ for $f(\cdot;s_j)$ and $F(\cdot)$ for $F(\cdot;\cD)$ when there is no ambiguity.
+
+By convexity, the error term of SGD is upper bounded as follows
+\eq{
+\label{eq:proof_sketch}
+    f_{j}(x^{(t)})-f_{j}(x^{*})\leq \nabla f_{j}(x^{(t)})^{\top}(x^{(t)}-x^{*}),
+}
+where $j \in [n]$ is the random index sampled at iteration $t$.
+
+By definition of $G_{k}$, we know that there is a $k$ dimensional
+subspace $U$ such that the gradient component orthogonal to $U$ is small when $G_k$ is small.
+Na\"ively, one decomposes the gradient $\nabla f_{j}(x^{(t)})=g_{1}+g_{2}$,
+where $g_{1}\in U$ and $g_{2}\in U^{\perp}$,
+and separately bounds the two terms $g_1^\top (x^{(t)}-x^{*})$ and $g_2^\top (x^{(t)}-x^{*})$.
+Since $g_{1}$ lies in a $k$ dimensional subspace, one can follow existing
+arguments on DP-SGD to bound $g_{1}^{\top}(x^{(t)}-x^{*})$. 
+Unfortunately, this argument does not give a dimension-independent bound.
+Although
+$\|g_{2}\|_{2}\leq G_{k}$ (which can be small for large $k$), the term
+$\|x^{(t)}-x^{*}\|_{2}$ is as large as $\Omega(\sqrt{d})$ with high probability due
+to the isotropic Gaussian noise injected in DP-SGD. 
+
+% {[}Yintat:Discuss why projected DP-SGD does not work. I am not super sure. But if you have a good explanation, put it here.{]}
+% \Daogao{I write the following paragraph. But i feel it is better to put it somewhere else like related work}
+% One natural way to derive a good bound on $\|x^{{(t)}}-x^{*}\|_2$ is through projection.
+% However, previous lower bounds in constrained optimization already suggest that DP projected-SGD cannot evade the curse of dimensionality~\cite{bassily2014private}, since projections tend to destroy the low-rank structure.
+% The unconstrained low-rank DP-ERM considered in \cite{song2021evading} is in some sense a rank-dimensional problem, say $\nabla f_{j}(x)\in U$ and adding noise on the null space $U^{\top}$ does not influence the excess empirical risk. Doing projection, however, may lead to a larger loss and destroy the low-rank structure in spirit.
+
+% Our key idea is to partition the whole space $\R^d$ into  $\lfloor \log(d/k) \rfloor + 2$ orthogonal sub-spaces, expressing the error term $\nabla f_j(x^{(t)})^\top (x^{(t)}-x^*)$ as the sum of terms where each term corresponds to the projection to a particular subspace.
+Our key idea is to partition the whole space $\R^d$ into  $\lfloor \log(d/k) \rfloor + 2$ orthogonal subspaces, expressing the error term $\nabla f_j(x^{(t)})^\top (x^{(t)}-x^*)$ as the sum of individual terms, each of which corresponds to a projection to a particular subspace.
+Fix a $k \in [d]$, and consider the following subspaces:
+Let $U_{0}=\text{range}(P_{k})$,
+ $U_{s}$ be the subspace orthogonal to all previous subspaces such that $\bigoplus_{i=0}^s U_i = \text{range}(P_{2^sk})$ for $s=1,2,\cdots,\left\lfloor \log(d/k)\right\rfloor $,
+and $U_{S}$ be the subspace such that the orthogonal direct sum of all subspaces $\{U_i\}_{i=0}^S$ is $\R^d$, where $S=\left\lfloor \log(d/k)\right\rfloor +1$.
+Here, $P_{i}$ is the orthogonal projection matrix with rank $i$ promised by $G_{i}$ in Assumption~\ref{assm:G_k}. 
+Let $Q_{s}$ be the orthogonal projection to the subspace $U_{s}$, and observe that $\rank (Q_{s}) \leq 2^{s}k$ and
+$\|Q_{s}\nabla F(x)\|_{2}\leq G_{2^{s-1}k}\text{ for all }x\text{ and all }s\geq1.$
+Rewriting the right hand side of~\eqref{eq:proof_sketch} with this decomposition yields
+$$
+f_{j}(x^{(t)})-f_{j}(x^{*})  \leq \lp Q_{0}\nabla f_{j}(x^{(t)})+\sum_{s=1}^{S} Q_{s}\nabla f_{j}(x^{(t)})\rp^{\top}(x^{(t)}-x^{*}).    
+$$
+On the one hand, if $G_k$ decays quickly, $\| \mathbb{E}_j [  Q_{s} \nabla f_{j} ] \|_2$ can be small for large $s$. 
+On the other hand, we expect $\|Q_{s} (x^{(t)}-x^{*})\|_2$ to be small for small $s$ where $Q_{s}$ is an orthogonal projection onto a small subspace. 
+Thus, for each $s$, $\nabla f_{j}(x^{(t)})^{\top} Q_{s} (x^{(t)}-x^{*})$ is small either due to a small gradient (small $Q_s \nabla f_{j}$ in expectation over the random index) or small noise (small $Q_{s} (x^{(t)}-x^{*})$), since noise injected in DP-SGD is isotropic. 
+More formally, in Lemma~\ref{lem:radius}, we show that for any projection matrix $Q$ with rank $r$, $\|Q(x^{(t)}-x^{(0)})\|_2$ can be upper bounded by a term that depends only on $r$ (rather than $d$).
+
+
+\subsection{Proof of Theorem~\ref{thm:DPERM}}\label{app:dperm_proof}
+
+Before bounding the utility of DP-SGD, we first bound $x^{(t)}-x^{(0)}$ in expectation.
+% \Daogao{Maybe we can move this statement earlier? As we discussed $f_j$ and $\nabla F$ before.}
+
+\begin{lemm}
+\label{lem:radius}
+Suppose Assumption~\ref{assm:G_k} holds.
+Let $Q$ be an orthogonal projection matrix with rank $r$ and suppose that $\|Q\nabla f(x;s)\|_2 \leq G_Q$ for all $x\in\R^d$ and $s \in \mathcal{S}$. 
+If we set $\eta\leq\frac{1}{2\alpha}$ in DP-SGD, then for all $t>0$, we have
+\[
+\E\|Q(x^{(t)}-x^{(0)})\|_2^{2}\leq\frac{4 G_{Q}^{2}}{\alpha^{2}}+\frac{2\eta G_{0}^{2}}{\alpha}(1+r\sigma^{2}).
+\]
+\end{lemm}
+
+
+\begin{proof}[Proof of Lemma \ref{lem:radius}]
+By the assumption, we know $\|Q \nabla F(x)\|_2\le G_Q$ and $\| \nabla F(x)\|_2\leq G_0$.
+Let $z^{(t)}=x^{(t)}-x^{(0)}$. Note that
+\begin{align*}
+    z^{(t+1)}=& ~ x^{(t+1)}-x^{(0)}\\
+    =& ~ x^{(t)}-\eta\Big(\nabla f_j(x^{(t)})+\alpha(x^{(t)}-x^{(0)})+G_{0}\cdot \zeta\Big)-x^{(0)}\\
+    =& ~ (1-\alpha\eta)z^{(t)}-\eta(\nabla f_{j}(x^{(t)})+G_{0}\cdot\zeta ),
+\end{align*}
+where $\zeta\sim \cN(0,\sigma^{2}I_d)$ is the isotropic Gaussian noise drawn in $(t+1)$th step. 
+For simplicity, we use $\Tnabla f_j(x^{(t)})$ to denote the noisy subgradient $\nabla f_{j}(x^{(t)})+G_{0}\cdot\zeta$.
+Hence, we have
+\begin{align*}
+    \|Qz^{(t+1)}\|_2^2=& ~ (1-\alpha\eta)^2\|Qz^{(t)}\|_2^2-2\eta(1-\alpha\eta)( Qz^{(t)})^\top Q\Tnabla f_j(x^{(t)})+\eta^2\|Q\Tnabla f_j(x^{(t)})\|_2^2.
+\end{align*}
+
+Taking expectation over the random sample $f_j$ and random Gaussian noise $\zeta$, we have
+\begin{align*}
+\E\|Qz^{(t+1)}\|_{2}^{2}= & (1-\alpha\eta)^{2}\E\|Qz^{(t)}\|_{2}^{2}-2\eta(1-\alpha\eta)\cdot\E\Big((Qz^{(t)})^{\top}(Q\nabla F(x^{(t)}))\Big) \\
+ & +\eta^{2}\E\|Q\Tnabla f_j(x^{(t)})\|_{2}^{2}\\
+\leq & (1-\alpha\eta)\E[\|Qz^{(t)}\|_{2}^{2}]+2 \eta G_{Q}\cdot\E[\|Qz^{(t)}\|_{2}]+\eta^{2}G_{0}^{2}(1+r\sigma^{2}),
+\end{align*}
+where we used the fact that $\zeta$ has zero mean, $\|\nabla f_{j}(x^{(t)})\|_{2}\leq G_{0}$, $\|Q\nabla F(x^{(t)})\|_{2}\leq G_{Q}$ and $\eta\leq\frac{1}{2\alpha}$. 
+Further simplifying and taking expectation over all iterations, we have
+\begin{align}
+\label{eq:recursion_distance}
+\E\|Qz^{(t+1)}\|_{2}^{2} & \leq(1-\alpha\eta)\E\|Qz^{(t)}\|_{2}^{2}+2\eta(\frac{\alpha}{4}\E\|Qz^{(t)}\|_{2}^{2}+\frac{1}{\alpha}G_{Q}^{2})+\eta^{2}G_{0}^{2}(1+r\sigma^{2}) \nonumber\\
+ & \leq(1-\frac{\alpha\eta}{2})\E\|Qz^{(t)}\|_{2}^{2}+\frac{2 \eta}{\alpha}G_{Q}^{2}+\eta^{2}G_{0}^{2}(1+r\sigma^{2}).
+\end{align}
+Using that $z^{(0)}=0$, we know $\E\|Qz^{(0)}\|_2^2=0$.
+Solving the recursion (Equation~\eqref{eq:recursion_distance}) gives 
+\[
+\E\|Qz^{(t)}\|_{2}^{2}\leq\frac{2}{\alpha\eta}(\frac{2 \eta}{\alpha}G_{Q}^{2}+\eta^{2}G_{0}^{2}(1+r\sigma^{2}))
+\]
+for all $t$. 
+This concludes the proof.
+\end{proof}
+
+
+Now, we are ready to bound the utility. 
+The proof builds upon the standard mirror descent proof.
+\begin{lemm}
+\label{lm:utility_DPSGD_appendix}
+Let $\delta \in (0, \frac{1}{2}]$, and $\epsilon \in (0, 10]$.
+Under Assumption~\ref{assm:G_k}, let $x^{(0)}$ be the initial iterate and $x^{*} \in \R^d$ be such that $\|x^{(0)}-x^{*}\|_2\le D$.
+For all $k \in [d]$,
+setting $T=\Theta(n^2 + d \log^2 d)$,
+ $\sigma=\Theta \bracks{ \frac{\sqrt{T\log(1/\delta)}}{n\epsilon} }$, $\eta=\sqrt{\frac{D^{2}}{T\cdot G_{0}^{2}\cdot k\sigma^{2}}}$
+and $\alpha=\frac{1}{D}\sqrt{\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}}$, we have
+\begin{align*}
+\E [F(\overline{x})- F(x^{*})] &~ \lesssim \frac{G_{0}D\sqrt{k\log(1/\delta)}}{\epsilon n}+D\sqrt{\sum_{s=1}^{S} s^2 2^{s}G_{2^{s-1}k}^{2}},
+\end{align*}
+where $S = \lfloor \log(d/k) \rfloor + 1$, $\overline{x}$ is the output of DP-SGD, and the expectation is under the randomness of DP-SGD.
+
+Moreover, if $G_k\leq G_0 k^{-c}$ for each $k$ for some $c>1/2$, and in addition $n > \epsilon^{-1} \sqrt{\log(1/\delta)} $, picking the best $k \in [d]$ for the bound above gives
+\begin{align*}
+    \E[F(\ox;\cD)-F(x^*;\cD)]\lesssim
+        G_{0}D\cdot \bracks{
+            \frac{\sqrt{\log(1/\delta)}}{\epsilon n}
+        }^{2c/(1+2c)}.
+\end{align*}
+\end{lemm}
+
+\begin{proof}[Proof of Lemma \ref{lm:utility_DPSGD_appendix}]
+The above statement is true for $k = d$ by standard arguments in past work~\cite{bassily2014private,song2021evading}.
+Now fix a $k \in \{1, \dots, d - 1\}$.
+Our key idea is to split the whole space $\R^d$ into different subspaces.
+We define the following set of subspaces:
+% \begin{itemize}
+% \item Let $U_{0}=\text{range}(P_{k})$,
+% \item Let $U_{s}=\text{range}(P_{2^{s}k})\backslash U_{s-1}$, for $s=1,2,\cdots,\left\lfloor \log(d/k)\right\rfloor $,
+% \item Let $U_{S}=\R^{d}\backslash U_{S-1}$, where $S=\left\lfloor \log(d/k)\right\rfloor +1$,
+% \end{itemize}
+\begin{itemize}
+\item $U_{0}=\text{range}(P_{k})$.
+\item For $s=1,2,\ldots,\left\lfloor \log(d/k)\right\rfloor$, 
+    let $U_{s} \subseteq \text{range}(P_{2^{s}k})$ be a subspace with maximal dimension such that $U_s \bot U_i$ for all $i=0, \dots, s-1$.
+    % Note that $U_s$ having maximal dimension implies that $\bigoplus_{i=0}^{s} U_i \supseteq \text{range}(P_{2^sk})$.
+\item For $S=\left\lfloor \log(d/k)\right\rfloor +1$, 
+    let $U_{S} \subseteq \R^{d}$ be the subspace such that $\bigoplus_{i=0}^S U_i = \R^d$, and $U_S \bot U_i$ for all $i=0, \dots, S-1$.
+\end{itemize}
+Recall $P_{i}$ is the orthogonal projection matrix with rank $i$ that gives rise to $G_{i}$ in Assumption~\ref{assm:G_k}. 
+In the above, we have assumed that the base of $\log$ is 2.
+Let $Q_{s}$ be the orthogonal projection matrix that projects vectors onto the subspace $U_{s}$. 
+Note that $\rank(Q_{s})\leq 2^{s}k$ since $U_s \subseteq \text{range}(P_{2^s k})$.
+Moreover, it's clear that $U_s \bot \text{range}(P_{2^{s-1}k})$ for all $s \in \{1, \dots, S\}$. 
+This is true by construction $\bigoplus_{i=0}^{s-1} U_i \supseteq \text{range}(P_{2^{s-1}k})$ and that 
+$U_s \bot \bigoplus_{i=0}^{s-1} U_i$. Thus,
+\begin{equation}
+\label{eq:Qbound}
+\|Q_{s}\nabla F(x)\|_{2} =
+\|Q_{s} (I - P_{2^{s-1}k}) \nabla F(x)\|_{2}
+\le 
+\normop{Q_{s}} \normtwo{(I - P_{2^{s-1}k}) \nabla F(x)}
+\leq G_{2^{s-1}k}
+\end{equation}
+for all $x \in \R^d$ and all $s \in \{1, \dots, S\}$.
+
+Let $j \in [n]$ be the (uniformly random) index sampled in iteration $t$ of DP-SGD.
+By convexity of the individual loss $f_j$,
+\begin{align*}
+    f_{j}(x^{(t)})-f_{j}(x^{*})\leq\nabla f_{j}(x^{(t)})^{\top}(x^{(t)}-x^{*}).
+\end{align*}
+By construction, $\R^d$ is the orthogonal direct sum of the subspaces $\{U_j\}_{j=0}^S$, and thus any vector $v\in \R^d$ can be rewritten as the sum $\sum_{i=0}^S Q_i v $.
+We thus split the right hand side of the above as follows
+\begin{align}
+f_{j}(x^{(t)})-f_{j}(x^{*}) & \leq \lp Q_{0}\nabla f_{j}(x^{(t)})+\sum_{s=1}^{S}Q_{s}\nabla f_{j}(x^{(t)})\rp^{\top}(x^{(t)}-x^{*}).\label{eq:mirror_two_term}
+\end{align}
+
+We use different approaches to bound $(Q_0\nabla f_j(x^{(t)}))^\top (x^{(t)}-x^*)$ and $(Q_s\nabla f_j(x^{(t)}))^\top (x^{(t)}-x^*)$ when $s\geq 1$, and we discuss them separately in the following.
+
+\medskip
+{\bf  Bounding  $(Q_0\nabla f_j(x^{(t)}))^\top (x^{(t)}-x^*)$:} Recall that
+\begin{align*}
+    x^{(t+1)}=x^{(t)}-\eta\Big(\nabla f_j(x^{(t)})+\alpha(x^{(t)}-x^{(0)})+G_{0}\cdot \zeta\Big)
+\end{align*}
+for some Gaussian $\zeta\sim \cN(0,\sigma^{2}I_d)$. 
+Hence, we have
+\begin{align}
+\label{eq:duality_Q_0}
+    %&~~ (\nabla f_{j}(x^{(t)}))^{\top}Q_{0}(x^{(t)}-x^{*})\nonumber \\
+    (\nabla f_{j}(x^{(t)}))^{\top}Q_{0}(x^{(t)}-x^{*}) = &~~ \left(\frac{1}{\eta}(x^{(t)}-x^{(t+1)})-\alpha(x^{(t)}-x^{(0)})-G_{0}\cdot\zeta\right)^{\top}Q_{0}(x^{(t)}-x^{*})\nonumber \\
+= & ~~ \left(\frac{1}{\eta}Q_0(x^{(t)}-x^{(t+1)})\right)^{\top}Q_{0}(x^{(t)}-x^{*})-\left(
+\alpha(x^{(t)}-x^{(0)})+G_{0}\cdot\zeta
+\right)^\top Q_0(x^{(t)}-x^*)\nonumber \\
+=& \frac{1}{2\eta}
+    \bracks{
+        \|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+        \|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2} + 
+        \|Q_{0}(x^{(t)}-x^{(t+1)})\|_2^{2}
+    }
+\nonumber \\
+ ~& -\lp\alpha(x^{(t)}-x^{(0)})+G_{0}\cdot\zeta\rp^{\top}Q_{0}(x^{(t)}-x^{*}),
+\end{align}
+where we used the fact that $Q_0^2 v = Q_0 v$ for any $v \in \R^d$ (since $Q_0$ is a projection matrix), and the last equality follows from 
+\begin{align*}
+   2(Q_0(x^{(t)}-x^{(t+1)}))^\top Q_0(x^{(t)}-x^*) \\
+ = & \|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+    \|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2} + 
+    \|Q_{0}(x^{(t)}-x^{(t+1)})\|_2^{2}.
+\end{align*}
+
+Taking expectation on $\zeta$ over both sides of Equation~\eqref{eq:duality_Q_0} and making use of the fact that $\zeta$ has mean $0$, we have
+\begin{align*}
+\E_{\zeta}(Q_{0}\nabla f_{j}(x^{(t)}))^{\top}(x^{(t)}-x^{*}) = & \frac{1}{2\eta}
+    \lp\E_{\zeta}\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+        \E_{\zeta}\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2} + 
+        \E_{\zeta}\|Q_{0}(x^{(t)}-x^{(t+1)})\|_2^{2}\rp\\
+ & -\alpha\E_{\zeta}\lp (x^{(t)}-x^{(0)})^{\top}Q_{0}(x^{(t)}-x^{*}) \rp.
+\end{align*}
+
+Recalling the definition of $Q_0$ and that $Q_0$ has rank at most $k$, one has
+\begin{align*}
+\E_{\zeta}\|Q_{0}(x^{(t)}-x^{(t+1)})\|_2^{2} =
+    &~ \eta^{2}\E_{\zeta}\|Q_{0}\big(\nabla f_{j}(x^{(t)})+\alpha(x^{(t)}-x^{(0)})+G_{0}\cdot\zeta\big)\|_2^{2}\\
+    = &~ \eta^{2}\E_{\zeta}\|Q_{0}\big(\nabla f_{j}(x^{(t)})+\alpha(x^{(t)}-x^{(0)})\big)\|_2^{2}+\eta^{2}G_{0}^{2}k\sigma^{2}\\
+\leq &~
+    2\eta^{2}G_{0}^{2}(1+k\sigma^{2}) + 
+    2\eta^{2}\alpha^{2}\E_{\zeta}\|Q_{0}(x^{(t)}-x^{(0)})\|_2^{2}.
+\end{align*}
+
+Moreover, one has
+\begin{align*}
+-\alpha(x^{(t)}-x^{(0)})^{\top}Q_{0}(x^{(t)}-x^{*}) = &~ -\alpha(x^{(t)}-x^{(0)})^{\top}Q_{0}(x^{(t)}-x^{(0)})-\alpha(x^{(t)}-x^{(0)})^{\top}Q_{0}(x^{(0)}-x^{*})\\
+\leq &~
+    -\frac{\alpha}{2}\|Q_{0}(x^{(t)}-x^{(0)})\|_2^{2} + 
+    \frac{\alpha}{2}\|Q_{0}(x^{(0)}-x^{*})\|_2^{2}.
+\end{align*}
+
+Therefore, we have
+\begin{align}
+\E_{\zeta}(Q_{0}\nabla f_{j}(x^{(t)}))^{\top}(x^{(t)}-x^{*}) \leq & ~ \frac{1}{2\eta}
+        \lp\E_{\zeta}\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+           \E_{\zeta}\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}
+        \rp + \eta G_0^2(1+k\sigma^2) \nonumber\\ 
+     &~~~~ +\eta \alpha^2\E_{\zeta}\| Q_0(x^{(t)}-x^{(0)})\|_2^2 - 
+                \frac{\alpha}{2}\E_{\zeta}\|Q_{0}(x^{(t)}-x^{(0)})\|_2^{2} + 
+                \frac{\alpha}{2}\E_{\zeta}\|Q_{0}(x^{(0)}-x^{*})\|_2^{2}  \nonumber \\
+     \leq & ~ \frac{1}{2\eta} \lp\E_{\zeta}\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+                \E_{\zeta}\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}  \rp  \\
+                &~~~~+\eta G_0^2(1+k\sigma^2)+\frac{\alpha}{2}\E_{\zeta}\|Q_0(x^{(0)}-x^*)\|_2^2 \label{eq:term1},
+\end{align}
+where we used $\eta\leq\frac{1}{2\alpha}$ at the end. 
+\medskip
+
+{\bf  Bounding $(Q_s\nabla f_j(x^{(t)}))^\top (x^{(t)}-x^*)$ :}
+We bound the objective above for each $s$ separately. 
+By taking expectation over the random $f_j$, we have
+\begin{align}
+\E_{f_j}(Q_{s}\nabla f_{j}(x^{(t)}))^{\top}(x^{(t)}-x^{*}) = &~ (Q_{s}\nabla F(x^{(t)}))^{\top}(x^{(t)}-x^{*}) \nonumber\\
+\leq & ~ \|Q_{s}\nabla F(x^{(t)})\|_2
+            \cdot \|Q_s(x^{(t)}-x^{*})\|_2 \nonumber \\
+\leq &~ \frac{1}{\alpha_{s}}\|Q_{s}\nabla F(x^{(t)})\|_2^{2} + 
+            \frac{\alpha_{s}}{4}\|Q_{s}(x^{(t)}-x^{*})\|_2^{2} \nonumber \\
+\leq &~ \frac{G_{2^{s-1}k}^{2}}{\alpha_{s}} + 
+            \frac{\alpha_{s}}{2}\|Q_{s}(x^{(t)}-x^{(0)})\|_2^{2} +
+            \frac{\alpha_{s}}{2}\|Q_{s}(x^{(0)}-x^{*})\|_2^{2} \label{eq:term2},
+\end{align}
+where we chose $\alpha_{s}=\alpha s^{-2} 2^{-s}$ and used the bound \eqref{eq:Qbound} and Young's inequality at the end.
+
+\medskip
+
+{\bf Bounding Equation \eqref{eq:mirror_two_term}:} Combining both the terms \eqref{eq:term1} and \eqref{eq:term2} and taking expectation
+over all randomness, we have
+\begin{align*}
+\E [F(x^{(t)})- F(x^{*})] \leq &~~ \frac{1}{2\eta}(
+    \E\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+    \E\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}) +
+    \eta G_{0}^{2}(1+k\sigma^{2})+\frac{\alpha}{2}\E\|Q_{0}(x^{(0)}-x^{*})\|_2^{2}\\
+ & +\sum_{s=1}^{S}\frac{G_{2^{s-1}k}^{2}}{\alpha_{s}} + 
+    \frac{1}{2}\sum_{s=1}^{S}\alpha_{s}\E\|Q_{s}(x^{(t)}-x^{(0)})\|_2^{2} + 
+    \frac{1}{2}\sum_{s=1}^{S}\alpha_s\E\|Q_{s}(x^{(0)}-x^{*})\|_2^{2}\\
+\leq &~ \frac{1}{2\eta}(
+    \E\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+    \E\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}) +
+    \eta G_{0}^{2}(1+k\sigma^{2}) + 
+    \frac{\alpha}{2}\|x^{(0)}-x^{*}\|_2^{2}\\
+ & +\sum_{s=1}^S\frac{G_{2^{s-1}k}^{2}}{\alpha_{s}} + 
+    \frac{1}{2}\sum_{s=1}^S\alpha_{s}\E\|Q_{s}(x^{(t)}-x^{(0)})\|_2^{2}.
+\end{align*}
+
+Recall $\alpha\cdot\eta\leq 1/2$. Under the other assumptions, by Lemma \ref{lem:radius}, one can show
+\begin{align*}
+\E\|Q_{s}(x^{(t)}-x^{(0)})\|^{2} & \leq\frac{4 G_{2^{s-1}k}^{2}}{\alpha^{2}}+\frac{2\eta G_{0}^{2}}{\alpha}(1+2^{s}k\sigma^{2})\\
+ & \leq\frac{4 G_{2^{s-1}k}^{2}}{\alpha_{s}^{2}}+\frac{2\eta G_{0}^{2}}{\alpha_{s} s^2}(1+k\sigma^2).
+\end{align*}
+Using $\sum_{s=1}^{\infty} s^{-2} \leq 2$, we have
+\begin{align*}
+\E F(x^{(t)})-\E F(x^{*}) \leq &~ \frac{1}{2\eta}(
+    \E\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+    \E\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}
+) + \frac{\alpha}{2}\|x^{(0)}-x^{*}\|^{2}\\
+&+ \eta G_0^2(1+k\sigma^2)+3\sum_{s=1}^S\frac{G_{2^{s-1}k}^2}{\alpha_s}+2 \eta G_0^2(1+k\sigma^2)\\
+\leq  &~ \frac{1}{2\eta}(
+    \E\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} -
+    \E\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}
+) + \frac{\alpha}{2}\|x^{(0)}-x^{*}\|_2^{2}\\
+&~ +3\eta G_{0}^{2}(1+k\sigma^{2}) +\frac{3}{\alpha}\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}.
+\end{align*}
+Summing up over $t=1,2,\cdots,T$, by the assumption that $\|x^{(0)}-x^*\|_2\leq D$ and convexity of the function, we have
+\begin{align}
+\label{eq:utility_eta_alpha}
+\E [F(\ox)- F(x^{*})]\leq\frac{D^{2}}{2\eta T}+3\eta G_{0}^{2}(1+k\sigma^{2})+\frac{\alpha}{2}D^{2}+\frac{3}{\alpha}\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}.    
+\end{align}
+
+Set the parameters $T=c_1 (n^2 + d \log^2 d)$, $\sigma=\frac{c_2\sqrt{T\log(1/\delta)}}{ n \epsilon}$,
+$\eta=\sqrt{\frac{D^{2}}{T\cdot G_{0}^{2}\cdot k\sigma^{2}}}$
+and $\alpha=\frac{1}{D}\sqrt{\sum_{s=1}^{S}s^2 2^{s}G_{2^{s-1}k}^{2}}$ for some large constants $c_1,c_2$. 
+Note that this choice of parameters satisfies
+\begin{align*}
+\eta\cdot\alpha
+& =
+    \sqrt{\frac{D^{2}}{T\cdot G_{0}^{2}\cdot k\sigma^{2}}}\cdot\frac{\sqrt{\sum_{s=1}^{S}s^2 2^{s}G_{2^{s-1}k}^{2}}}{D}\\
+ & \leq
+    \sqrt{\frac{ G_{0}^{2} (2d) \log^3 (2d)}{T\cdot G_{0}^{2}\cdot k\sigma^{2}}}
+    = 
+        \frac{n\epsilon}{c_{2}T}\sqrt{\frac{ (2d) \log^3 (2d) }{k \cdot\log(1/\delta)}}\\
+ & \leq\frac{n\epsilon\sqrt{ (2d) \log^3 (2d) }}{c_{2}T}\leq\frac{1}{2},
+\end{align*}
+where we used the fact that $G_k \leq G_0$, $s \le S \le \log (2d)$ , $T \geq n^2 + d \log^2 d$, and $c_2$ is large enough.
+
+Using the parameters we pick, we have
+\[
+\E [F(\overline{x})- F(x^{*})]\lesssim \frac{G_{0}D\sqrt{k\log(1/\delta)}}{\epsilon n}+D \sqrt{\sum_{s=1}^{S} s^2 2^{s}G_{2^{s-1}k}^{2}}
+\]
+
+Moreover,
+assuming $G_{k}\leq G_0 k^{-c}$ for some $c>1/2$, we have $\sqrt{\sum_s s^2 2^sG_{2^{s-1}k}^2}\lesssim G_0 / k^{c}$. 
+Hence,
+\begin{align*}
+    \E [F(\overline{x})- F(x^{*})]\lesssim\frac{G_{0}D\sqrt{k\log(1/\delta)}}{\epsilon n}+\frac{G_0D}{k^c}.
+\end{align*}
+
+
+%For the general case, taking back the value of $T=\Theta(n^2/k)$ and $\sigma=\frac{\sqrt{T\log(1/\delta)}}{n\epsilon}=\frac{\sqrt{\log(1/\delta)}}{\epsilon\sqrt{k}}$. 
+%If $\sqrt{\sum_{s}2^{s}G_{2^{s-1}k}^{2}}\leq \frac{G_0n\sqrt{\log d\log(1/\delta)}}{2\epsilon\sqrt{k}}$ and choose the best value of $\eta=\frac{D\epsilon\sqrt{k} }{G_0n\sqrt{\log d\log(1/\delta)}}$ and $\alpha=\frac{\sqrt{\sum_{s}2^{s}G_{2^{s-1}k}^{2}}}{D}$,
+%we have
+%\begin{align*}
+%    \E [F(\overline{x})- F(x^{*})]\lesssim\frac{G_{0}D\sqrt{k\log d\log(1/%\delta)}}{\epsilon n}+D\cdot\sqrt{\sum_{s}2^{s}G_{2^{s-1}k}^{2}}.
+%\end{align*}
+
+%Moreover,
+%assuming $G_{k}\leq\frac{G_{0}}{\epsilon\sqrt{k}}$, we have $\sqrt{\sum_s2^sG_{2^{s-1}k}^2}\leq \frac{G_0\sqrt{\log d}}{\epsilon \sqrt{k}}$ and thus satisfy the condition that $\sqrt{\sum_{s}2^{s}G_{2^{s-1}k}^{2}}\leq \frac{G_0n\sqrt{\log d\log(1/\delta)}}{2\epsilon\sqrt{k}}$.
+%Choosing the parameters according to the general case, we have
+%\begin{align*}
+%    \E [F(\overline{x})- F(x^{*})]\lesssim\frac{G_{0}D\sqrt{k\log d\log(1/\delta)}}{\epsilon n}+\frac{G_0D\sqrt{\log d}}{\epsilon \sqrt{k}}.
+%\end{align*}
+
+Since the above bound holds for all $k \in \{1, \dots, d\}$, we may optimize it with respect to $k$.
+Recall by assumption that $ n\geq \epsilon^{-1} \sqrt{\log(1/\delta)}$. 
+Letting
+\eqn{
+    k = \min \left\{ 
+        d,  
+        \left\lceil \left( \frac{\epsilon n}{\sqrt{\log(1/\delta)}} \right)^{\frac{2}{1+2c}} \right\rceil
+    \right\}
+}
+yields the bound
+\eqn{
+    \E[F(\ox;\cD)-F(x^*;\cD)]\lesssim G_{0}D \cdot 
+        \bracks{
+            \frac{\sqrt{\log(1/\delta)}}{\epsilon n}
+        }^{2c/(1+2c)}.
+}
+\end{proof}
+
+Combining the privacy guarantee in Lemma~\ref{lm:privacy_guarantee} and Lemma~\ref{lm:utility_DPSGD_appendix} directly results in Theorem~\ref{thm:DPERM}.
+
+\subsection{Proof of Theorem~\ref{thm:DPSCO}} \label{app:dpsco_proof}
+
+We study the generalization error of DP-SGD and make use of its stability.
+The bound on the excess population loss follows from combining bounds on the excess empirical loss and the generalization error. 
+Before stating the proof, we first recall two results in the literature.
+
+\begin{lemm}[{\cite[Lemma 7]{BE02}}]
+\label{lm:stab_generalization_error}
+Given a learning algorithm $\cA$, a dataset $\cD=\{s_1,\cdots,s_n\}$ formed by $n$ i.i.d. samples drawn from the underlying distribution $\cP$, and we replace one random sample in $\cD$ with a freshly sampled $s'\sim\cP$ to obtain a new neighboring dataset $\cD'$.
+One has
+\begin{align*}
+    \E_{\cD,\cA}[F(\cA(\cD); \cP)-F(\cA(\cD);\cD)]=\E_{\cD,s'\sim\cP,\cA}[f(\cA(\cD);s')-f(\cA(\cD');s')],
+\end{align*}
+where $\cA(\cD)$ is the output of $\cA$ with input $\cD$.
+\end{lemm}
+
+\begin{lemm}[{\cite[Theorem 3.3]{BFGT20}}]
+\label{lm:stab_DPSGD}
+Suppose Assumption~\ref{assm:G_k} holds, running DP-SGD with step size $\eta$ 
+on any two neighboring datasets $\cD$ and $\cD'$ for $T$ steps yields the following bound
+\begin{align*}
+    \E \sbracks{ \|\ox-\ox'\|_2 } \le 4 G_0 \eta\left(\frac{T}{n}+\sqrt{T}\right),
+\end{align*}
+where $\ox$ and $\ox'$ are the outputs of DP-SGD with datasets $\cD$ and $\cD'$, respectively.
+\end{lemm}
+
+% Combining our previous results, our result on DP-SCO follows.
+
+% \DPSCO*
+
+% We now state the proof of Theorem~\ref{thm:DPSCO}.
+
+\begin{proof}[Proof of Theorem \ref{thm:DPSCO}]
+Let $\ox$ and $\ox'$ be the outputs of DP-SGD when applied to the datasets $\cD$ and $\cD'$, respectively.
+$\cD'$ is a neighbor of $\cD$ with one example replaced by $s' \sim \cP$ that is independently sampled. 
+Combining Lemma~\ref{lm:stab_generalization_error} and Lemma~\ref{lm:stab_DPSGD} yields
+\begin{align*}
+    \E [F(\ox; \cP)-F(\ox;\cD)]= &~ \E[f(\ox;s')-f(\ox';s')]\\
+    \leq & ~\E [G_0 \|\ox-\ox'\|_2]\\
+    \leq & ~ 4G_0^2\eta \bracks{ \frac{T}{n}+\sqrt{T}}.
+\end{align*}
+
+Similar to the DP-ERM case, 
+by setting $T=c_1 (n^2 + d \log^2 d)$,
+$\sigma=\frac{c_2\sqrt{T\log(1/\delta)}}{n\epsilon}$, 
+$\eta=\sqrt{\frac{D^{2}}{T \cdot G_{0}^{2}(T/n+k\sigma^{2})}}$
+and $\alpha=\frac{1}{D} \sqrt{\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}}$ for some large positive constants $c_1$ and $c_2$, we conclude that $\eta\cdot\alpha\leq 1/2$. Hence, Equation~\eqref{eq:utility_eta_alpha} shows that, for any fixed dataset $\cD$ and any $x^*$ such that $\normtwo{x^{(0)} - x^*} \le D$, we have
+\begin{align*}
+\E [F(\ox;\cD)- F(x^{*};\cD)]\leq\frac{D^{2}}{2\eta T}+3\eta G_{0}^{2}(1+k\sigma^{2})+\frac{\alpha}{2}D^{2}+\frac{3}{\alpha}\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}.    
+\end{align*}
+
+We can rewrite the population loss as follows
+\begin{align*}
+\E[F(\ox; \cP)-F(x^*; \cP)] =& ~ \E[F(\ox; \cP)-F(\ox;\cD)]+\E_{\cD}[F(\ox;\cD)-F(x^*;\cD)]\\
+\leq &~ 
+    4G_0^2\eta \bracks{ \frac{T}{n}+\sqrt{T} } + 
+    \frac{D^{2}}{2\eta T} + 
+    3\eta G_{0}^{2}(1+k\sigma^{2}) + 
+    \frac{\alpha}{2}D^{2} + 
+    \frac{3}{\alpha}\sum_{s=1}^S s^2 2^{s}G_{2^{s-1}k}^{2}.
+\end{align*}
+
+Substituting in the values for parameters $T$, $\sigma$, $\eta$, and $\alpha$ yields
+\begin{align*}
+    \E[F(\ox; \cP)-F(x^*; \cP)]\lesssim \frac{G_0D}{\sqrt{n}}+\frac{G_{0}D\sqrt{k\log(1/\delta)}}{\epsilon n}+D\sqrt{\sum_{s=1}^{S}s^2 2^{s}G_{2^{s-1}k}^{2}} 
+\end{align*}
+for all $k \in [d]$.
+
+Similarly, if we have $G_k\leq G_0 k^{-c}$ for some $c>1/2$, and in addition $n > \epsilon^{-1} \log(1/\delta)$, it immediately follows that
+\begin{align*}
+    \E[F(\ox; \cP)-\min_x F(x; \cP)]\lesssim \frac{G_0D}{\sqrt{n}}+G_{0}D\cdot \bracks { \frac{\sqrt{\log(1/\delta)}}{\epsilon n} }^{2c/(1+2c)}.
+\end{align*}
+This completes the proof.
+\end{proof}

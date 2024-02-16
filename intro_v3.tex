@@ -1,0 +1,47 @@
+\section{Introduction}
+
+Recent works have shown that large publicly pretrained models can be differentially privately fine-tuned on small downstream datasets with performance approaching those attained by non-private models. 
+In particular, past works showed that pretrained BERT~\cite{devlin2018bert} and GPT-2~\cite{radford2018improving,radford2019language} models can be fine-tuned to perform well for text classification and generation under a privacy budget of $\epsilon \in [2, 6]$~\cite{li2021large,yu2021differentially}. 
+More recently, it was shown that pretrained ResNets~\cite{he2016deep} and vision-Transformers~\cite{dosovitskiy2020image} can be fine-tuned to perform well for ImageNet classification under single digit privacy budgets~\cite{de2022unlocking,mehta2022large}. 
+
+One key ingredient in these successes has been the use of large pretrained models with millions to billions of parameters. 
+These works generally highlighted the importance of two phenomena: (i) large pretrained models tend to experience good privacy-utility trade-offs when fine-tuned, and (ii) the trade-off improves with the improvement of the quality of the pretrained model (correlated with increase in size).
+While the power of scale and pretraining have been demonstrated numerous times in non-private deep learning~\cite{kaplan2020scaling}, one common wisdom in private learning had been that large models tend to perform worse.
+This intuition was based on (a) results in differentially private convex optimization, most of which predicted that errors would scale proportionally with the dimension of the learning problem in the worst case, and (b) empirical observations that the noise injected to ensure privacy tends to greatly exceed the gradient in magnitude for large models~\cite{yu2021not,gautum14}. 
+
+For instance, consider the problem of differentially private convex \emph{empirical risk minimization} (ERM).
+Here, we are given a dataset of $n$ examples $\cD = \{s_j\}_{j=1}^n \in \mathcal{S}^{n}$, a convex set $\cK \subseteq \R^{d}$ (not necessarily bounded), and the goal is to perform the optimization
+\eqn{
+	\text{minimize}_{x\in \cK} F(x; \cD) = \frac{1}{n} \sum_{j=1}^n f(x; s_j)
+}
+subject to differential privacy, 
+where $f(\cdot;s)$ is convex over $\cK$ for all $s\in \mathcal{S}$. 
+For bounded $\cK$, past works presented matching upper and lower bounds that are dimension-dependent under the usual Lipschitz assumption on the objective~\cite{bassily2014private,chaudhuri2011differentially}.
+These results seem to suggest that the performance of differentially private ERM algorithms inevitably degrades with increasing problem size in the worst case, and present a seeming discrepancy between recent empirical results on large-scale fine-tuning.\footnote{We judiciously choose to describe the discrepancy as seeming, since the refined analysis presented in the current work suggests that the discrepancy is likely non-existent.}
+
+To better understand the relation between problem size and the performance of differentially private learning, we study the following question both theoretically and empirically:
+\begin{quote}
+	\centering
+	\emph{When does the performance of differentially private stochastic gradient descent (DP-SGD) not degrade with increasing problem dimension?}
+\end{quote}
+
+On the theoretical front, we show that DP-SGD can result in dimension-independent error bounds even when gradients span the entire ambient space for unconstrained optimization problems.
+We identify that the standard dependence on the dimension of the ambient space can be replaced by the magnitudes of gradients projected onto subspaces of varying dimensions.
+We formalize this in a condition that we call \textit{restricted Lipschitz continuity} and derive refined bounds for the excess empirical and population risks for DP-SGD when loss functions obey this condition. 
+We show that when the restricted Lipschitz coefficients decay rapidly, both the excess empirical and population risks become dimension-independent.
+This extends a previous work which derived rank-dependent bounds for learning generalized linear models in an unconstrained space~\cite{song2021evading}. 
+
+Our theoretical results shed light on the recent success of large-scale differentially private fine-tuning.
+We empirically show that gradients of language models during fine-tuning are mostly controlled by a few principal components --- a behavior that is similar to conditions under which we obtain dimension-independent bounds for private convex ERM. 
+This provides a possible explanation for the observation that densely fine-tuning with DP-SGD need not necessarily experience much worse performance than sparsely fine-tuning~\cite{li2021large}. Moreover, it suggests that DP-SGD can be adaptive to problems that are effectively low-dimensional (as characterized by restricted Lipschitz continuity) without further algorithmic intervention.
+
+We summarize our contributions below.
+\begin{itemize}[leftmargin=7mm]
+\setlength\itemsep{0.1em}
+	\item [(1)] We introduce a condition on the objective function that we term restricted Lipschitz continuity.
+		This condition generalizes the usual Lipschitz continuity notion and gives rise to refined analyses when magnitudes of gradients projected onto diminishing subspaces decay rapidly.
+	\item [(2)] Under restricted Lipschitz continuity, we present refined bounds on the excess empirical and population risks for DP-SGD when optimizing convex objectives. These bounds generalize previous dimension-independent results~\cite{song2021evading} and are broadly applicable to cases where gradients are full rank but most coordinates only marginally influence the objective.
+	\item [(3)] Our theory sheds light on recent successes of large-scale differentially private fine-tuning of language models.
+		We show that gradients obtained through fine-tuning mostly lie in a subspace spanned by a few principal components --- a behavior similar to when optimizing a restricted Lipschitz continuous loss with decaying coefficients.
+		These empirical results provide a possible explanation for the recent success of large-scale private fine-tuning.
+\end{itemize}
