@@ -10,7 +10,7 @@ Given a positive semidefinite matrix $A$, let $\| x \|_A = (x^\top A x)^{1/2}$ d
 For scalar functions $f$ and $g$, we write $f \lesssim g$ if there exists a positive constant $C$ such that $f(x) \leq C g(x)$ for all input $x$ in the domain.
 
 \subsection{Differentially Private Empirical Risk Minimization and Stochastic Convex Optimization}
-Before stating the theoretical problem of interest, we recall the basic concepts of Lipschitz continuity, convexity, and approximate differential privacy.
+Before stating the theoretical problem of interest, we recall the basic concepts of Lipschitz continuity, convexity.
 \begin{defi}[Lipschitz Continuity]
 The loss function $h:\cK\to\R$ is $G$-Lipschitz with respect to the $\ell_2$ norm if for all $x,x' \in \cK$, $|f(x)-f(x')|\leq G\|x-x'\|_2$.
 \end{defi}
@@ -19,12 +19,12 @@ The loss function $h:\cK\to\R$ is $G$-Lipschitz with respect to the $\ell_2$ nor
 The loss function $h:\cK\to\R$ is convex if $h(\alpha x + (1 - \alpha) y) \le \alpha h(x) + (1 - \alpha) h(y)$, for all $\alpha \in [0, 1]$, and $x, y$ in a convex domain $\cK$.
 \end{defi}
 
-\begin{defi}[Approximate Differential Privacy~\cite{dwork2014algorithmic}]
-A randomized algorithm $\cM$ is $(\epsilon,\delta)$-differentially private if for all neighboring datasets $\cD$ and $\cD'$ that differ by a single record and all sets $\cO\subset\mathrm{range}(\cM)$, the following expression holds
-\begin{align*}
-    \Pr[\cM(\cD)\in \cO]\le \exp ({\epsilon}) \Pr[\cM(\cD')\in \cO]+\delta.
-\end{align*}
-\end{defi}
+% \begin{defi}[Approximate Differential Privacy~\cite{dwork2014algorithmic}]
+% A randomized algorithm $\cM$ is $(\epsilon,\delta)$-differentially private if for all neighboring datasets $\cD$ and $\cD'$ that differ by a single record and all sets $\cO\subset\mathrm{range}(\cM)$, the following expression holds
+% \begin{align*}
+%     \Pr[\cM(\cD)\in \cO]\le \exp ({\epsilon}) \Pr[\cM(\cD')\in \cO]+\delta.
+% \end{align*}
+% \end{defi}
 In this work, we study both \emph{differentially private empirical risk minimization} (DP-ERM) for convex objectives and \emph{differentially private stochastic convex optimization} (DP-SCO).
 
 In DP-ERM for convex objectives, we are given a dataset $\cD=\{s_{j}\}_{j\in[n]} \in \mathcal{S}^n$ of $n$ examples. 
@@ -38,7 +38,7 @@ $F(x;\cP):=\E_{s\sim\cP} [ f(x;s) ]$.
 The term $\mathbb{E}_{x^\text{priv}} \sbracks{ F(x^\text{priv} ; \cP)-\min_{x\in\cK}F(x;\cP) }$ is referred to as the \emph{excess population risk}.
 
 \subsection{Differentially Private Stochastic Gradient Descent}
-\emph{Differentially Private Stochastic Gradient Descent} (DP-SGD)~\cite{abadi2016deep,song2013stochastic} is a popular algorithm for DP convex optimization.
+\emph{Differentially Private Stochastic Gradient Descent} (DP-SGD)~\citep{abadi2016deep,song2013stochastic} is a popular algorithm for DP convex optimization.
 For the theoretical analysis, we study DP-SGD for \emph{unconstrained} optimization. 
 To facilitate analysis, we work with the $\ell_{2}$ regularized objective expressed as 
 \eqn{
@@ -61,22 +61,22 @@ Algorithm \ref{alg:noisy_SGD} presents the pseudocode.
 % {\bf Return:} $\overline{x}\defeq\frac{1}{T}\sum_{t=1}^{T}x^{(t)}$.
 % \end{algorithm2e}
 \begin{algorithm}
-\caption{DP-SGD for optimizing regularized finite-sum objectives}
+\caption{DP-SGD for Optimizing Regularized Finite-Sum Objectives}
 \label{alg:noisy_SGD}
-\begin{algorithmic}
-\Require Initial iterate $x^{(0)}$, dataset $\cD = \{s_j\}_{j \in [n]}$, per-step noise magnitude $\sigma$, number of updates $T$, learning rate $\eta$, Lipschitz constant $G$ of $f$.
+\begin{algorithmic}[1]
+\State {\bfseries Input:} Initial iterate $x^{(0)}$, dataset $\cD = \{s_j\}_{j \in [n]}$, per-step noise magnitude $\sigma$, number of updates $T$, learning rate $\eta$, Lipschitz constant $G$ of $f$.
 \For{$t=1,\ldots,T$}
     \State $j_t \sim \text{Uniform}([n])$
     \State $x^{(t)} = x^{(t-1)} - \eta\Big(\nabla f(x^{(t-1)};s_{j_t}) + \alpha(x^{(t-1)}-x^{(0)})+ G \cdot \zeta_t \Big), \quad \zeta_t \sim \cN(0,\sigma^{2}I_d)$
 \EndFor
-\Return $\overline{x}\defeq\frac{1}{T}\sum_{t=1}^{T}x^{(t)}$.
+\State \Return $\overline{x}\defeq\frac{1}{T}\sum_{t=1}^{T}x^{(t)}$.
 \end{algorithmic}
 \end{algorithm}
 
 
 It is straightforward to show that Algorithm~\ref{alg:noisy_SGD} satisfies differential privacy. 
-The following lemma quantifies the overall privacy spending and builds on a long line of work on accounting the privacy loss of compositions~\cite{abadi2016deep,balle2018privacy}.
-\begin{lemm}[{\cite{KLL21}}]
+The following lemma quantifies the overall privacy spending and builds on a long line of work on accounting the privacy loss of compositions~\citep{abadi2016deep,balle2018privacy}.
+\begin{lemm}[\citep{KLL21}]
 \label{lm:privacy_guarantee}
 There exists constants $c_1$ and $c_2$ such that for $n\geq10$, $\epsilon< c_1 T/n^2$ and $\delta \in (0, \frac{1}{2}]$, DP-SGD (Algorithm~\ref{alg:noisy_SGD}) is $(\epsilon,\delta)$-DP whenever $\sigma \ge \frac{c_2 \sqrt{T\log(1/\delta)}}{\epsilon n}$.
 \end{lemm}
@@ -84,10 +84,10 @@ There exists constants $c_1$ and $c_2$ such that for $n\geq10$, $\epsilon< c_1 T
 \subsection{On the Dimension Dependence of Private Learning}
 Early works on bounding the excess empirical and population risks for privately optimizing convex objectives focused on a constrained optimization setup where algorithms typically project iterates back onto a fixed bounded domain after each noisy gradient update. 
 Results in this setting suggested that risks are inevitably dimension-dependent in the worst case.
-For instance, it was shown that the excess empirical risk bound $\Theta (  G \normtwo{\cK} \sqrt{d\log(1/\delta)} n^{-1} \epsilon^{-1} )$ and excess population risk bound $\Theta ( G \normtwo{\cK} ( n^{-1/2} + \sqrt {d \log(1/\delta) } n^{-1} \epsilon^{-1} ) )$ are tight when privately optimizing convex $G$-Lipschitz objectives in a convex domain of diameter $\normtwo{\cK}$~\cite{bassily2014private}.
+For instance, it was shown that the excess empirical risk bound $\Theta (  G \normtwo{\cK} \sqrt{d\log(1/\delta)} n^{-1} \epsilon^{-1} )$ and excess population risk bound $\Theta ( G \normtwo{\cK} ( n^{-1/2} + \sqrt {d \log(1/\delta) } n^{-1} \epsilon^{-1} ) )$ are tight when privately optimizing convex $G$-Lipschitz objectives in a convex domain of diameter $\normtwo{\cK}$~\citep{bassily2014private}.
 Moreover, the lower bound instances in these works imply that such dimension-dependent lower bounds also apply when one considers the class of loss functions whose gradients are low-rank.
 
-The body of work on unconstrained convex optimization is arguably less abundant, with the notable result that differentially private gradient descent need not suffer from a dimension-dependent penalty when learning generalized linear models with low-rank data (equivalently stated, when gradients are low-rank)~\cite{song2021evading}.
+The body of work on unconstrained convex optimization is arguably less abundant, with the notable result that differentially private gradient descent need not suffer from a dimension-dependent penalty when learning generalized linear models with low-rank data (equivalently stated, when gradients are low-rank)~\citep{song2021evading}.
 Our main theoretical results (Theorems~\ref{thm:DPERM} and~\ref{thm:DPSCO}) extend this line of work and show that dimension-independence is achievable under weaker conditions.
 % \Daogao{The last sentence somehow makes me feel we just make an independent/different assumption compared the one in \cite{song2021evading} and waters down the importance of our results.}
 
