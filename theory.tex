@@ -212,7 +212,8 @@ where we used the fact that $\zeta$ has zero mean, $\|\nabla f_{j}(x^{(t)})\|_{2
 Further simplifying and taking expectation over all iterations, we have
 \begin{align}
 \label{eq:recursion_distance}
-\E\|Qz^{(t+1)}\|_{2}^{2} & \leq(1-\alpha\eta)\E\|Qz^{(t)}\|_{2}^{2}+2\eta(\frac{\alpha}{4}\E\|Qz^{(t)}\|_{2}^{2}+\frac{1}{\alpha}G_{Q}^{2})+\eta^{2}G_{0}^{2}(1+r\sigma^{2}) \nonumber\\
+& \E\|Qz^{(t+1)}\|_{2}^{2} \\
+\leq& (1-\alpha\eta)\E\|Qz^{(t)}\|_{2}^{2}+2\eta(\frac{\alpha}{4}\E\|Qz^{(t)}\|_{2}^{2}+\frac{1}{\alpha}G_{Q}^{2})+\eta^{2}G_{0}^{2}(1+r\sigma^{2}) \nonumber\\
  & \leq(1-\frac{\alpha\eta}{2})\E\|Qz^{(t)}\|_{2}^{2}+\frac{2 \eta}{\alpha}G_{Q}^{2}+\eta^{2}G_{0}^{2}(1+r\sigma^{2}).
 \end{align}
 Using that $z^{(0)}=0$, we know $\E\|Qz^{(0)}\|_2^2=0$.
@@ -307,7 +308,8 @@ Hence, we have
 \begin{align}
 \label{eq:duality_Q_0}
     %&~~ (\nabla f_{j}(x^{(t)}))^{\top}Q_{0}(x^{(t)}-x^{*})\nonumber \\
-    (\nabla f_{j}(x^{(t)}))^{\top}Q_{0}(x^{(t)}-x^{*}) = &~~ \left(\frac{1}{\eta}(x^{(t)}-x^{(t+1)})-\alpha(x^{(t)}-x^{(0)})-G_{0}\cdot\zeta\right)^{\top}Q_{0}(x^{(t)}-x^{*})\nonumber \\
+    &(\nabla f_{j}(x^{(t)}))^{\top}Q_{0}(x^{(t)}-x^{*})  \\
+    =& \left(\frac{1}{\eta}(x^{(t)}-x^{(t+1)})-\alpha(x^{(t)}-x^{(0)})-G_{0}\cdot\zeta\right)^{\top}Q_{0}(x^{(t)}-x^{*})\nonumber \\
 = & ~~ \left(\frac{1}{\eta}Q_0(x^{(t)}-x^{(t+1)})\right)^{\top}Q_{0}(x^{(t)}-x^{*})-\left(
 \alpha(x^{(t)}-x^{(0)})+G_{0}\cdot\zeta
 \right)^\top Q_0(x^{(t)}-x^*)\nonumber \\
@@ -318,23 +320,24 @@ Hence, we have
         \|Q_{0}(x^{(t)}-x^{(t+1)})\|_2^{2}
     }
 \nonumber \\
- ~& -\lp\alpha(x^{(t)}-x^{(0)})+G_{0}\cdot\zeta\rp^{\top}Q_{0}(x^{(t)}-x^{*}),
+ ~& \quad -\lp\alpha(x^{(t)}-x^{(0)})+G_{0}\cdot\zeta\rp^{\top}Q_{0}(x^{(t)}-x^{*}),
 \end{align}
 where we used the fact that $Q_0^2 v = Q_0 v$ for any $v \in \R^d$ (since $Q_0$ is a projection matrix), and the last equality follows from 
 \begin{align*}
-   2(Q_0(x^{(t)}-x^{(t+1)}))^\top Q_0(x^{(t)}-x^*) \\
- = & \|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
+   &2(Q_0(x^{(t)}-x^{(t+1)}))^\top Q_0(x^{(t)}-x^*) \\
+   =& \|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
     \|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2} + 
     \|Q_{0}(x^{(t)}-x^{(t+1)})\|_2^{2}.
 \end{align*}
 
 Taking expectation on $\zeta$ over both sides of Equation~\eqref{eq:duality_Q_0} and making use of the fact that $\zeta$ has mean $0$, we have
 \begin{align*}
-\E_{\zeta}(Q_{0}\nabla f_{j}(x^{(t)}))^{\top}(x^{(t)}-x^{*}) = & \frac{1}{2\eta}
+ &\E_{\zeta}(Q_{0}\nabla f_{j}(x^{(t)}))^{\top}(x^{(t)}-x^{*}) \\
+=& \frac{1}{2\eta}
     \lp\E_{\zeta}\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
         \E_{\zeta}\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2} + 
         \E_{\zeta}\|Q_{0}(x^{(t)}-x^{(t+1)})\|_2^{2}\rp\\
- & -\alpha\E_{\zeta}\lp (x^{(t)}-x^{(0)})^{\top}Q_{0}(x^{(t)}-x^{*}) \rp.
+ & \quad -\alpha\E_{\zeta}\lp (x^{(t)}-x^{(0)})^{\top}Q_{0}(x^{(t)}-x^{*}) \rp.
 \end{align*}
 
 Recalling the definition of $Q_0$ and that $Q_0$ has rank at most $k$, one has
@@ -357,7 +360,8 @@ Moreover, one has
 
 Therefore, we have
 \begin{align}
-\E_{\zeta}(Q_{0}\nabla f_{j}(x^{(t)}))^{\top}(x^{(t)}-x^{*}) \leq & ~ \frac{1}{2\eta}
+& \E_{\zeta}(Q_{0}\nabla f_{j}(x^{(t)}))^{\top}(x^{(t)}-x^{*}) \\
+\leq& \frac{1}{2\eta}
         \lp\E_{\zeta}\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
            \E_{\zeta}\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}
         \rp + \eta G_0^2(1+k\sigma^2) \nonumber\\ 
@@ -388,10 +392,10 @@ where we chose $\alpha_{s}=\alpha s^{-2} 2^{-s}$ and used the bound \eqref{eq:Qb
 
 \medskip
 
-{\bf Bounding Equation \eqref{eq:mirror_two_term}:} Combining both the terms \eqref{eq:term1} and \eqref{eq:term2} and taking expectation
-over all randomness, we have
+{\bf Bounding Equation \eqref{eq:mirror_two_term}:} Combining both the terms \eqref{eq:term1} and \eqref{eq:term2} and taking expectation over all randomness, we have
 \begin{align*}
-\E [F(x^{(t)})- F(x^{*})] \leq &~~ \frac{1}{2\eta}(
+&\E [F(x^{(t)})- F(x^{*})] \\
+\leq & \frac{1}{2\eta}(
     \E\|Q_{0}(x^{(t)}-x^{*})\|_2^{2} - 
     \E\|Q_{0}(x^{(t+1)}-x^{*})\|_2^{2}) +
     \eta G_{0}^{2}(1+k\sigma^{2})+\frac{\alpha}{2}\E\|Q_{0}(x^{(0)}-x^{*})\|_2^{2}\\
