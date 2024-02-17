@@ -4,7 +4,7 @@ In Section~\ref{sec:synthetic}, we study a synthetic example that matches our th
 In Section~\ref{sec:lm}, we study a stylized example of privately fine-tuning large language models. 
 Building on the previous theory, we provide insights as to why dense fine-tuning can yield good performance. 
 
-\subsection{Synthetic Example: Estimating the Generalized Geometric Median}\label{sec:synthetic}
+\subsection{Synthetic Example: Generalized Geometric Median}\label{sec:synthetic}
 We privately estimate the geometric median which minimizes the average Mahalanobis distance. 
 Specifically, let $x_i \in \R^d$ for $i \in [n]$ be feature vectors drawn i.i.d. from some distribution $P_x$, each of which is treated as an individual record. 
 Denote the entire dataset as $\mathcal{D} = \{ x_i\}_{i=1}^n$.
@@ -66,7 +66,7 @@ Each training run was performed with $\epsilon=2$, $\delta=10^{-6}$, and $n=1000
 \label{fig:toy}
 \end{figure}
 
-\subsection{Why Does Dense Fine-Tuning Work Well for Pretrained Language Models?}\label{sec:lm}
+\subsection{Why Does Dense Fine-Tuning Work Well?}\label{sec:lm}
 Stated informally, our bounds in Theorem~\ref{thm:DPSCO} imply that DP-SGD obtains dimension-independent errors if gradients approximately reside in a subspace much smaller than the ambient space.
 Inspired by these results for the convex case, we now turn to study dense language model fine-tuning~\citep{li2021large} and provide a possible explanation for their recent intriguing success --- fine-tuning gigantic parameter vectors frequently results in moderate performance drops compared to non-private learning.
 
