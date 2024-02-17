@@ -15,7 +15,7 @@ We set privacy parameter $\delta= 10^{-5}$ and choose $\epsilon$ from $\{1,3,5,8
 We compare the performance of adaptive per-layer clipping with that of flat clipping. 
 For both algorithms, we use  hyperparameters suggested by \cite{de2022unlocking}  and tune learning rates. %
 We use a fraction $r=0.01$ of privacy budget for quantile estimation and choose the target quantile $q$ from $\{0.5, 0.6, 0.7\}$. For both algorithms we train for 300 epochs. 
-We summarize the details in Appendix \ref{app:cifar}.  
+% We summarize the details in Appendix \ref{app:cifar}.  
 Table~\ref{table:cifar_acc} shows that adaptive per-layer clipping achieves  training and validation accuracies on par with flat clipping for multiple choices of $\epsilon$. %
 
 
@@ -38,7 +38,7 @@ on par with flat clipping in accuracy for all setups and justifies the wall time
 \cite{li2022large} demonstrated that the performance of private fine-tuning for text classification with various algorithms improves with a text infilling formulation. 
 The infilling technique reformulates the optimization problem and is orthogonal to the algorithmic aspects under study. 
 To ensure our comparisons are fair, all experiments in this section follow the usual BERT fine-tuning setup without text infilling. 
-Additional details of the two experiments can be found in Appendix \ref{app:glue}.
+% Additional details of the two experiments can be found in Appendix \ref{app:glue}.
 
 \input{files/tables/glue}
 
@@ -48,7 +48,8 @@ Additional details of the two experiments can be found in Appendix \ref{app:glue
 \paragraph{Table-To-Text Generation.}
 We compare adaptive per-layer clipping against flat clipping for full fine-tuning with GPT-2 on the E2E~\citep{novikova2017e2e} and DART~\citep{nan2020dart} table-to-text generation tasks. 
 Since~\cite{li2022large} performed extensive tuning on these tasks for flat clipping, we recall their results here.
-For runs with adaptive per-layer clipping, we reused hyperparameter values tuned for SST-2, but re-tuned the target quantile with the E2E validation set and constrained the batch size and number of training epochs to be the same as that for flat clipping; see Appendix~\ref{app:lang_gen} for details.
+For runs with adaptive per-layer clipping, we reused hyperparameter values tuned for SST-2, but re-tuned the target quantile with the E2E validation set and constrained the batch size and number of training epochs to be the same as that for flat clipping.
+% ; see Appendix~\ref{app:lang_gen} for details.
 Table~\ref{table:table2text_trimmed} confirms that DP learning with adaptive per-layer clipping performs comparably to flat clipping under a given epoch constraint.
 \input{files/tables/gpt3_trimmed}
 \paragraph{Dialog Summarization.}\label{exp:summarization}
