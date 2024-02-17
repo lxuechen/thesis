@@ -43,7 +43,7 @@ In all cases, the span of gradients $\text{span}( \{ \nabla F(x) \} )$ is the am
 To ensure the distance from the initial iterate $\beta^{(0)} = 0$ to the optimum is the same for problem instances of different dimensions, we let feature vectors $\{x_i\}_{i=1}^n$ take zero values in any dimension $k > d_{\text{min}}$, where $d_{\text{min}}$ is the dimension of the smallest problem in our experiments.
 Our theoretical bounds suggest that when the sequence of restricted Lipschitz coefficients is constant (when $A = A_{\text{const}}$), the excess empirical loss grows with the problem dimension, whereas when the sequence of $k$th-Lipschitz constants rapidly decays with $k$ (when $A = A_{\text{sqrt}}$ or $A = A_{\text{linear}}$), the excess empirical loss does not grow beyond a certain problem dimension. 
 Figure~\ref{fig:toy} empirically captures this phenomenon. 
-We include additional experimental setup details in Appendix~\ref{app:exp_synth}.
+% We include additional experimental setup details in Appendix~\ref{app:exp_synth}.
 \begin{figure}[t]
 \begin{center}
 \begin{minipage}[t]{0.48\linewidth}

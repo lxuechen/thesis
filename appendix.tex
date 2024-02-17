@@ -91,11 +91,16 @@ We compare different adaptation methods by reporting task specific metrics on th
 For sentence classification tasks, we reused the same hyperparameters, except for the number of training epochs and batch size.
 For SST-2, we reused the same batch size as for private E2E fine-tuning, and the number of epochs exactly as in typical non-private fine-tuning for SST-2 (number of epochs equals to 3 in this case).
 For remaining classification tasks, we use a batch size such that the sampling rate is the same as for SST-2, and a number of training epochs that is roughly proportional to the dataset size.
-Appendix~\ref{app:hp_transfer} outlines why we transfer the sampling rate as opposed to the batch size.
+
+We transfer the sampling rate as opposed to the batch size, since transferring the batch size may cause a discrepancy in the effective noise multiplier across workloads with different datasets.
+This is because different datasets may be of different sizes.
+In particular, transferring the batch size based on hyperparameter tuning on small datasets to larger datasets can be particularly problematic, as the effective noise multiplier can be larger than ideal. 
+
+% Appendix~\ref{app:hp_transfer} outlines why we transfer the sampling rate as opposed to the batch size.
 We list the range of hyperparameters that we searched over for each individual adaptation method on E2E considered in the paper. 
 Prefix-tuning has two additional hyperparameters: the length of the prefix and the dimensionality of the hidden layer. 
 We set these to the default used by~\cite{li2021prefix} (10 for the former and 512 for the latter).
-For Adam, we use the default hyperparamaters set by PyTorch~\citep{paszke2017automatic}. 
+For Adam, we use the default hyperparamaters set by PyTorch~\citep{paszke2017automatic}.
 
 \begin{table}[H]
     \centering
