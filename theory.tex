@@ -1,4 +1,4 @@
-\section{Dimension-Independence via Restricted Lipschitz Continuity}\label{sec:theory}
+\section[Dimension-Independence via Restricted Lipschitz Continuity]{Dimension-Independence via \\Restricted Lipschitz Continuity}\label{sec:theory}
 In this section, we introduce the restricted Lipschitz continuity condition and derive improved bounds for the excess empirical and population risks for DP-SGD when optimizing convex objectives.
 
 \begin{defi}[Restricted Lipschitz Continuity]
@@ -53,7 +53,7 @@ Consider DP-ERM for learning generalized linear models with convex and Lipschitz
 When the (empirical) data covariance is of rank $r < d$, the span of gradients $\text{span}(\{ \nabla_x F(x) \})$ is also of rank $r$. 
 Thus, the average loss is restricted Lipschitz continuous with coefficients where $G_{r'} = 0$ for all $r' > r$. 
 Setting $k = r$ in \eqref{eq:erm_general_condition} yields an excess empirical risk bound of order $O\bracks{ {G_{0}D\sqrt{ r \cdot\log(1/\delta)}} \epsilon^{-1} n^{-1} }$.
-This recovers the previous dimension-independent result in~\cite{song2021evading}.
+This recovers the previous dimension-independent result by~\cite{song2021evading}.
 \end{remark}
 
 % \begin{remark}
@@ -71,7 +71,7 @@ We leverage these insights to build intuition for understanding privately fine-t
 \subsection{Bounds for Excess Population Loss}
 %Making use of the stability of SGD, we can bound the generalization error and hence the excess population loss for the DP-SCO problem.
 %To prove the utility guarantees in Theorem \ref{thm:DPSCO} 
-For DP-SCO, we make use of the \emph{stability} of DP-SGD to bound its generalization error \cite{BE02}, following previous works \cite{bassily2019private,BFGT20,song2021evading}.
+For DP-SCO, we make use of the \emph{stability} of DP-SGD to bound its generalization error \citep{BE02}, following previous works \citep{bassily2019private,BFGT20,song2021evading}.
 The bound on the excess population loss follows from combining the bounds on the excess empirical risk and the generalization error.
 
 \begin{restatable}[Excess Population Loss]{theorem}{DPSCO}
@@ -110,11 +110,11 @@ Moreover, if for some $c>1/2$, we have $G_k\leq G_0 k^{-c}$ for all $k \in [d]$,
 % We refer the reader to Appendix~\ref{app:dpsco_proof} for the full proof.
 
 \begin{remark}
-Our result on DP-SCO also recovers the DP-SCO rank-dependent result for learning generalized linear models with convex and Lipschitz losses~\cite{song2021evading}.
+Our result on DP-SCO also recovers the DP-SCO rank-dependent result for learning generalized linear models with convex and Lipschitz losses~\citep{song2021evading}.
 \end{remark}
 
 \begin{remark}
-When $c>1/2$, $\epsilon = \Theta(1)$ and $\delta = 1/\mathrm{poly}(n)$, the population loss matches the (non-private) informational-theoretical lower bound $\Omega(G_0 D/\sqrt{n})$ \cite{agarwal2009information}.
+When $c>1/2$, $\epsilon = \Theta(1)$ and $\delta = 1/\mathrm{poly}(n)$, the population loss matches the (non-private) informational-theoretical lower bound $\Omega(G_0 D/\sqrt{n})$ \citep{agarwal2009information}.
 \end{remark}
 
 \begin{remark}
@@ -253,7 +253,7 @@ Moreover, if $G_k\leq G_0 k^{-c}$ for each $k$ for some $c>1/2$, and in addition
 \end{lemm}
 
 \begin{proof}[Proof of Lemma \ref{lm:utility_DPSGD_appendix}]
-The above statement is true for $k = d$ by standard arguments in past work~\cite{bassily2014private,song2021evading}.
+The above statement is true for $k = d$ by standard arguments in past work~\citep{bassily2014private,song2021evading}.
 Now fix a $k \in \{1, \dots, d - 1\}$.
 Our key idea is to split the whole space $\R^d$ into different subspaces.
 We define the following set of subspaces:
