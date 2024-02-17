@@ -2,14 +2,14 @@
 
 Deep learning models trained on sensitive data can leak privacy.
 For instance, models trained with standard algorithms may regurgitate training data or reveal membership information of data contributors.
-Differential Privacy (DP) is a formal guarantee that provably limits privacy leakage and has become the gold standard for private statistical data analysis.
-However, previous approaches for training deep learning models with DP typically were computationally intensive and incurred substantial performance penalties on the resulting model.
+Differential Privacy (DP) is a formal guarantee that provably limits privacy leakage and has become the gold standard for privacy-preserving statistical data analysis.
+However, most approaches for training deep learning models with DP were computationally intensive and incurred substantial performance penalties on the resulting model.
 This thesis presents improved techniques for DP training that are more efficient and performant.
 These techniques have seen growing interest in industry and have led to the first deployment of differentially private machine learning at Microsoft, protecting users' privacy and providing substantial computational savings.
 
-We show that Differentially Private Stochastic Gradient Descent (DP-SGD), when properly applied to fine-tune pretrained models of increasing size, consistently produces better privacy-utility tradeoffs. Vanilla DP-SGD is memory-intensive and slow. We present algorithms and implementations that are as efficient as standard training for Transformers models.
+We show that Differentially Private Stochastic Gradient Descent (DP-SGD), when properly applied to fine-tune large pretrained models of increasing size, consistently produces better privacy-utility tradeoffs. Vanilla DP-SGD is memory-intensive and slow. We present algorithms and implementations that are as efficient as standard training for Transformers models.
 In addition, we provide theoretical analyses of our empirical results.
-A prevailing prior belief was that DP-SGD performs poorly when optimizing high-dimensional objectives. 
+A prevailing prior belief is that DP-SGD performs poorly when optimizing high-dimensional objectives. 
 This intuition, grounded in previous dimension-dependent bounds for private convex optimization, appears to be at odds with our empirical observations. 
 To address this disparity, we study when the dimension adversely affects the performance of DP-SGD and prove that DP-SGD has dimension-independent bounds for a class of unconstrained convex optimization problems. 
 % This resonates with our empirical observations where gradients of large language models obtained during fine-tuning are mostly controlled by a few principal components.
