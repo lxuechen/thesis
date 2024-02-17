@@ -195,15 +195,15 @@ Algorithm~\ref{algo:dp_first_order} presents the general pattern of DP first-ord
   \State Calculate the noise multiplier $\sigma$ from $\epsilon, \delta, q, T$ with adaptive composition and privacy amplification theorems.
   \For{ $t = 1, \dots, T $ }
     \State Draw a batch $B_t$ via \emph{Poisson sampling} (sample each element with prob. $q$).
-    \For{ $x_i \in B_t$ }
-        \State $g_t(x_i) \gets \nabla_{\theta_t} \mathcal{L}(x_i)$ \Comment{ {\color{red} Compute per-example gradient.}}
-        \State $\widetilde{g_t}(x_i) \gets g_t(x_i) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x_i)} })$ \Comment{
+    \For{ $x \in B_t$ }
+        \State $g_t(x) \gets \nabla_{\theta_t} \mathcal{L}(x)$ \Comment{ {\color{red} Compute per-example gradient.}}
+        \State $\widetilde{g_t}(x) \gets g_t(x) \cdot \min(1, \nicefrac{C}{ \normtwo{g_t(x)} })$ \Comment{
         {\color{red} Clip per-example gradient.}}
     \EndFor
     \State \(\triangleright\) {\color{red} Estimate the average gradient with the sampled Gaussian mechanism.} 
     \State $z_t \sim \mathcal{N}(0, \sigma^2 C^2 I_p)$
     \State $\widebar{g_t} \gets \frac{1}{B} \bracks{ 
-        \sum_{x_i \in B_t} \widetilde{g_t}(x_i) + z_t
+        \sum_{x \in B_t} \widetilde{g_t}(x) + z_t
     }$
     \State \(\triangleright\) {\color{red} Update model weights and optimizer states with private gradient.}
     \State $\theta_{t + 1}, s_{t+1} \gets \texttt{WeightUpdate}(\widebar{g_t}, \theta_t, s_t, H)$
