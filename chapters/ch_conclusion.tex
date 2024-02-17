@@ -3,3 +3,36 @@
 % long-term privacy leaks.
 % language correlation, paper on not train privately on language
 In this dissertation, we presented improved techniques for training deep learning models with DP that are more computationally efficient and have better privacy-utility trade-offs.
+In addition, we also presented theoretical analyses that help explain and understand our seemingly counterintuitive empirical observations.
+These contributions have gained industry adoption and have been deployed at Microsoft.
+Below we discuss additional considerations.
+\Chen{TODO: Logic of this chapter: 1) conclusions, 2) cautionary notes on DP limitation, 3) suggest that risk-benefit trade-off and long-term effect of deployment should be studied.}
+
+\Chen{TODO: data collection harms.}
+
+Successful private learning has the potential to motivate corporations to expand the deployment of DP machine learning.
+This could result in long-term privacy harms that don't surface immediately.
+For example, experiments in our work assume that the privacy budget $\epsilon$ is fixed ahead of time and model training is only ever performed once.
+But for real-world deployments, statistical analyses or model training tend to be periodically repeated (with the same set of users) to adapt services to temporal changes in the data stream.
+Some privacy is lost for each user with each repetition. \footnote{Foundation work has proposed the \emph{continual observation} model~\citep{dwork2010differential}; its deployment in privacy-preserving deep learning is yet to be seen.}
+
+Lastly, we note that for DP algorithms to accomplish their privacy goal of ``hiding'' individuals' participation, one needs to assume that different examples in the dataset are produced independently~\citep{kifer2011no}.
+When examples aren't independent, an algorithm can satisfy DP but still leak substantial privacy.\footnote{The simplest example is running DP algorithms on datasets with duplicates.}
+Settings in our dissertation implicitly assumed that different examples are independent, but in practice example boundaries may be hard to define.
+For instance, a transcript in a (private) dialog dataset can involve multiple users.
+Defining the example boundary at the user level would imply that a transcript be duplicated across multiple users.
+\Chen{TODO}
+% Differential privacy as a guarantee alone may fail to fulfill the desired privacy goals if example boundaries are not set appropriately.
+
+% We argue that improvements in differentially private machine learning alone should not be the sole motivation to
+% expand the collection of user data or make aggressive the training of machine learning models on
+% such data without considering the potential long-term harms of developing and releasing models
+% trained with sensitive data.
+% Our efforts on scaling differentially private fine-tuning to work with GPT-3 are purely motivated by
+% an academic research question. We note there are privacy concerns associated with the pretraining
+% corpus of GPT-3, and thus a model fine-tuned from GPT-3 should not be deployed without undergoing
+% careful privacy audits. For deployment purposes, we suggest fine-tuning only models pretrained on
+% carefully curated corpora.
+% Lastly, we note that language is inherently complex, and its complexity may well be reflected in
+% datasets for sophisticated tasks such as dialog completion. Differential privacy as a guarantee alone
+% may fail to fulfill the desired privacy goals if example boundaries are not set appropriately.
