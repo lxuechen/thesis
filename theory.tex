@@ -25,7 +25,7 @@ We present the main theoretical result on DP-ERM for convex objectives.
 The result consists of two components:
 Equation~\eqref{eq:erm_general_condition} is a general bound that is applicable to any sequence of restricted Lipschitz coefficients;
 Equation~\eqref{eq:erm_fast_decaying} specializes the previous bound when the sequence of coefficients decays rapidly and demonstrates dimension-independent error scaling.
-\begin{theo}[Excess Empirical Loss]{theorem}{DPERM}
+\begin{theo}[Excess Empirical Loss]
 \label{thm:DPERM}
 Let $ \delta \in (0, \frac{1}{2}]$ and $\epsilon\in(0,10]$.
 Under Assumption~\ref{assm:G_k}, for all $k \in [d]$, 
@@ -48,13 +48,13 @@ minimizing the right hand side of \eqref{eq:erm_general_condition} with respect 
 \end{align}
 \end{theo}
 We include a sketch of the proof techniques in Subsection~\ref{sec:proof_technique} and defer the full proof to Subsection~\ref{app:dperm_proof}.
-\begin{remark}
+\begin{Remark}
 Consider DP-ERM for learning generalized linear models with convex and Lipschitz losses.
 When the (empirical) data covariance is of rank $r < d$, the span of gradients $\text{span}(\{ \nabla_x F(x) \})$ is also of rank $r$. 
 Thus, the average loss is restricted Lipschitz continuous with coefficients where $G_{r'} = 0$ for all $r' > r$. 
 Setting $k = r$ in \eqref{eq:erm_general_condition} yields an excess empirical risk bound of order $O\bracks{ {G_{0}D\sqrt{ r \cdot\log(1/\delta)}} \epsilon^{-1} n^{-1} }$.
 This recovers the previous dimension-independent result by~\cite{song2021evading}.
-\end{remark}
+\end{Remark}
 
 % \begin{remark}
 %     If $\epsilon n<\sqrt{\log(1/\delta)}$, instead of running DP-SGD, one can output the public initial point $x_0$ directly and get the excess empirical risk $G_0D$.
@@ -74,7 +74,7 @@ We leverage these insights to build intuition for understanding privately fine-t
 For DP-SCO, we make use of the \emph{stability} of DP-SGD to bound its generalization error \citep{BE02}, following previous works \citep{bassily2019private,BFGT20,song2021evading}.
 The bound on the excess population loss follows from combining the bounds on the excess empirical risk and the generalization error.
 
-\begin{restatable}[Excess Population Loss]{theorem}{DPSCO}
+\begin{theo}[Excess Population Loss]
 \label{thm:DPSCO}
 Let $ \delta \in (0, \frac{1}{2}]$ and $\epsilon\in (0,10]$.
 Under Assumption~\ref{assm:G_k}, for all $k \in [d]$, 
@@ -94,7 +94,6 @@ DP-SGD (Algorithm~\ref{alg:noisy_SGD}) is $(\epsilon,\delta)$-DP, and
 where $\|x^{(0)}- \argmin_x F(x ; \cP) \|_2 \le D$, $\ox$ is the (random) output of DP-SGD (Algorithm~\ref{alg:noisy_SGD}), and the expectation is over the randomness of $\overline{x}$.
 
 Moreover, if for some $c>1/2$, we have $G_k\leq G_0 k^{-c}$ for all $k \in [d]$, and in addition $n>\epsilon^{-1}\sqrt{\log(1/\delta)}$, minimizing the above bound with respect to $k$ yields
-% \begin{align*}
 \eqn{
 \E \sbracks{
     F(\ox;\cP)- \min_x F(x;\cP)
@@ -104,23 +103,21 @@ Moreover, if for some $c>1/2$, we have $G_k\leq G_0 k^{-c}$ for all $k \in [d]$,
     G_{0} D \cdot \bracks{
         \frac{\sqrt{\log(1/\delta)}}{\epsilon n}
     }^{2c/(1+2c)}.
-% \end{align*}
 }
-\end{restatable}
-% We refer the reader to Appendix~\ref{app:dpsco_proof} for the full proof.
+\end{theo}
 
-\begin{remark}
+\begin{Remark}
 Our result on DP-SCO also recovers the DP-SCO rank-dependent result for learning generalized linear models with convex and Lipschitz losses~\citep{song2021evading}.
-\end{remark}
+\end{Remark}
 
-\begin{remark}
+\begin{Remark}
 When $c>1/2$, $\epsilon = \Theta(1)$ and $\delta = 1/\mathrm{poly}(n)$, the population loss matches the (non-private) informational-theoretical lower bound $\Omega(G_0 D/\sqrt{n})$ \citep{agarwal2009information}.
-\end{remark}
+\end{Remark}
 
-\begin{remark}
+\begin{Remark}
     % DP-SGD considered in our work randomly queries the (sub)gradient of one function uniformly in each iteration.
     Our results on DP-ERM and DP-SCO naturally generalize to (full-batch) DP-GD.
-\end{remark}
+\end{Remark}
 
 \subsection{Overview of Proof Techniques}\label{sec:proof_technique}
 The privacy guarantees in Theorems \ref{thm:DPERM} and \ref{thm:DPSCO} follow from Lemma~\ref{lm:privacy_guarantee}.
