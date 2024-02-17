@@ -79,7 +79,8 @@ We reformulate the label prediction problem as templated text prediction~\cite{l
 We focus on fine-tuning these specific parameter matrices due to the success of LoRA for non-private learning~\cite{hu2021lora} which focuses on adapting the attention layers. Unlike LoRA, we fine-tune all parameters in these matrices rather than focusing on low-rank updates.
 This gives a setup that is lightweight enough to run spectral analyses computationally tractably but retains enough parameters ($\approx7$ million) such that a problem of similar scale outside of fine-tuning results in substantial losses in utility.\footnote{For instance, an off-the-shelf ResNet image classifier has 10 to 20+ million parameters. A plethora of works report large performance drops when training these models from scratch~\cite{YZCL21,luo2021scalable,de2022unlocking}.}
 For our setup, DP-SGD obtains a dev set accuracy approximately of $90\%$ and $92\%$, privately and non-privately, respectively.
-These numbers are similar to previous results obtained with the same pretrained model~\cite{yu2021differentially,li2021large}. We include the full experimental protocol and additional results in Appendix~\ref{app:exp_privlm}. 
+These numbers are similar to previous results obtained with the same pretrained model~\cite{yu2021differentially,li2021large}. 
+We include the full experimental protocol and additional results in Appendix~\ref{app:exp_privlm}.
 
 To provide evidence for the small subspace hypothesis, we sample gradients during fine-tuning and study their principal components.
 Specifically, we ``over-train'' by privately fine-tuning for $r = 2 \times 10^3$ updates and collect all the non-privatized average clipped gradients along the optimization trajectory.

@@ -506,3 +506,196 @@ We fine-tuned for 5 epochs in all runs (both GPT-3 and GPT-2-xl; both private an
 For the DP LoRA fine-tuning runs, we used a machine with 16 V100 GPUs each with 32 gigabytes of VRAM. 
 This enabled LoRA fine-tuning with a rank of 32 with a microbatch size of 1 under pipeline parallelism.
 Fine-tuning with DP LoRA for 5 epochs on SAMSum's training set took 15 hours, and decoding with test inputs using beam search further took another 22 hours. 
+
+
+
+
+
+
+
+
+% ===================================
+\clearpage
+\newpage
+\section{Supplementary for Chapter 5}
+
+\subsection{Protocol and Additional Fine-Tuning Experiments for Section~\ref{sec:lm}} \label{app:exp_privlm}
+
+\subsubsection{Experimental Protocol}
+For experiments in Section~\ref{sec:lm}, we fine-tuned the DistilRoBERTa model with $(8, \nicefrac{1}{n^{1.1}})$-DP on the SST-2 training set with $n \ge 60000$ examples and measured performance on the companion dev set.
+We used the exact set of hyperparameters presented in~\cite{li2021large} for this task.
+We repeated our re-training experiments over five independent random seeds.
+Fine-tuning for 3 epochs on this task takes 10 minutes on an A100-powered machine with sufficient RAM and CPU cores.
+
+Our spectral analysis relies on running the orthogonal iteration algorithm on the set of collected gradients along the private fine-tuning trajectory~\cite{demmel1997applied}.\footnote{By gradients, we always mean the average of clipped per-example gradients --- before adding noise --- in this section.}
+Unlike other numerical algorithms for estimating eigenvalues of a matrix, orthogonal iteration provably produces the set of eigenvalues that are largest in absolute value (and corresponding eigenvectors, if the underlying matrix is normal) in the limit.\footnote{The orthogonal iteration algorithm is also known as simultaneous iteration or subspace iteration.}
+Recall that we needed the top eigenvectors for projection in our re-training experiment.\footnote{
+Note that one commonly used algorithm in the neural net spectral analysis literature --- Lanczos iteration~\cite{ghorbani2019investigation} --- does not guarantee that the top eigenvalues are produced, even though its spectral estimates are frequently deemed accurate~\cite{granziol2019deep}.
+}
+By default, we run orthogonal iteration for ten iterations. 
+We show in the following that our results are insensitivity to the number of iterations used in the orthogonal iteration algorithm.
+Each orthogonal iteration takes $10$ minutes on an A100-powered machine with $r=4000$ gradient samples and $k=1000$ principal components for the DistilRoBERTa experiments.
+
+\subsubsection{Robustness of Results}
+
+\paragraph{Robustness to the number of orthogonal iterations.}
+The orthogonal iteration algorithm is a generalization of the power method that simultaneously produces estimates of multiple eigenvalues.
+Its convergence is known to be sensitivity to the gap between successive eigenvalues.
+The algorithm converges slowly if consecutive eigenvalues (with the largest absolute values) are close in absolute value.
+To confirm that our results aren't sensitivity to the choice of the number of iterations, we visualize the top 500 eigenvalues for the orthogonal iteration algorithm is run for different number of updates.
+Figure~\ref{fig:num_power_iter_robust} shows that the linear fit to the top $500$ eigenvalues remains stable across different number of orthogonal iterations $T$.
+Notably, $T=10$ produces similar results as $T=100$. 
+These results were obtained with $r=4000$ gradients.
+
+\begin{figure}[thb]
+\begin{center}
+\begin{minipage}[t]{0.32\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/roberta/npi_000010/eigenvalue-linfit.pdf}}
+(a) $T=10$
+\end{minipage}
+\begin{minipage}[t]{0.32\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/roberta/npi_000050/eigenvalue-linfit.pdf}}
+(b) $T=50$
+\end{minipage}
+\begin{minipage}[t]{0.32\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/roberta/npi_000100/eigenvalue-linfit.pdf}}
+(c) $T=100$
+\end{minipage}
+\end{center}
+\caption{
+The eigenspectrum remains stable with different number of iterations $T$. 
+}
+\label{fig:num_power_iter_robust}
+\end{figure}
+
+\paragraph{Robustness to the number of gradient samples.}
+We further ran experiments with different numbers of gradient samples $r$ collected along the fine-tuning trajectory, and plot the top $500$ eigenvalues.
+Figure~\ref{fig:num_grad_sample_robust} shows that while the slope and intercept of the fitted line in log-log space changes, the change is moderate.
+Notably, the decaying trend of the top eigenvalues remains stable.
+
+\begin{figure}[thb]
+\begin{center}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/roberta/less_samples_no_trim_front/eigenvalue-linfit.pdf}}
+(a) $r=1000$
+\end{minipage}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/roberta/npi_000010/eigenvalue-linfit.pdf}}
+(b) $r=4000$
+\end{minipage}
+\end{center}
+\caption{
+The fast decaying trend of the eigenspectrum remains stable with different number of samples $r$ used for the spectral analysis.
+}
+\label{fig:num_grad_sample_robust}
+\end{figure}
+
+\paragraph{Robustness to the gradient sampling strategy.}
+We observe that gradients at the beginning of fine-tuning tend to be larger in magnitude than gradients collected later on along the optimization trajectory.
+To eliminate the potential confounder that the top principal components are solely formed by the initial few gradients evaluated during fine-tuning, we re-ran the spectral analysis experiment without the initial gradients.
+Specifically, we performed PCA for the gradients evaluated from step 300 to step 1300 during private fine-tuning, and compared the distribution of top eigenvalues returned from this setup to when we used the first 1000 gradients.
+Note the dev set accuracy converged to $\approx 90\%$ by step 200. 
+Figure~\ref{fig:trunc_strategy_robust} shows that while the slope and intercept of linear fits are slightly different in the new setup compared to the old setup (when all gradients along the fine-tuning trajectory were used for PCA), that the eigenvalues follow a rapidly decaying trend remains true under both setups.
+
+\begin{figure}[thb]
+\begin{center}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/roberta/less_samples_no_trim_front/eigenvalue-linfit.pdf}}
+(a) Gradients at iterations $0$ to $1000$
+\end{minipage}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/roberta/less_samples_trim_front/eigenvalue-linfit.pdf}}
+(b) Gradients at iterations $300$ to $1300$
+\end{minipage}
+\end{center}
+\caption{
+The rapidly decaying trend of the eigenspectrum remains stable with different sampling strategies.
+}
+\label{fig:trunc_strategy_robust}
+\end{figure}
+
+\paragraph{Robustness to model size.}
+In previous experiments, we empirically verified that gradients for fine-tuning DistilRoBERTa are near low rank.
+Here, we show that similar observations also hold for Roberta-base and Roberta-large when fine-tuning only the attention layers.
+The former setup has approximately $14$ million trainable parameters, while the latter has approximately $50$ million.
+Figures~\ref{fig:pca_roberta_base} and~\ref{fig:pca_roberta_large} illustrate these results.
+
+\begin{figure}[thb]
+\begin{center}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/rebuttal/eigenvalue-linfit.pdf}}
+\footnotesize{(a) singular values decay with rank}
+\end{minipage}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/rebuttal/plot2.pdf}}
+\footnotesize{(b) retrain in fixed subspace}
+\end{minipage}
+\end{center}
+\caption{
+Experiments for Roberta-base.
+}
+\label{fig:pca_roberta_base}
+\end{figure}
+
+\begin{figure}[thb]
+\begin{center}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/rebuttal/eigenvalue-linfit-large.pdf}}
+\footnotesize{(a) singular values decay with rank}
+\end{minipage}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/rebuttal/plot2-large.pdf}}
+\footnotesize{(b) retrain in fixed subspace}
+\end{minipage}
+\end{center}
+\caption{
+Experiments for Roberta-large.
+}
+\label{fig:pca_roberta_large}
+\end{figure}
+
+
+\paragraph{Non-robustness to fine-tuning strategy.}
+Recall our fine-tuning experiments for classification was based on the template-completion formulation detailed in~\cite{li2021large}.
+As opposed to framing the task as integer label prediction, this formulation requires the model to predict one of $K$ candidate tokens to fill in a templated prompt for a $K$-way classification problem.
+While we have also performed the experiment where we re-train in the subspace of top principal components under the usual fine-tuning setup (stack a randomly initialized prediction head on top of the embedding of the \texttt{[CLS]} token), we found it difficult to recover the original fine-tuning performance when gradients are projected onto the top eigen-subspace with $d=100$ dimensions. 
+Retraining performance exhibited high variance and the final dev accuracy was bi-modal over random seeds with near guess accuracy ($\approx50\%$) and original accuracy ($\approx90\%$) being the two modes.
+We suspect this to be caused by the linear prediction head being randomly initialized.
+
+\subsubsection{Additional Fine-Tuning Experiments with DistilGPT-2 for Generation Tasks}
+Experiments in Section~\ref{sec:lm} demonstrated that gradients from fine-tuning for classification are mostly controlled by a few principal components.
+In this section, we show that similar observations hold for fine-tuning on a text generation task. 
+We follow the setup and hyperparameters in~\cite{li2021large} for privately fine-tuning DistilGPT-2 on the E2E dataset~\cite{novikova2017e2e} under $(8, \nicefrac{1}{n^{1.1}})$-DP. 
+We fine-tune all weight matrices in attention layers that produce the queries, values, and keys. 
+This amounts to fine-tuning approximately $10.6$ million parameters of a model with a total parameter count of more than $100$ million.
+We again collected $r=4000$ gradients evaluated during private fine-tuning, performed PCA, and conducted the eigenspectrum analysis.
+Figure~\ref{fig:gpt2} shows that the top eigenspectrum decays rapidly with a rate similar to what is observed in fine-tuning for the classification problem we studied.
+
+\begin{figure}[thb]
+\begin{center}
+\begin{minipage}[t]{0.45\linewidth}
+\centering
+{\includegraphics[width=0.98\textwidth]{figs/privlm/gpt2/eigenvalue-linfit.pdf}}
+\end{minipage}
+% \begin{minipage}[t]{0.4\linewidth}
+% \centering
+% {\includegraphics[width=0.98\textwidth]{figs/privlm/gpt2/retrain.pdf}}
+% \end{minipage}
+\end{center}
+\caption{
+The eigenspectrum of gradients from fine-tuning for text generation rapidly decays.
+% Gradients from fine-tuning for text generation are controlled by a few principal components.
+}
+\label{fig:gpt2}
+\end{figure}
