@@ -1,7 +1,7 @@
 \input{files/meat/prelim_v2}
 
 
-\section{Efficient Private Learning with Adaptive Per-layer Clipping} \label{sec:benefit-loss}
+\section[Efficient Private Learning with Adaptive Per-layer Clipping]{Efficient Private Learning with \\Adaptive Per-layer Clipping} \label{sec:benefit-loss}
 The first instantiation of group-wise clipping we study is per-layer clipping which clips gradients of separate neural network layers separately.
 This scheme had been presented in past works~\citep{mcmahan2018general,mcmahan2018learning,dupuy2022efficient},
 but neither its computational properties nor its performance implications had been carefully studied.
@@ -9,7 +9,7 @@ We show that with proper implementation, per-layer clipping can be as memory-eff
 Additionally, we confirm that per-layer clipping with hand-set thresholds underperforms flat clipping and demonstrate that adaptively setting these thresholds eliminates potential performance losses. 
 
 
-\subsection{Per-layer Clipping DP-SGD Can Be Almost as Efficient as Non-private Sgd}
+\subsection[Per-layer Clipping DP-SGD Can Be Almost as Efficient as Non-private SGD]{Per-layer Clipping DP-SGD Can Be as Efficient as SGD}
 Per-layer clipping groups together parameters of a neural network layer (e.g., linear, convolution) and prescribes each of the $K$ layers of the network a clipping threshold $C_k$ to clip the gradient of that layer. This directly implies that gradient clipping for any layer can be performed as soon as backpropagation reaches that layer (to construct per-example gradients or norms) when parameter sharing is absent, and is unlike flat clipping which cannot be performed until backpropagation completes entirely.\footnote{Note the DP learning library Opacus~\citep{yousefpour2021opacus} has a per-layer clipping optimizer which supports clipping each layer with a separate threshold. But this implementation conducts per-layer clipping after backpropagation completes and instantiates all per-example gradients before clipping, which is inefficient.
 }
 
@@ -140,7 +140,7 @@ Darker colors indicate higher values of gradient norms.
 \label{fig:grad-norm-cifar10}
 \end{figure}
 
-\subsection{Adaptive Per-layer Clipping Can Be as Effective as Flat Clipping}
+\subsection{Adaptive Per-layer Clipping Can Be \\as Effective as Flat Clipping}
 \label{sec:adaptive-clipping}
 
 \begin{wrapfigure}[15]{R}{0.40\textwidth}
@@ -154,7 +154,7 @@ To overcome the above performance issues of fixed per-layer clipping, we conside
 Our hope is that the adaptive thresholds can track gradient norm shift, capture gradient structure, and consequently mitigate the structural bias caused by clipping gradients of separate layers separately. 
 One candidate statistic for setting the adaptive threshold is some quantile of gradient norms. 
 Notably, \cite{andrew2019differentially} provided an effective way of estimating  quantiles privately for flat clipping via online convex optimization.
-We adapt their algorithm to the per-layer setup, and let each layer maintain an online estimate of a target gradient norm quantile. %
+We adapt their algorithm to the per-layer setup and let each layer maintain an online estimate of a target gradient norm quantile. %
 
 
 Two questions arise with this formulation: 1) How should the per-layer gradient norm quantiles be privately estimated, and 2) how should the noise levels for different layers be decided? 
@@ -164,8 +164,8 @@ The pseudocode is based on DP-SGD, but its core ideas naturally apply to private
 
 
 
-
-\textbf{Estimating Quantiles Privately.}  We allocate some privacy budget (in practice $r=$1\% to 10\% of total budget) to estimate a target quantile of each layer's gradient norms. 
+\paragraph{Estimating Quantiles Privately.}
+We allocate some privacy budget (in practice $r=$1\% to 10\% of total budget) to estimate a target quantile of each layer's gradient norms. 
 Clipping thresholds $C_1, ..., C_K$ are then set to these estimated quantiles. 
 We record the number of gradients clipped before each parameter update and adjust the clipping threshold based on whether too many or too few are clipped. 
 The central quantity which needs to be privatized is then the fraction of clipped gradients.
@@ -184,8 +184,7 @@ Then the new noise multiplier $\sigma_{\text{new}}$ for noising parameter update
 The private quantile estimation for $K$ groups costs  a fraction $r = K\sigma^2/(4\sigma_b^2)$ of privacy budget (in terms of R\'enyi differential privacy~\citep{mironov2017renyi}). 
 \end{Remark}
 
-
-\textbf{Allocating Noise.} 
+\paragraph{Allocating noise.}
 The original Gaussian mechanism adds isotropic noise to statistics before their release~\citep{dwork2014algorithmic} which results in different coordinates experiencing the same amount of noise.
 Yet, simply scaling different components with public quantities (before adding noise) allows different components to experience different levels of noise. 
 As an example, let $\gamma_1, \cdots, \gamma_K$ be coefficients for scaling, and recall that $\tilde{\vg}_k$ is the sum of clipped gradients for layer / group $k$. 

@@ -7,7 +7,7 @@ Reported numbers are averaged over three seeds unless otherwise stated.
 
 
 
-\subsection{Privately Learn WideResNets for CIFAR-10 Classification}\label{subsec:cifar10}
+\subsection{CIFAR-10 Classification with WideResNets}\label{subsec:cifar10}
 
 We train a wide ResNet (WRN16-4, 2.8M trainable parameters) \citep{zagoruyko2016wide} from scratch for CIFAR-10 classification with differential privacy. We follow the implementation by  \cite{de2022unlocking}, e.g.,  batch normalization are replaced with group normalization and weight standardization is applied for convolutional layers, except that we do not use augmentation multiplicity for simplicity.
 We set privacy parameter $\delta= 10^{-5}$ and choose $\epsilon$ from $\{1,3,5,8\}$, which are typical privacy parameters used in previous works.
@@ -21,7 +21,7 @@ Table~\ref{table:cifar_acc} shows that adaptive per-layer clipping achieves  tra
 
 \input{files/tables/cifar}
 
-\subsection{Privately Fine-tune RoBERTa on GLUE Tasks} \label{subsec:roberta}
+\subsection{Text Classification Tasks with RoBERTa} \label{subsec:roberta}
 
 Our first experiment aims to show that adaptive per-layer clipping is broadly competitive with existing approaches in the literature in terms of the privacy-utility tradeoff. 
 In this experiment, we fine-tune RoBERTa-base (125M) and RoBERTa-large (355M)~\citep{liu2019roberta} on SST-2, QNLI, QQP, and MNLI from the GLUE benchmark~\citep{wang2018glue} with differential privacy. 
@@ -42,7 +42,7 @@ Additional details of the two experiments can be found in Appendix \ref{app:glue
 
 \input{files/tables/glue}
 
-\subsection{Privately Fine-tune on Langauge Generation Tasks} \label{subsec:gpt}
+\subsection{Langauge Generation Tasks} \label{subsec:gpt}
 
 \input{files/tables/table2text_trimmed_v2}
 \paragraph{Table-To-Text Generation.}
