@@ -67,7 +67,8 @@ Despite the computational advantages, per-layer clipping with fixed clipping thr
 To further verify this and remove confounding effects of potentially suboptimal hyperparameters, we compare fixed per-layer clipping against (fixed) flat clipping on two tasks: 
 1) training wide ResNet (WRN16-4) \citep{zagoruyko2016wide} from scratch to classify CIFAR-10 images, and
 2) fine-tuning the pretrained RoBERTa-base for classifying sentiment on SST-2. 
-We carefully tuned the clipping thresholds and learning rate for both clipping methods; see Appendix \ref{app:hyperparameter} for details.
+% We carefully tuned the clipping thresholds and learning rate for both clipping methods; see Appendix \ref{app:hyperparameter} for details.
+We carefully tuned the clipping thresholds and learning rate for both clipping methods.
 Tables~\ref{table:fixed_global_cifar10} and \ref{table:fixed_global_sst2} confirm that per-layer clipping with hand-set fixed thresholds underperforms flat clipping. 
 \begin{table}[h]
 \footnotesize
@@ -120,20 +121,21 @@ Tables~\ref{table:fixed_global_cifar10} and \ref{table:fixed_global_sst2} confir
 
 
 
-To understand why fixed per-layer clipping gives worse performance, we plot the per-layer gradient norms of randomly sampled CIFAR-10 examples for privately training WRN16-4 in Figure \ref{fig:grad-norm-cifar10} (see Appendix \ref{app:gradnorm-shift} for the setup). 
+To understand why fixed per-layer clipping gives worse performance, we plot the per-layer gradient norms of randomly sampled CIFAR-10 examples for privately training WRN16-4 in Figure \ref{fig:grad-norm-cifar10}.
+ % (see Appendix \ref{app:gradnorm-shift} for the setup). 
 We observe that the general magnitudes of per-layer gradient norms change dramatically across training. 
 Early on, gradient norms are generally uniformly low across all layers. 
 As training proceeds, gradient norms for layers close to the input gradually become high. 
-We present additional evidence for this phenomenon with language model fine-tuning in Appendix~\ref{app:gradnorm-shift}. 
+% We present additional evidence for this phenomenon with language model fine-tuning in Appendix~\ref{app:gradnorm-shift}. 
 
 These observations suggest that clipping with fixed layer-wise thresholds likely removes the structural relation between gradients of different layers. 
-This incurs an extra source of bias in addition to the usual bias of flat clipping that alters the relation of gradients across samples, and makes balancing clipping bias and privacy noise throughout training more challenging. 
+This incurs an extra source of bias in addition to the usual bias of flat clipping that alters the relation of gradients across samples and makes balancing clipping bias and privacy noise throughout training more challenging. 
 These observations motivate us to set the thresholds based on some adaptively estimated statistic of layer-wise gradients. 
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.85\textwidth]{files/fig/persample_perlayer_norm_cifar.pdf}
-\caption{The distribution of per-layer gradient norms shifts substantially across training. Each column represents one layer, and each row represents  one example. 
+\caption{The distribution of per-layer gradient norms shifts substantially across training. Each column represents one layer, and each row represents one example. 
 Layers of the neural network are placed from input (left) to output (right). 
 Darker colors indicate higher values of gradient norms. 
 }
@@ -170,18 +172,34 @@ Clipping thresholds $C_1, ..., C_K$ are then set to these estimated quantiles.
 We record the number of gradients clipped before each parameter update and adjust the clipping threshold based on whether too many or too few are clipped. 
 The central quantity which needs to be privatized is then the fraction of clipped gradients.
 We introduce the additional noise multiplier $\sigma_{b}$ to privatize this fraction statistic (used in Gaussian mechanism). 
-The new noise multiplier $\sigma_\text{new}$ (based on $1-r$ fraction of total budget) for noising parameter updates is computed with the following proposition, whose proof we defer to Appendix~\ref{app:proofs}.
+The new noise multiplier $\sigma_\text{new}$ (based on $1-r$ fraction of total budget) for noising parameter updates is computed with the following proposition.
+% , whose proof we defer to Appendix~\ref{app:proofs}.
 
 
-\begin{restatable}{Proposition}{NewNoiseMultiplier} \label{prop:noise-multiplier}
+\begin{prop}\label{prop:noise-multiplier}
 Let $\sigma$ be the original noise multiplier for noising parameter updates to achieve a certain level of differential privacy (without private quantile estimation) and $\sigma_b$ be chosen for noising quantile estimates (release of the latter consumes $r$ fraction of the privacy budget). %
 Then the new noise multiplier $\sigma_{\text{new}}$ for noising parameter updates (consuming $1-r$ fraction of the budget) is
 \begin{equation}
 \sigma_{\text{new}} = (\sigma^{-2}- K/(2\sigma_b)^2)^{-1/2}. \label{eq:sigma_new_sigma_b}    
 \end{equation}
-\end{restatable}
+\end{prop}
+
+\begin{proof}
+The proof is based on direct calculation, a simple version of which is given in \cite{andrew2019differentially}. First, we note that the clip counts $b_k^{(i)}$ is either 0 or 1 (see line 10 in Algorithm \ref{alg:perlayer-DPSGD}). One can make it to be symmetric by using $b_k^{(i)} -\frac{1}{2}$, whose sensitivity is $\frac{1}{2}$. Suppose the gradient has sensitivity $S$. 
+
+For the Gaussian mechanism, to keep the privacy budget constant we have 
+\begin{flalign*}
+S^2/(S\sigma)^2 = S^2/(S\sigma_{\text{new}})^2 + K\cdot \frac{(1/2)^2}{\sigma_b^2}.
+\end{flalign*}
+Simplifying the above expression, we get $\sigma_{\text{new}}$.
+
+
+We can further compute the fraction $r$ of budget that is used to privately estimate quantiles by  
+$r=K\cdot \frac{(1/2)^2}{\sigma_b^2}/(1/\sigma^2)$. We can also derive the value of $\sigma_b$ given $r$ from the above formula.
+\end{proof}
+
 \begin{Remark}
-The private quantile estimation for $K$ groups costs  a fraction $r = K\sigma^2/(4\sigma_b^2)$ of privacy budget (in terms of R\'enyi differential privacy~\citep{mironov2017renyi}). 
+The private quantile estimation for $K$ groups costs a fraction $r = K\sigma^2/(4\sigma_b^2)$ of privacy budget (in terms of R\'enyi differential privacy~\citep{mironov2017renyi}). 
 \end{Remark}
 
 \paragraph{Allocating noise.}
@@ -191,14 +209,12 @@ As an example, let $\gamma_1, \cdots, \gamma_K$ be coefficients for scaling, and
 Then, applying the Gaussian mechanism to the scaled $\hat{\vg} := (\hat{\vg}_1, ..., \hat{\vg}_K)$, where $\hat{\vg}_k:={\tilde{\vg}_k}/{\gamma_k}$, and rescaling back the privatized quantities afterwards ends up adding noise to $\tilde{\vg}_k$ that has standard deviation proportional to $\gamma_k$.
 
 Among the possible ways of choosing $\{\gamma_1, ..., \gamma_K\}$, we outline two simple approaches that we found to be effective for different reasons in our empirical studies. We use the global strategy in all but experiments with GPT-3.
-Appendix~\ref{app:noise-allocation} includes empirical studies of alternate strategies.
+% Appendix~\ref{app:noise-allocation} includes empirical studies of alternate strategies.
 \begin{itemize}[leftmargin=6mm,noitemsep]
     \item \emph{Global strategy}: $\gamma_k = 1$ for $k\ \in [K]$. This strategy adds the same amount of noise to every component.  The total noise has squared $\ell_2$ norm $V_{G}\propto(\sum_{k}C_k^{2})\cdot(\sum_{k}d_{k})$.
 
     \item \emph{Equal budget strategy}: $\gamma_k = C_k$ for $k\ \in [K]$. Each group has the same amount of privacy budget.  The total noise has squared $\ell_2$ norm $V_{E}\propto K\sum_{k=1}^{K}d_{k}C_k^{2}$.
 \end{itemize}
-
-
 
 
 \begin{algorithm}
@@ -280,7 +296,7 @@ Appendix~\ref{app:noise-allocation} includes empirical studies of alternate stra
 
 
 
-With the tools of quantile estimation and noise allocation, we show that adaptive per-layer clipping matches the performance of flat clipping. . 
+With the tools of quantile estimation and noise allocation, we show that adaptive per-layer clipping matches the performance of flat clipping. 
 Figure~\ref{fig:cifar_without_noise} compares adaptive per-layer clipping against fixed per-layer clipping and flat clipping with and without noise for training WRN16-4 on CIFAR-10 (details in Appendix~\ref{app:hyperparameter}), and
 shows that the performance of adaptive per-layer clipping matches that of flat clipping, while fixed adaptive clipping suffers large performance drops.
 Section~\ref{sec:experiment} includes additional results to validate this point.
