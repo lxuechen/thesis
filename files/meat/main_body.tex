@@ -19,21 +19,6 @@ This implementation results in private training that is as memory-efficient as n
 Figure~\ref{fig:throughput-comparison} shows that carefully implemented per-layer clipping matches the memory profile and almost matches the training throughput of non-private learning for an autoregressive fine-tuning task with GPT-2 on a single GPU (we followed the same experimental protocol as that of Section 4 in~\citep{li2022large} for a fair comparison).
 See Appendix~\ref{app:runtime} for additional experiments with head-to-head wall time comparisons. 
 
-
-
-
-
-
-
-
-    
-    
-
-
-
-
-
-
 \begin{figure}[htb]
 \begin{center}
 \begin{minipage}[t]{0.48\linewidth}
@@ -61,7 +46,7 @@ Ghost clipping~\citep{li2022large} is based on flat clipping but avoids material
 
 
 
-\subsection{Fixed Per-layer Clipping May Hurt the Utility}
+\subsection{(Fixed) Per-layer Clipping May Hurt the Utility}
 
 Despite the computational advantages, per-layer clipping with fixed clipping thresholds set by hand (which we refer to as \emph{fixed per-layer clipping}) reportedly underperforms flat clipping \citep{mcmahan2018learning}. 
 To further verify this and remove confounding effects of potentially suboptimal hyperparameters, we compare fixed per-layer clipping against (fixed) flat clipping on two tasks: 
@@ -145,9 +130,8 @@ Darker colors indicate higher values of gradient norms.
 \subsection{Adaptive Per-layer Clipping Can Be \\as Effective as Flat Clipping}
 \label{sec:adaptive-clipping}
 
-\begin{wrapfigure}[15]{R}{0.40\textwidth}
+\begin{wrapfigure}[13]{R}{0.45\textwidth}
     \centering
-    \vspace{-4mm}
     \includegraphics[width=.38\textwidth]{files/fig/cifar_withour_noise_single.pdf}
     \caption{Adaptive per-layer clipping eliminates performance losses experienced by fixed per-layer clipping.}
     \label{fig:cifar_without_noise}
@@ -166,7 +150,7 @@ The pseudocode is based on DP-SGD, but its core ideas naturally apply to private
 
 
 
-\paragraph{Estimating Quantiles Privately.}
+\paragraph{Estimating quantiles privately.}
 We allocate some privacy budget (in practice $r=$1\% to 10\% of total budget) to estimate a target quantile of each layer's gradient norms. 
 Clipping thresholds $C_1, ..., C_K$ are then set to these estimated quantiles. 
 We record the number of gradients clipped before each parameter update and adjust the clipping threshold based on whether too many or too few are clipped. 
@@ -221,7 +205,18 @@ Among the possible ways of choosing $\{\gamma_1, ..., \gamma_K\}$, we outline tw
 \caption{DP-SGD with adaptive per-layer clipping}
 \label{alg:perlayer-DPSGD}
 \begin{algorithmic}[1]
-\State \textbf{INPUT}:  Private dataset  $\mathbb{D}=\{s_i\}_{i=1}^N$; initial iterate $\vtheta_0$; number of iterations $T$; learning rate $\eta_t$; learning rate for quantile estimation $\eta$; privacy parameters $\epsilon, \delta$; per-layer parameters $\{\vtheta_1, \dots, \vtheta_K\}$; initial  clipping thresholds $\{C_1,\dots, C_K\}$; weighting factors $\{\gamma_1,\dots,  \gamma_K\}$; target quantile $q$; sampling rate $\rho=B/N$.
+\State {\bfseries Input:}
+Private dataset $D=\{s_i\}_{i=1}^N$, 
+initial iterate $\vtheta_0$, 
+number of iterations $T$, 
+learning rate $\eta_t$, 
+learning rate for quantile estimation $\eta$, 
+privacy parameters $\epsilon, \delta$, 
+per-layer parameters $\{\vtheta_1, \dots, \vtheta_K\}$, 
+initial  clipping thresholds $\{C_1,\dots, C_K\}$, 
+weighting factors $\{\gamma_1,\dots,  \gamma_K\}$, 
+target quantile $q$, 
+sampling rate $\rho=B/N$.
 
 \State $\sigma \leftarrow \text{PrivacyAccountant}(\epsilon, \delta, \rho, T)$
 
@@ -232,40 +227,37 @@ Among the possible ways of choosing $\{\gamma_1, ..., \gamma_K\}$, we outline tw
 \For{$t=0$ to $T-1$}
 
 
-    \State 
-    
-    Sample a minibatch $\mathcal{S}_t$ with sampling rate $\rho$ and perform the forward pass
+    \State Sample a minibatch $\mathcal{S}_t$ with sampling rate $\rho$ and perform the forward pass
     
     \For{$k=K$ to $1$}
 
 
 
 
-        \State Compute per-sample gradient norms $\{\| \vg_{k}^{(i)} \|\}_{i\in\mathcal{S}_t}$  given activations and output gradients
+        \State Compute gradient norms $\{\| \vg_{k}^{(i)} \|\}_{i\in\mathcal{S}_t}$  given activations and output gradients.
         
-        \State Compute $\tilde{\vg}_{k} \hspace{1mm} \gets \hspace{1mm}
+        \State $\tilde{\vg}_{k} \hspace{1mm} \gets \hspace{1mm}
             \sum_{i\in\mathcal{S}_t} \tilde{\vg}_{k}^{(i)} = 
-            \sum_{i\in\mathcal{S}_t} \vg_{k}^{(i)} \cdot \min \{1, C_k / \| \vg_{k}^{(i)} \| \} $ with fused operation
+            \sum_{i\in\mathcal{S}_t} \vg_{k}^{(i)} \cdot \min \{1, C_k / \| \vg_{k}^{(i)} \| \} $ with fused operation.
 
-        \State Record
-        $\widebar{b}_k \gets \sum_{ i\in \mathcal{S}_t } \mathbbm{1}[ \|\vg_k^{(i)}\|\le C_k ] $ for quantile estimation
+        \State $\widebar{b}_k \gets \sum_{ i\in \mathcal{S}_t } \mathbbm{1}[ \|\vg_k^{(i)}\|\le C_k ] $ for quantile estimation.
 
-        \State Perform usual backpropagation to obtain input gradients if $k > 1$
+        \State Perform usual backpropagation to obtain input gradients if $k > 1$.
     \EndFor
 
     
-    \State Draw $\vz \gets (\vz_1, ..., \vz_K)$, where  $\vz_k\sim\mathcal{N}\left(0,\sigma_{\text{new}}^2  S^2 \gamma_k^2 \mI_{d_k}\right)$ and $S = (\sum_{k=1}^K C_k^2/\gamma_k^2)^{1/2}$
+    \State $\vz \gets (\vz_1, ..., \vz_K)$, where  $\vz_k\sim\mathcal{N}\left(0,\sigma_{\text{new}}^2  S^2 \gamma_k^2 \mI_{d_k}\right)$ and $S = (\sum_{k=1}^K C_k^2/\gamma_k^2)^{1/2}$
 
     \State $\vtheta_{t+1} \gets \vtheta_t-{\eta_t}\left(\tilde{\vg}+ \vz\right)/B$.
  
 
     \For{$k = 1$ to $K$}
         
-        \State Draw $z_k \sim \mathcal{N}(0, \sigma_b^2) $, set $\tilde{b}_k \gets (\widebar{b}_k+ z_k) / B$, and $C_k \leftarrow C_k \cdot \exp(-\eta(\tilde{b}_k-q))$. 
+        \State $z_k \sim \mathcal{N}(0, \sigma_b^2) $, set $\tilde{b}_k \gets (\widebar{b}_k+ z_k) / B$, and $C_k \leftarrow C_k \cdot \exp(-\eta(\tilde{b}_k-q))$. 
     \EndFor
 \EndFor
 
-\State \textbf{return} $\vtheta_T$ (or some average of all iterates)
+\State \Return $\theta_{T}$ or $\frac{1}{T}\sum_{t=1}^T \theta_t$
 \end{algorithmic}
 \end{algorithm}
 
