@@ -16,7 +16,7 @@ The first research question we study is therefore
   {\endlist}
 \begin{quote}
 	\centering
-	\emph{Can private learning be as memory and time efficient (per epoch) as non-private learning?}
+	\emph{\footnotesize Can private learning be as memory and time efficient (per epoch) as non-private learning?}
 \end{quote}
 
 We answer the above question affirmatively by giving an efficient implementation of \emph{per-layer clipping} which had been studied in past works but not from a computational efficiency perspective~\citep{mcmahan2018learning,dupuy2022efficient}. 
@@ -32,7 +32,7 @@ These works observe that the privacy-utility trade-off improves with the use of 
 We extend this research and study a second research question 
 \begin{quote}
 	\centering
-	\emph{Can the privacy-utility trade-off be further improved with even better / larger pretrained models?}
+	\emph{\footnotesize Can the privacy-utility trade-off be further improved with even better/larger pretrained models?}
 \end{quote}
 To study this, we scale DP fine-tuning to work with one of the largest and most performant pretrained language models to date---the original 175 billion-parameter GPT-3.
 Weights of this model cannot be hosted in the memory of a single accelerator (e.g., GPU) and must be distributed across multiple devices. 
@@ -45,9 +45,3 @@ Our contributions are summarized below.
 \item[(2)] We show adaptive per-layer clipping matches or outperforms flat clipping under fixed training epoch constraints, and thus attains similar or better task performances with less wall time.
 \item[(3)] We bypass scaling challenges associated with communicating per-example gradient norms with per-device clipping, with which we scale DP fine-tuning to work with the 175 billion-parameter GPT-3 and obtain improved task performance for a challenging summarization task at $\epsilon=1$.
 \end{itemize}
-
-
-
-
-
-
