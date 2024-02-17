@@ -1,23 +1,23 @@
 \chapter{Introduction}
 
 The issue of privacy in machine learning has gained considerable attention as an increasing amount of user data becomes a potential source for training predictive models.
-Privacy attacks against machine learning pipelines have demonstrated that models trained without formal guarantees can reveal membership information and reproduce training data~\cite{shokri2017membership,carlini2021extracting}.
+Privacy attacks against machine learning pipelines have demonstrated that models trained without formal guarantees can reveal membership information and reproduce training data~\citep{shokri2017membership,carlini2021extracting}.
 These vulnerabilities are not merely of academic interest---they have already led to societal harms and an increasing public distrust towards machine learning applications.
-For instance, a South Korean company developed a chatbot with (private) user data that regurgitated sensitive information such as nicknames and home addresses. This led to a public relations incident~\cite{sk-chatbot}.
+For instance, a South Korean company developed a chatbot with (private) user data that regurgitated sensitive information such as nicknames and home addresses. This led to a public relations incident~\citep{sk-chatbot}.
 In addition, privacy concerns impede the development of data-driven systems in specialized domains such as health care where a vast amount of quality data is sensitive.
 These concerns present a challenge to fully realizing the societal benefits of machine learning and AI as they gain rising attention with tightening legislation and policy.
 
 Differential Privacy~\cite[DP]{dwork2014algorithmic} is a formal privacy definition that has become the gold standard for statistical analysis with private data.
 % Intuitively, a randomized algorithm satisfies DP if it is difficult (in a probabilistic sense) to distinguish the two outputs of the algorithm obtained on any two similar input datasets.
-Differentially private algorithms are provably resistant to membership inference~\cite{yeom2018privacy,wasserman2010statistical} and data reconstruction attacks~\cite{pmlr-v162-guo22c,hayes2023bounding}.
-As such, these algorithms have been deployed in high-stakes scenarios such as the 2020 US census~\cite{us-census} to protect users' privacy.
+Differentially private algorithms are provably resistant to membership inference~\citep{yeom2018privacy,wasserman2010statistical} and data reconstruction attacks~\citep{pmlr-v162-guo22c,hayes2023bounding}.
+As such, these algorithms have been deployed in high-stakes scenarios such as the 2020 US census~\citep{us-census} to protect users' privacy.
 
 In contrast to the growing adoption of DP for private statistical data analysis, the privacy framework has seen limited industry adoption for deep learning applications.
-This is because previous approaches for training deep learning models with DP guarantees typically were computationally intensive or incurred substantial performance penalties on the resulting model.
+This is because most approaches for training deep learning models with DP guarantees were computationally intensive or incurred substantial performance penalties on the resulting model.
 
 This dissertation contributes improved techniques for training deep learning models with DP that are much more efficient and performant than prior art.
 These improvements have gained industry adoption and have made deep learning with DP compelling.
-For example, some of the presented ideas led to the first set of deployments of differentially private machine learning at Microsoft.
+For example, some of the presented ideas led to the first set of deployments of differentially private machine learning at Microsoft~\citep{yue-etal-2023-synthetic,yu2023selective}.
 % Chapter~\ref{ch_2} covers relevant background on privacy risks in machine learning, common DP algorithms for training models, and drawbacks of previous approaches.
 % , building on ideas from past work~\cite{abadi2016deep,tramer2020differentially}.
 
@@ -34,14 +34,14 @@ Chapter~\ref{ch_3} discusses batch size tuning with effective noise, which can b
 
 Finally, we note that the general issue of privacy in machine learning is broad and complex.
 While DP offers a robust and specific form of protection, it should not be seen as a universal solution to all issues related to privacy.
-For example, DP does not address various privacy harms that occur during data collection~\cite{solove2005taxonomy}.
-In addition, in order for DP algorithms to be effective at limiting the \emph{inference of participation}, one needs to understand the context of the application as well as the underlying generation process of the private data~\cite{kifer2011no}. 
+For example, DP does not address various privacy harms that occur during data collection~\citep{solove2005taxonomy}.
+In addition, in order for DP algorithms to be effective at limiting the \emph{inference of participation}, one needs to understand the context of the application as well as the underlying generation process of the private data~\citep{kifer2011no}. 
 Chapter~\ref{ch_6} discusses the limitations and the broader societal impact in detail.
 
 \section{Summary of Contributions}\label{sec:overview_of_results}
 
 Before summarizing our contributions, we recap the \emph{Differentially Private Stochastic Gradient Descent} (DP-SGD) algorithm.
-DP-SGD is a popular algorithm for training deep learning models with DP owing to its algorithmic simplicity and its ease of privacy accounting through standard composition theorems~\cite{dwork2014algorithmic}.
+DP-SGD is a popular algorithm for training deep learning models with DP owing to its algorithmic simplicity and its ease of privacy accounting through standard composition theorems~\citep{dwork2014algorithmic}.
 Similar to plain SGD, DP-SGD updates model weights incrementally with the gradient computed at each iteration.
 On the other hand, DP-SGD differs from SGD in that it clips \emph{per-example gradients} and noises their average before updating the weights for each iteration. 
 For the purpose of this chapter, we summarize the challenges to making DP-SGD effective in practice below and defer to Chapter~\ref{ch_2} for a detailed treatment of the algorithm. 
@@ -85,19 +85,19 @@ worse performance than sparsely fine-tuning.
 \noindent The contents of Chapter~\ref{ch_3} consist of research ideas and results taken from:
 
 \begin{mdframed}[leftline=true, topline=false, rightline=false, bottomline=false, linewidth=2pt]
-Xuechen Li, Florian Tramer, Percy Liang, and Tatsunori Hashimoto. ``Large Language Models Can Be Strong Differentially Private Learners." International Conference on Learning Representations (ICLR), 2022.~\cite{li2022large}
+Xuechen Li, Florian Tramer, Percy Liang, and Tatsunori Hashimoto. ``Large Language Models Can Be Strong Differentially Private Learners." International Conference on Learning Representations (ICLR), 2022.~\citep{li2022large}
 \end{mdframed}
 
 \noindent The contents of Chapter~\ref{ch_4} consist of research ideas and results taken from:
 
 \begin{mdframed}[leftline=true, topline=false, rightline=false, bottomline=false, linewidth=2pt]
-Jiyan He*, Xuechen Li*, Da Yu*, Huishuai Zhang, Janardhan Kulkarni, Yin Tat Lee, Arturs Backurs, Nenghai Yu, and Jiang Bian. ``Exploring the Limits of Differentially Private Deep Learning With Group-Wise Clipping." International Conference on Learning Representations (ICLR), 2023.~\cite{he2022exploring}
+Jiyan He*, Xuechen Li*, Da Yu*, Huishuai Zhang, Janardhan Kulkarni, Yin Tat Lee, Arturs Backurs, Nenghai Yu, and Jiang Bian. ``Exploring the Limits of Differentially Private Deep Learning With Group-Wise Clipping." International Conference on Learning Representations (ICLR), 2023.~\citep{he2022exploring}
 \end{mdframed}
 
 \noindent The contents of Chapter~\ref{ch_5} consist of research ideas and results taken from:
 
 \begin{mdframed}[leftline=true, topline=false, rightline=false, bottomline=false, linewidth=2pt]
-Xuechen Li*, Daogao Liu*, Tatsunori B. Hashimoto, Huseyin A. Inan, Janardhan Kulkarni, Yin-Tat Lee, and Abhradeep Guha Thakurta. ``When Does Differentially Private Learning Not Suffer in High Dimensions?" Advances in Neural Information Processing Systems (NeurIPS), 2022.~\cite{li2022does}
+Xuechen Li*, Daogao Liu*, Tatsunori B. Hashimoto, Huseyin A. Inan, Janardhan Kulkarni, Yin-Tat Lee, and Abhradeep Guha Thakurta. ``When Does Differentially Private Learning Not Suffer in High Dimensions?" Advances in Neural Information Processing Systems (NeurIPS), 2022.~\citep{li2022does}
 \end{mdframed}
 
 
@@ -108,34 +108,34 @@ During my PhD, I have also contributed to the following research articles, which
 
 \begin{verticalline}
 Yann Dubois*, Xuechen Li*, Rohan Taori*, Tianyi Zhang*, Ishaan Gulrajani, Jimmy Ba, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto. ``AlpacaFarm: A Simulation Framework for Methods that Learn from Human Feedback."
-Advances in Neural Information Processing Systems (NeurIPS), 2023.~\cite{dubois2023alpacafarm}\\
+Advances in Neural Information Processing Systems (NeurIPS), 2023.~\citep{dubois2023alpacafarm}\\
 
 \noindent
 Rohan Taori*, Ishaan Gulrajani*, Tianyi Zhang*, Yann Dubois*, Xuechen Li*, Carlos Guestrin, Percy Liang, and Tatsunori B. Hashimoto.
-``Stanford Alpaca: An Instruction-following LLaMA model.''~\cite{alpaca}\\
+``Stanford Alpaca: An Instruction-following LLaMA model.''~\citep{alpaca}\\
 
 \noindent 
 Peter Henderson*, Xuechen Li*, Dan Jurafsky, Tatsunori Hashimoto, Mark A. Lemley, and Percy Liang. 
 ``Foundation Models and Fair Use.''
-Journal of Machine Learning Research (JMLR), 2023.~\cite{henderson2023fairuse}\\
+Journal of Machine Learning Research (JMLR), 2023.~\citep{henderson2023fairuse}\\
 
-\noindent Xiang Yue, Huseyin Inan, Xuechen Li, Girish Kumar, Julia McAnallen, Hoda Shajari, Huan Sun, David Levitan, and Robert Sim. ``Synthetic Text Generation with Differential Privacy: A Simple and Practical Recipe." Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (ACL), 2023.~\cite{yue-etal-2023-synthetic}\\
+\noindent Xiang Yue, Huseyin Inan, Xuechen Li, Girish Kumar, Julia McAnallen, Hoda Shajari, Huan Sun, David Levitan, and Robert Sim. ``Synthetic Text Generation with Differential Privacy: A Simple and Practical Recipe." Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (ACL), 2023.~\citep{yue-etal-2023-synthetic}\\
 
 \noindent 
-Daniel Kang, Xuechen Li, Ion Stoica, Carlos Guestrin, Matei Zaharia, and Tatsunori Hashimoto. ``Exploiting Programmatic Behavior of LLMs: Dual-Use Through Standard Security Attacks."~\cite{kang2023exploiting}\\
+Daniel Kang, Xuechen Li, Ion Stoica, Carlos Guestrin, Matei Zaharia, and Tatsunori Hashimoto. ``Exploiting Programmatic Behavior of LLMs: Dual-Use Through Standard Security Attacks."~\citep{kang2023exploiting}\\
 
 \noindent 
 Hanlin Zhang, Xuechen Li, Prithviraj Sen, Salim Roukos, and Tatsunori Hashimoto. 
-``A Closer Look at the Calibration of Differentially Private Learners."~\cite{zhang2022closer}\\
+``A Closer Look at the Calibration of Differentially Private Learners."~\citep{zhang2022closer}\\
 
 \noindent 
 Liang et al.
 ``Holistic Evaluation of Language Models.''
-Transactions on Machine Learning Research (TMLR), 2023.~\cite{liang2023holistic}\\
+Transactions on Machine Learning Research (TMLR), 2023.~\citep{liang2023holistic}\\
 
 \noindent 
 Bommasani et al.
-``On the Opportunities and Risks of Foundation Models.''~\cite{bommasani2021opportunities}
+``On the Opportunities and Risks of Foundation Models.''~\citep{bommasani2021opportunities}
 
 \end{verticalline}
 
