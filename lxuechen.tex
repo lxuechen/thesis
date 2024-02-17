@@ -23,9 +23,6 @@
 \usepackage{thm-restate}
 \usepackage{bbm}
 \usepackage{arydshln}
-\theoremstyle{remark}
-\newtheorem{Remark}{Remark}[section]
-
 
 \hypersetup{
     colorlinks=true,
@@ -59,9 +56,12 @@
 % \numberwithin{prop}{section}
 
 % lemma, theorem, corollary
-\newtheorem{lemm}{Lemma}
-\newtheorem{theo}[lemm]{Theorem}
-\newtheorem{coro}[lemm]{Corollary}
+\newtheorem{lemm}[defi]{Lemma}
+\newtheorem{theo}[defi]{Theorem}
+\newtheorem{coro}[defi]{Corollary}
+
+\theoremstyle{remark}
+\newtheorem{Remark}{Remark}[section]
 
 \theoremstyle{remark}
 \newtheorem*{remark}{\textbf{Remark}}
