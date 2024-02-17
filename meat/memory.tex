@@ -14,7 +14,7 @@ Unlike their approach, our extension avoids instantiating the per-example gradie
 We call this approach \textit{ghost clipping}, as the per-example gradient is the ghost that never explicitly appears.
 We anticipate this extension to be useful for both privately fine-tuning and pretraining large Transformers.
 
-\subsection{The memory trick by~\cite{lee2020scaling}}
+\subsection{The Memory Trick By~\cite{lee2020scaling}}
 Per-example gradient clipping is easy if we know per-example gradient norms. In this case, we first compute the scaling factor $c_i = \min(1, \nicefrac{C}{ \normtwo{ \nabla \mathcal{L}_i} })$, where $C$ is the clipping threshold and $\mathcal{L}_i$ is the loss associated with the $i$th example. Then, we perform the usual backward pass with the reweighted scalar loss $ \sum_{i} c_i \mathcal{L}_i $. This procedure gives us the sum of clipped gradients.
 Under this setup, the difficulty is computing the per-example gradient norm $\normtwo{\nabla \mathcal{L}_i}$. 
 We emphasize two technicalities that enable computing this quantity without instantiating the full per-example gradient $\nabla \mathcal{L}_i$. 
