@@ -68,25 +68,25 @@ Each training run was performed with $\epsilon=2$, $\delta=10^{-6}$, and $n=1000
 
 \subsection{Why Does Dense Fine-Tuning Work Well for Pretrained Language Models?}\label{sec:lm}
 Stated informally, our bounds in Theorem~\ref{thm:DPSCO} imply that DP-SGD obtains dimension-independent errors if gradients approximately reside in a subspace much smaller than the ambient space.
-Inspired by these results for the convex case, we now turn to study dense language model fine-tuning~\cite{li2021large} and provide a possible explanation for their recent intriguing success --- fine-tuning gigantic parameter vectors frequently results in moderate performance drops compared to non-private learning.
+Inspired by these results for the convex case, we now turn to study dense language model fine-tuning~\citep{li2021large} and provide a possible explanation for their recent intriguing success --- fine-tuning gigantic parameter vectors frequently results in moderate performance drops compared to non-private learning.
 
 
 In the following, we present evidence that gradients obtained through fine-tuning mostly lie in a small subspace.
 We design subsequent experiments to work under a simplified setup. 
-Specifically, we fine-tune DistilRoBERTa~\cite{sanh2019distilbert,liu2019roberta} under $\epsilon=8$ and $\delta = \nicefrac{1}{n^{1.1}}$ for sentiment classification on the SST-2 dataset~\cite{socher2013recursive}.
-We reformulate the label prediction problem as templated text prediction~\cite{li2021large}, and fine-tune only the query and value matrices in attention layers.
+Specifically, we fine-tune DistilRoBERTa~\citep{sanh2019distilbert,liu2019roberta} under $\epsilon=8$ and $\delta = \nicefrac{1}{n^{1.1}}$ for sentiment classification on the SST-2 dataset~\citep{socher2013recursive}.
+We reformulate the label prediction problem as templated text prediction~\citep{li2021large}, and fine-tune only the query and value matrices in attention layers.
 
-We focus on fine-tuning these specific parameter matrices due to the success of LoRA for non-private learning~\cite{hu2021lora} which focuses on adapting the attention layers. Unlike LoRA, we fine-tune all parameters in these matrices rather than focusing on low-rank updates.
-This gives a setup that is lightweight enough to run spectral analyses computationally tractably but retains enough parameters ($\approx7$ million) such that a problem of similar scale outside of fine-tuning results in substantial losses in utility.\footnote{For instance, an off-the-shelf ResNet image classifier has 10 to 20+ million parameters. A plethora of works report large performance drops when training these models from scratch~\cite{YZCL21,luo2021scalable,de2022unlocking}.}
+We focus on fine-tuning these specific parameter matrices due to the success of LoRA for non-private learning~\citep{hu2021lora} which focuses on adapting the attention layers. Unlike LoRA, we fine-tune all parameters in these matrices rather than focusing on low-rank updates.
+This gives a setup that is lightweight enough to run spectral analyses computationally tractably but retains enough parameters ($\approx7$ million) such that a problem of similar scale outside of fine-tuning results in substantial losses in utility.\footnote{For instance, an off-the-shelf ResNet image classifier has 10 to 20+ million parameters. A plethora of works report large performance drops when training these models from scratch~\citep{YZCL21,luo2021scalable,de2022unlocking}.}
 For our setup, DP-SGD obtains a dev set accuracy approximately of $90\%$ and $92\%$, privately and non-privately, respectively.
-These numbers are similar to previous results obtained with the same pretrained model~\cite{yu2021differentially,li2021large}. 
+These numbers are similar to previous results obtained with the same pretrained model~\citep{yu2021differentially,li2021large}. 
 We include the full experimental protocol and additional results in Appendix~\ref{app:exp_privlm}.
 
 To provide evidence for the small subspace hypothesis, we sample gradients during fine-tuning and study their principal components.
 Specifically, we ``over-train'' by privately fine-tuning for $r = 2 \times 10^3$ updates and collect all the non-privatized average clipped gradients along the optimization trajectory.
 While fine-tuning for 200 and 2k updates have similar final dev set performance under our hyperparameters, the increased number of steps allows us to collect more gradients around the converged solution. 
 This yields a gradient matrix $H \in \R^{r \times p}$, where $p \approx 7 \times 10^6$ is the size of the parameter vector. 
-We perform PCA for $H$ with the orthogonal iteration algorithm~\cite{demmel1997applied} and visualize the set of estimated singular values $\sigma_i(H) = \lambda_i(H^\top H)^{1/2}$ in terms of both (i) the density estimate, and (ii) their relation with the rank.
+We perform PCA for $H$ with the orthogonal iteration algorithm~\citep{demmel1997applied} and visualize the set of estimated singular values $\sigma_i(H) = \lambda_i(H^\top H)^{1/2}$ in terms of both (i) the density estimate, and (ii) their relation with the rank.
 Figure~\ref{fig:pca} (a) shows the top 1000 singular values sorted and plotted against their rank $k$ and the least squares fit on log-transformed inputs and outputs.
 The plot displays few large singular values which suggests that gradients are controlled through only a few principal directions.
 The linear fit suggests that singular values decay rapidly (at a rate of approximately $k^{-0.6}$).
