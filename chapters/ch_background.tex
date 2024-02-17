@@ -5,7 +5,7 @@ Privacy has a multitude of meanings in machine learning.
 For example, a hospital may be interested in using an external machine learning service but is afraid that sending input queries with its patient data to the external party can breach privacy.
 This is an example that necessitates \emph{private inference}~\citep{tramer2018slalom,h100_confidential_computing}.
 On the other hand, a tech corporation may be interested in training better predictive models for their services with user data but is concerned that deploying such models would leak sensitive information in the training data.
-This scenario calls for \emph{private training} which is the focus of this thesis.
+This scenario calls for \emph{private training} which is the focus of this dissertation.
 
 % motivation!
 Private training has become ever more relevant for at least two reasons. 
@@ -60,7 +60,7 @@ A smaller $\epsilon$ (or $\delta$) will yield better privacy.
 When $\delta=0$, the randomized algorithm $\M$ is said to satisfy \emph{pure differential privacy}.
 
 The definition of ``neighboring'' could vary based on the context. 
-For this thesis, we say that two datasets $X, X' \in \mathcal{X}$ are neighboring if one could be obtained from the other through the addition of an example. 
+For this dissertation, we say that two datasets $X, X' \in \mathcal{X}$ are neighboring if one could be obtained from the other through the addition of an example. 
 This implies that $X$ and $X'$ always differ by one in terms of the size of the set.\footnote{
 In other text, this is referred to as \emph{unbounded DP}~\citep{kifer2011no}. When ``neighboring'' is defined as two datasets of the same size differ by one element, it is referred to as \emph{bounded DP}.
 Unbounded DP implies bounded DP with a different privacy leakage parameter.
@@ -264,7 +264,7 @@ First, DP training algorithms such as DP-SGD typically incur substantial perform
 Most successful cases rely on the dataset being considerably large~\citep{ramaswamy2020training,mcmahan2017learning}.
 Second, DP-SGD and related algorithms can be much more computationally intensive than standard training algorithms.
 The per-example gradient clipping operation can be memory-demaning~\citep{hoory2021learning} and cause overhead in terms of wall time~\citep{carlini2019secret}.
-This thesis contributes improved techniques to address the two challenges.
+This dissertation contributes improved techniques to address the two challenges.
 
 % \section{Why Differential Privacy?}
 
